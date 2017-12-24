@@ -40,7 +40,6 @@ class App extends Component {
   render() {
     return (
       <div className="bg-secondary text-primary">
-        {/* <Nav class="navbar sticky-top" /> */}
         <div
           className="jumbotron jumbotron-fluid bg-secondary mt-3"
           id="header"
@@ -118,14 +117,14 @@ class App extends Component {
             <div className="row">
               <div className="col text-center">
                 <div id="head" className="pt-5">
-                  <h1 id="div-title" className="display-4 text-white">
+                  <h1 id="div-title" className="text-white">
                     Free Programs<br />
                   </h1>
-                  <h2>
+                  <h4>
                     <small id="div-footer" className="text-muted">
-                      Beginner level workout guides for those new to fitness.
+                      Workout guides for those looking to start a new healthy life style.
                     </small>
-                  </h2>
+                  </h4>
                 </div>
               </div>
             </div>
@@ -155,14 +154,14 @@ class App extends Component {
             <div className="row">
               <div className="col text-center">
                 <div id="head" className="pt-3">
-                  <h1 id="div-title" className="display-4">
+                  <h1 id="div-title" className="">
                     Premium Programs<br />
                   </h1>
-                  <h2>
+                  <h3>
                     <small id="div-footer" className="text-muted">
                       Designed to take you to the next level.
                     </small>
-                  </h2>
+                  </h3>
                 </div>
               </div>
             </div>

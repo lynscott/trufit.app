@@ -29,8 +29,8 @@ class OnlineTraining extends Component {
                   <div className="card-body">
                     <h4 className="card-title">$59.99/Month</h4>
                     <p className="card-text">
-                      Fitness training for those just starting thier fitness
-                      journey or restarting.
+                      Fitness program for those just starting thier fitness
+                      journey.
                     </p>
                     <ul className="list-group">
                       <li className="list-group-item">
@@ -42,14 +42,11 @@ class OnlineTraining extends Component {
                         synced to the LS Fitness Mobile App
                       </li>
                       <li className="list-group-item">
-                        <i className="fa fa-check" /> Custom nutrition plan with
-                        healthy food options and recipes!
+                        <i className="fa fa-check" /> Nutrition plan with
+                        healthy food options!
                       </li>
                       <li className="list-group-item">
                         <i className="fa fa-check" /> Supplement Guide
-                      </li>
-                      <li className="list-group-item">
-                        <i className="fa fa-check" /> 2-3 Workout Days Week
                       </li>
                     </ul>
                     <a
@@ -72,7 +69,7 @@ class OnlineTraining extends Component {
                   <div className="card-body">
                     <h4 className="card-title">$99.99/Month</h4>
                     <p className="card-text">
-                      LifeStyle program for those familiar with fitness but
+                      LifeStyle program for those
                       ready to transform.
                     </p>
                     <ul className="list-group">
@@ -85,14 +82,11 @@ class OnlineTraining extends Component {
                         synced to the LS Fitness Mobile App
                       </li>
                       <li className="list-group-item">
-                        <i className="fa fa-check" /> Custom nutrition plan with
-                        healthy food options and recipes!
+                        <i className="fa fa-check" /> Personalized nutrition plan with
+                        healthy food options!
                       </li>
                       <li className="list-group-item">
                         <i className="fa fa-check" /> Supplement Guide
-                      </li>
-                      <li className="list-group-item">
-                        <i className="fa fa-check" /> 2-3 Workout Days Week
                       </li>
                     </ul>
                     <a
@@ -116,7 +110,7 @@ class OnlineTraining extends Component {
                     <h4 className="card-title">$199.99/Month</h4>
                     <p className="card-text">
                       Athlete training plan desinged to push your limts.
-                      Competition/Photoshoot prep.
+
                     </p>
                     <ul className="list-group">
                       <li className="list-group-item">
@@ -128,14 +122,14 @@ class OnlineTraining extends Component {
                         synced to the LS Fitness Mobile App
                       </li>
                       <li className="list-group-item">
-                        <i className="fa fa-check" /> Custom nutrition plan with
-                        healthy food options and recipes!
+                        <i className="fa fa-check" /> Personalized nutrition plan with
+                        healthy food options!
                       </li>
                       <li className="list-group-item">
                         <i className="fa fa-check" /> Supplement Guide
                       </li>
                       <li className="list-group-item">
-                        <i className="fa fa-check" /> 2-3 Workout Days Week
+                        <i className="fa fa-check" /> Competition/Photoshoot prep.
                       </li>
                     </ul>
                     <a
