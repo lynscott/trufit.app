@@ -112,10 +112,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', (req, res) => {
-  res.send({ hello: 'api homepage' });
-});
-
 app.get('/api/plans', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' });
