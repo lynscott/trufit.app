@@ -219,6 +219,9 @@ h1 {
   background-size: cover;
   background-attachment: fixed;
   background-position: center top;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
   height: 100vh;
   color: white;
   text-align: center;
