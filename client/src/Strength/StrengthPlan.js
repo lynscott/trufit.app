@@ -41,7 +41,7 @@ class StrengthPlan extends Component {
           token={token =>
             this.props.handleStrengthToken(token, history, auth._id)
           }
-          stripeKey={keys.stripePubKey}
+          stripeKey='pk_live_2nhU1EGud3cMUuL7bMoZ3c19'
           image={pic}
           zipCode={true}
           bitcoin={true}

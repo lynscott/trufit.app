@@ -38,7 +38,7 @@ class TonePlan extends Component {
           description="Tone & Sculpt Program."
           amount={3900}
           token={token => this.props.handleToneToken(token, history, auth._id)}
-          stripeKey="pk_test_0MmGCS4ik8k7bj9vK53ziyj9"
+          stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
           image={pic}
           zipCode={true}
           bitcoin={true}
