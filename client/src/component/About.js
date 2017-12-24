@@ -28,7 +28,7 @@ class About extends Component {
               <div className="col-md-4 py-3">
                 <div className="card bg-primary text-center">
                   <div className="card-body">
-                    <i class="fas fa-user-plus" id="icons" />
+                    <i className="fas fa-user-plus" id="icons" />
                     <h3>Login</h3>
                     Easy and secure logins with Google or Facebook.
                   </div>
@@ -37,7 +37,7 @@ class About extends Component {
               <div className="col-md-4 py-3">
                 <div className="card bg-primary text-center">
                   <div className="card-body">
-                    <i class="fas fa-check-circle" id="icons" />
+                    <i className="fas fa-check-circle" id="icons" />
                     <h3>Select A Plan</h3>
                     Choose a plan right for you and fill out the intake form.
                   </div>
@@ -46,9 +46,9 @@ class About extends Component {
               <div className="col-md-4 py-3">
                 <div className="card bg-primary text-center">
                   <div className="card-body">
-                    <i class="fab fa-hotjar" id="icons" />
+                    <i className="fab fa-hotjar" id="icons" />
                     <h3>Get to Work!</h3>
-                    Hit your dashboard to access your plan and get started!
+                    Check your dashboard to access your plan and get started!
                   </div>
                 </div>
               </div>
@@ -112,14 +112,14 @@ class About extends Component {
                 and technology to create an easy and enjoyable fitness
                 experience.
               </p>
-              <p className="lead p-2">
+              {/* <p className="lead p-2">
                 <br />
                 Lyn's philosophies on training are custom, quantifiable, and
                 results driven. Custom plans based on your ability, experience,
                 body type and goals. Quantifiable metrics to determine what
                 works, whats doesn't and what needs adjustments. Results driven;
                 check-ins, measurements, accountability.
-              </p>
+              </p> */}
             </div>
             <div className="col-md-6 justify-content-center">
               <img

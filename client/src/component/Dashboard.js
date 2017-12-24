@@ -42,7 +42,7 @@ class Dashboard extends Component {
           <div className="jumbotron justify-content-center" id="dash">
             <i className="fa fa-chart-bar" /> Dashboard
             {this.renderContent()}
-            <div className="row justify-content-center">
+            {/* <div className="row justify-content-center">
               <div className="col-md-3 py-3">
                 <a href="" className="btn btn-primary btn-block">
                   <i className="fa-fa-plus" /> Add Plan
@@ -58,7 +58,7 @@ class Dashboard extends Component {
                   <i className="fa-fa-plus" /> Upload Progress Pics
                 </a>
               </div>
-            </div>
+            </div> */}
             <br />
             <PlanList />
           </div>

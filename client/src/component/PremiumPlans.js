@@ -14,7 +14,7 @@ class PremiumPlans extends Component {
         </div>
         <br />
         <hr />
-        <h4 className="display-4">Follow Lyn On IG! @Lsphysique</h4>
+        <h3>Follow Lyn On IG! @Lsphysique</h3>
         <br />
         <div className="row justify-content-center">
           <script src="//lightwidget.com/widgets/lightwidget.js" />
@@ -22,7 +22,7 @@ class PremiumPlans extends Component {
             title="IG Feed"
             src="//lightwidget.com/widgets/03c4457e13fa5ce4ba5131e79fceb9ad.html"
             scrolling="no"
-            allowTransparency="true"
+            allowtransparency="true"
             className="lightwidget-widget"
           />
         </div>
