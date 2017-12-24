@@ -12,9 +12,9 @@ const requireLogin = require('./middlewares/requireLogin');
 const keys = require('./config/dev');
 const sgMail = require('@sendgrid/mail');
 const stripe = require('stripe')(keys.stripeSecret);
-const app = express();
 const mongoose = require('mongoose');
 const emailTemplate = require('./services/emailTemplate');
+const app = express();
 mongoose.connect(keys.mongoURI);
 
 sgMail.setApiKey(keys.sendGridKey);
@@ -101,7 +101,7 @@ app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'build')));
+// app.use(express.static(path.join(__dirname, 'build')));
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   cookieSession({
