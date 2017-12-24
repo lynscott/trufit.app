@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const logger = require('morgan');
+const keys = require('./config/keys');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -9,7 +10,7 @@ const cookieParser = require('cookie-parser');
 require('./models/User');
 const cookieSession = require('cookie-session');
 const requireLogin = require('./middlewares/requireLogin');
-const keys = require('./config/dev');
+
 const sgMail = require('@sendgrid/mail');
 const stripe = require('stripe')(keys.stripeSecret);
 const mongoose = require('mongoose');
@@ -101,8 +102,7 @@ app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.static(path.join(__dirname, 'build')));
-// app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,

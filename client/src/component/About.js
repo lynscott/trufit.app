@@ -86,7 +86,7 @@ class About extends Component {
                 <div className="card bg-secondary text-center">
                   <div className="card-body">
                     <img
-                      src="http://www.toejoez.com/wp-content/uploads/2016/07/logo-comp5.png"
+                      src="https://www.toejoez.com/wp-content/uploads/2016/07/logo-comp5.png"
                       className="figure-img w-75 img-fluid rounded"
                       alt=" Plan A"
                     />

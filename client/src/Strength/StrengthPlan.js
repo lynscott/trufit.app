@@ -4,6 +4,7 @@ import StripeCheckout from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { withRouter } from 'react-router-dom';
+import keys from '../config/keys';
 
 const title = 'Strength Plan';
 
@@ -40,7 +41,7 @@ class StrengthPlan extends Component {
           token={token =>
             this.props.handleStrengthToken(token, history, auth._id)
           }
-          stripeKey="pk_test_0MmGCS4ik8k7bj9vK53ziyj9"
+          stripeKey={keys.stripePubKey}
           image={pic}
           zipCode={true}
           bitcoin={true}
