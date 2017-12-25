@@ -13,7 +13,7 @@ class FreePlanForm extends Component {
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
     }`;
     return (
-      <div className="form-group col-md-4">
+      <div className="form-group col-md-4 mt-4 mb-1">
         <input
           placeholder={field.placeholder}
           className={className}
@@ -60,7 +60,7 @@ class FreePlanForm extends Component {
 
         <button
           type="submit"
-          className="btn btn-outline-primary my-0"
+          className="btn btn-outline-primary mt-4 ml-2"
         >
           Get Free Plan!
         </button>
