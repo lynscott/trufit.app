@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import pic from '../img/shred_new.jpg';
+import pic from '../img/fat_loss.jpg';
 import StripeCheckout from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
