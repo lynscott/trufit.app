@@ -33,7 +33,7 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '}
+            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
           </p>
           <table className="table table-hover table-bordered">
             <thead className="thead-light">
@@ -317,7 +317,7 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '}
+            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
           </p>
           <table className="table table-hover table-responsive-sm table-bordered">
             <thead className="thead-light">
@@ -603,7 +603,7 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '}
+            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
           </p>
           <table className="table table-hover table-responsive-sm table-bordered">
             <thead className="thead-light">

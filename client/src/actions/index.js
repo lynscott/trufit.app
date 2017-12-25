@@ -34,6 +34,12 @@ export const trainingForm = (values, callback) => async dispatch => {
   dispatch({ type: TRAINING_FORM, payload: res.data });
 };
 
+export const freePlanForm = (values, type, plan) => async dispatch => {
+  const res = await axios.post('/api/freeplans', [values, type, plan]);
+
+  dispatch({ type: TRAINING_FORM, payload: res.data });
+};
+
 export const intakeStrengthForm = (values, history, id) => async dispatch => {
   const res = await axios.post('/api/intake/strength', values);
 

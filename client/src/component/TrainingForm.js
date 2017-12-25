@@ -114,17 +114,14 @@ class TrainingForm extends Component {
     );
   }
 
-  onSubmit(values) {
-    console.log(values);
-    this.props.trainingForm(values).then(() =>
-      Alert.success(
-        <h3>Training form sent! We will reach out to you shortly!</h3>,
-        {
-          position: 'bottom',
-          effect: 'scale'
-        }
-      )
-    );
+  async onSubmit(values) {
+    await this.props.trainingForm(values);
+    Alert.success(
+      <h4>Training request sent!</h4>,
+      {
+        position: 'top-right',
+        effect: 'slide'
+      });
   }
 
   render() {
