@@ -75,7 +75,7 @@ class ContactForm extends Component {
 
   async onSubmit(values) {
     await this.props.contactForm(values);
-    Alert.success(<h3>Email sent!</h3>, {
+    Alert.success(<h3>Message sent!</h3>, {
       position: 'bottom',
       effect: 'scale'
     });

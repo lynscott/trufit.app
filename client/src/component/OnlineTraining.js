@@ -196,7 +196,7 @@ class OnlineTraining extends Component {
           </div>
         </section>
 
-        <section id="faq" className="p-5 bg-dark text-white">
+        {/* <section id="faq" className="p-5 bg-dark text-white">
           <div className="container">
             <h1 className="text-center">Frequently Asked Questions</h1>
             <hr />
@@ -353,7 +353,7 @@ class OnlineTraining extends Component {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
         <Footer />
       </div>
     );

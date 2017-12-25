@@ -7,44 +7,12 @@ class ClientRoll extends Component {
   clientSection() {
     return (
       <div>
-        {/* <Slider {...settings}>
-          <div>
-            <div className="row">
-              <div className="col">
-                <img
-                  className="d-block w-100 img-fluid rounded"
-                  src={pic_1}
-                  alt="First slide"
-                />
-                <h3>Adam F.</h3>
-                <h4>
-                  <em>Down 70 lbs!</em>
-                </h4>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className="row">
-              <div className="col">
-                <img
-                  className="d-block w-100 img-fluid rounded"
-                  src={pic_2}
-                  alt="First slide"
-                />
-                <h3>David S.</h3>
-                <h4>
-                  <em>Down 90 lbs!</em>
-                </h4>
-              </div>
-            </div>
-          </div>
-        </Slider> */}
 
         <div id="carousel" className="carousel slide" data-ride="carousel">
           <ol className="carousel-indicators">
             <li data-target="#carousel" data-slide-to="0" className="active" />
             <li data-target="#carousel" data-slide-to="1" />
-            <li data-target="#carousel" data-slide-to="2" />
+            {/* <li data-target="#carousel" data-slide-to="2" /> */}
           </ol>
           <div className="carousel-inner">
             <div className="carousel-item active">
@@ -73,7 +41,7 @@ class ClientRoll extends Component {
                 </h4>
               </div>
             </div>
-            <div className="carousel-item">
+            {/* <div className="carousel-item">
               <img
                 className="d-block w-100 img-fluid rounded"
                 src={pic_3}
@@ -85,7 +53,7 @@ class ClientRoll extends Component {
                   <em>+ 30lbs!</em>
                 </h4>
               </div>
-            </div>
+            </div> */}
           </div>
           <a
             className="carousel-control-prev"

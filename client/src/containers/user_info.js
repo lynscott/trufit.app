@@ -1,67 +1,85 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
+import { Field, reset, reduxForm } from 'redux-form';
+import * as actions from '../actions';
 import Alert from 'react-s-alert';
 
+const afterSubmit = (result, dispatch) => dispatch(reset('FreePlanForm'));
 
-class InfoBar extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {name: '', email: '', weight: ''};
-    this.onInputChange = this.onInputChange.bind(this);
-    this.onInfoSubmit = this.onInfoSubmit.bind(this);
+class FreePlanForm extends Component {
+  renderField(field) {
+    const className = `form-control ${
+      field.meta.touched && field.meta.error ? 'is-invalid' : ''
+    }`;
+    return (
+      <div className="form-group col-md-4">
+        <input
+          placeholder={field.placeholder}
+          className={className}
+          type={field.type}
+          {...field.input}
+        />
+        <div className="invalid-feedback">
+          {field.meta.touched ? field.meta.error : ''}
+        </div>
+      </div>
+    );
   }
 
-
-  onInputChange(event) {
-    if (event.target.name ==="name") {
-      this.setState({name: event.target.value});
-    }
-    if (event.target.name ==="email") {
-      this.setState({email: event.target.value});
-    }
-    if (event.target.name ==="weight") {
-      this.setState({weight: event.target.value});
-    }
-  }
-
-  onInfoSubmit(event) {
-    event.preventDefault();
-    if (!this.props.type.type || !this.props.plan.name) {
-      return Alert.error("Please select a plan and body type", {
+    async onSubmit(values) {
+      const { type, plan } = this.props;
+      console.log(this.props.plan);
+      await this.props.freePlanForm(values, plan , type);
+      Alert.success(<h3>Plan sent!</h3>, {
         position: 'bottom',
-        effect: 'scale',
+        effect: 'scale'
       });
     }
-    this.props.sendEmail(event.target.name.value,
-                         event.target.email.value,
-                         this.props.plan.name)
-                         return Alert.success(<h3>Plan sent!</h3>, {
-                           position: 'bottom',
-                           effect: 'scale',
-                         })
-  }
 
   render() {
+    const { handleSubmit } = this.props;
+    console.log(this.props);
     return (
-      <form onSubmit={this.onInfoSubmit}>
-        <div className="form-row">
-          <div className="col-md-3">
-            <input type="text" className="form-control" onChange={this.onInputChange} name="name" value={this.state.name} placeholder="Full Name"/>
-          </div>
-          <div className="col-md-3">
-          <input type="email" className="form-control" name="email" onChange={this.onInputChange} value={this.state.email} placeholder="Email"/>
-          </div>
-          <div className="col-md-3">
-            <input type="integer" className="form-control" name="weight" onChange={this.onInputChange} value={this.state.weight} placeholder= "Wieght (lbs)"/>
-          </div>
-          <div className="col-md-3">
-            <button className="btn btn-primary" type="submit">Get My Plan!</button>
-          </div>
-        </div>
+      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+        {console.log(this.props.plan)}
+        <div className="form-row justify-content-center">
+        <Field
+          placeholder="Name"
+          name="person"
+          type="text"
+          component={this.renderField}
+        />
+
+        <Field
+          placeholder="Email"
+          name="email"
+          type="email"
+          component={this.renderField}
+        />
+
+        <button
+          type="submit"
+          className="btn btn-outline-primary my-0"
+        >
+          Get Free Plan!
+        </button>
+      </div>
       </form>
-    )
+    );
   }
+}
+
+function validate(values) {
+  const errors = {};
+  if (!values.person) {
+    errors.person = <strong>Oops! Forgot your Name.</strong>;
+  }
+  if (!values.email) {
+    errors.email = 'Oops! Forgot your Email.';
+  }
+
+  return errors;
 }
 
 function mapStateToProps(state) {
@@ -71,4 +89,8 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(InfoBar);
+export default reduxForm({
+  validate,
+  form: 'FreePlanForm',
+  onSubmitSuccess: afterSubmit
+})(connect(mapStateToProps, actions)(FreePlanForm));

@@ -10,11 +10,13 @@ const cookieParser = require('cookie-parser');
 require('./models/User');
 const cookieSession = require('cookie-session');
 const requireLogin = require('./middlewares/requireLogin');
-
+const pdf = require('phantom-html2pdf');
 const sgMail = require('@sendgrid/mail');
 const stripe = require('stripe')(keys.stripeSecret);
 const mongoose = require('mongoose');
 const emailTemplate = require('./services/emailTemplate');
+const freePlanTemplate = require('./services/freePlanTemplate');
+const trainingTemplate = require('./services/trainingTemplate');
 const app = express();
 mongoose.connect(keys.mongoURI);
 
@@ -236,28 +238,18 @@ app.post('/api/intake/strength', async (req, res) => {
   res.status(200).send(plan);
 });
 
-app.post('/api/free', function(req, res) {
+app.post('/api/freeplans', async (req, res) => {
+  // console.log(req.body);
+  const { name, type, person, email } = req.body;
+  const msg = {
+    to: req.body[0].email,
+    from: 'no-reply@LsFitness.com',
+    subject: 'Free Training Plan',
+    text: req.body[1].name,
+    html: freePlanTemplate(req),
+  };
+  await sgMail.send(msg);
   res.send('200');
-  db.User.create(req.body.name, req.body.email)
-    .then(function(newUser) {
-      res.json(newUser);
-    })
-    .catch(function(err) {
-      res.send(err);
-    });
-  console.log(email, text, name);
-  return server.send(
-    {
-      text: req.body.text,
-      from: 'LS Fitness <lynscott@lsphysique.com>',
-      to: req.body.email,
-      bcc: 'me <lynscott@lsphysique.com>',
-      subject: 'Testing Emailjs - ' + req.body.name
-    },
-    function(err, message) {
-      console.log(err || message);
-    }
-  );
 });
 
 app.post('/api/contactform', async (req, res) => {
@@ -279,16 +271,7 @@ app.post('/api/trainingform', async (req, res) => {
     from: 'no-reply@LSFitness.com',
     to: 'LS Fitness <lynscott@lsphysique.com>',
     subject: 'Training Form Submission',
-    html:
-      '<html>' +
-      req.body.weight +
-      '<br>' +
-      req.body.height +
-      '<br>' +
-      req.body.age +
-      '<br>' +
-      req.body.motivation +
-      '</html>'
+    html: trainingTemplate(req)
   };
   await sgMail.send(msg);
   res.send('200');
