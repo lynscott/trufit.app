@@ -33,9 +33,10 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
+            = Romanian Dead Lift Tempo: (seconds extend - seconds hold - seconds
+            flexion)
           </p>
-          <table className="table table-hover table-bordered">
+          <table className="table table-hover table-responsive-sm table-bordered">
             <thead className="thead-light">
               <tr>
                 <th scope="col">#</th>
@@ -131,7 +132,7 @@ class Plan extends Component {
             For taller people use DB for your bench press and incline press to
             help get a better range of motion.
           </p>
-          <table className="table table-hover">
+          <table className="table table-responsive-sm table-hover">
             <thead className="thead-dark">
               <tr>
                 <th scope="col">#</th>
@@ -292,7 +293,8 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
+            = Romanian Dead Lift Tempo: (seconds extend - seconds hold - seconds
+            flexion)
           </p>
           <table className="table table-responsive-sm table-hover">
             <thead className="thead-dark">
@@ -348,7 +350,7 @@ class Plan extends Component {
             For taller people use DB for your bench press and incline press to
             help get a better range of motion.
           </p>
-          <table className="table table-hover">
+          <table className="table table-responsive-sm table-hover">
             <thead className="thead-dark">
               <tr>
                 <th scope="col">#</th>
@@ -518,7 +520,8 @@ class Plan extends Component {
           </p>
           <p>
             *Suggested Schedule, Adjust Accordingly*<br /> *SS = Super Set, *RDL
-            = Romanian Dead Lift{' '} Tempo: (seconds extend - seconds hold - seconds flexion)
+            = Romanian Dead Lift Tempo: (seconds extend - seconds hold - seconds
+            flexion)
           </p>
           <h3>Leg Day 1</h3>
           <table className="table table-responsive-sm table-hover">
@@ -574,7 +577,7 @@ class Plan extends Component {
             For taller people use DB for your bench press and incline press to
             help get a better range of motion.
           </p>
-          <table className="table table-hover">
+          <table className="table table-responsive-sm table-hover">
             <thead className="thead-dark">
               <tr>
                 <th scope="col">#</th>
