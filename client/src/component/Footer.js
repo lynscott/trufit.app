@@ -50,7 +50,7 @@ class Footer extends Component {
                   </a>
                 </li>
                 <li className="nav-item" id="tw">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="">
                     <i className="fab fa-twitter" />
                   </a>
                 </li>

@@ -39,7 +39,6 @@ class FreePlanForm extends Component {
 
   render() {
     const { handleSubmit } = this.props;
-    console.log(this.props);
     return (
       <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
         {console.log(this.props.plan)}

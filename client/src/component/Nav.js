@@ -47,7 +47,6 @@ class Nav extends Component {
   }
 
   render() {
-    console.log(this.props.auth);
     return (
       <div>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">

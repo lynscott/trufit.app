@@ -23,13 +23,13 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "express": "^4.16.2",
+    "html-pdf": "^2.2.0",
     "mongoose": "^4.13.7",
     "morgan": "^1.9.0",
     "nodemon": "^1.14.3",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "passport-google-oauth20": "^1.0.0",
-    "phantom-html2pdf": "^4.0.1",
     "stripe": "^5.4.0"
   }
 }

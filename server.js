@@ -10,7 +10,8 @@ const cookieParser = require('cookie-parser');
 require('./models/User');
 const cookieSession = require('cookie-session');
 const requireLogin = require('./middlewares/requireLogin');
-const pdf = require('phantom-html2pdf');
+const fs = require('fs');
+const pdf = require('html-pdf');
 const sgMail = require('@sendgrid/mail');
 const stripe = require('stripe')(keys.stripeSecret);
 const mongoose = require('mongoose');
@@ -239,17 +240,19 @@ app.post('/api/intake/strength', async (req, res) => {
 });
 
 app.post('/api/freeplans', async (req, res) => {
-  // console.log(req.body);
+  // pdf.create(html).toFile('./tmp/trainingplan.pdf', (err, res) => {
+  //   console.log(res.filename);
+  // });
   const { name, type, person, email } = req.body;
   const msg = {
     to: req.body[0].email,
     from: 'no-reply@LsFitness.com',
     subject: 'Free Training Plan',
     text: req.body[1].name,
-    html: freePlanTemplate(req),
+    html: freePlanTemplate(req)
   };
   await sgMail.send(msg);
-  res.send('200');
+  res.sendFile('./tmp/trainingplan.pdf');
 });
 
 app.post('/api/contactform', async (req, res) => {
@@ -282,7 +285,7 @@ app.post('/api/stripe', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const charge = await stripe.charges.create({
-    amount: 3900,
+    amount: 30,
     currency: 'usd',
     description: 'Training Plan',
     source: req.body.id
