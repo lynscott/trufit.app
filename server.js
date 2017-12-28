@@ -285,7 +285,7 @@ app.post('/api/stripe', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const charge = await stripe.charges.create({
-    amount: 75,
+    amount: 3900,
     currency: 'usd',
     description: 'Training Plan',
     source: req.body.id
