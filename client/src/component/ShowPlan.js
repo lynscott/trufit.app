@@ -105,7 +105,7 @@ class ShowPlan extends Component {
                   role="tablist"
                 >
                   <a
-                    className="list-group-item list-group-item-action active"
+                    className="list-group-item list-group-item-action active list-group-item-dark"
                     id="list-home-list"
                     data-toggle="list"
                     href="#list-home"
@@ -115,7 +115,7 @@ class ShowPlan extends Component {
                     BMR: ~ {this.findBMR()} Calories
                   </a>
                   <a
-                    className="list-group-item list-group-item-action"
+                    className="list-group-item list-group-item-action list-group-item-dark"
                     id="list-profile-list"
                     data-toggle="list"
                     href="#list-profile"
@@ -126,7 +126,7 @@ class ShowPlan extends Component {
                     {Math.round(this.findBMR() * this.props.plan.activity_mod)}
                   </a>
                   <a
-                    className="list-group-item list-group-item-action"
+                    className="list-group-item list-group-item-action list-group-item-dark"
                     id="list-messages-list"
                     data-toggle="list"
                     href="#list-messages"
