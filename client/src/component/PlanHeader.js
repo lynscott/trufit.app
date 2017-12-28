@@ -22,7 +22,6 @@ class PlanHeader extends Component {
 
   render() {
     const calories = this.props.caloricGoal;
-    console.log(this.props);
     return (
       <div id="accordion" role="tablist">
         <div className="card">
