@@ -22,8 +22,8 @@ class PlanList extends Component {
           <h4 className="display-5">{plan.planName}</h4>
 
           <p className="lead">
-            Day Started:{' '}
-            <Moment format="MM/DD/YYYY hh:mma">{plan.datePurchased}</Moment>
+            Date Started:{' '}
+            <Moment format="MM/DD/YYYY h:mma">{plan.datePurchased}</Moment>
           </p>
         </Link>
       );

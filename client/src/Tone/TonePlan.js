@@ -30,13 +30,18 @@ class TonePlan extends Component {
             alt=" Plan A"
           />
           <figcaption className="figure-caption">
-            12 Week Tone & Sculpt Program.
+            Includes:
+            <ul className="list-unstyled">
+              <li>12 Week Personalized Tone & Sculpt Program</li>
+              <li>Nutrition Guide</li>
+              <li>Supplement Guide</li>
+            </ul>
           </figcaption>
         </figure>
         <StripeCheckout
           name={title}
           description="Tone & Sculpt Program."
-          amount={3900}
+          amount={2730}
           token={token => this.props.handleToneToken(token, history, auth._id)}
           stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
           image={pic}
@@ -44,7 +49,7 @@ class TonePlan extends Component {
           bitcoin={true}
         >
           <button disabled={!auth} className="btn btn-success">
-            Buy Premium Plan $39
+            Buy Premium Plan <s>$39</s> $27.30
           </button>
         </StripeCheckout>
         {this.renderCaption()}
