@@ -2,28 +2,21 @@ module.exports = req => {
   const { type } = req.body[2];
   const { name } = req.body[1];
   const typePick = () => {
-    if (type === 'Endomorph' ) {
-      return (
-        `Recommended macronutrients ratio: 20%-25%
-       carbohydrates, 40%-35% protein, 40% fat<br />`
-     );
-   } else if (type ==='Ectomorph') {
-     return (
-       `Recommended macronutrients ratio: 40%-50% carbohydrates,
-       40%-30% protein, 20% fat<br />`
-     );
-   } else if (type ==='Mesomorph') {
-     return (
-       `Recommended macronutrients ratio: 40%
-       carbohydrates, 30% protein, 30% fat<br />`
-     );
-   }
- }
+    if (type === 'Endomorph') {
+      return `Recommended macronutrients ratio: 25%
+       carbohydrates, 40%% protein, 35% fat<br />`;
+    } else if (type === 'Ectomorph') {
+      return `Recommended macronutrients ratio: 45% carbohydrates,
+       40%% protein, 15% fat<br />`;
+    } else if (type === 'Mesomorph') {
+      return `Recommended macronutrients ratio: 40%
+       carbohydrates, 30% protein, 30% fat<br />`;
+    }
+  };
 
-   const planPick = () => {
-     if (name === 'Muscle Up - Mass Gain Plan' ) {
-       return (
-         `<p className="lead py-2">
+  const planPick = () => {
+    if (name === 'Muscle Up - Mass Gain Plan') {
+      return `<p className="lead py-2">
            Try this training program out for building strength.
          </p>
          <table className="table table-hover table-bordered">
@@ -236,12 +229,10 @@ module.exports = req => {
                <td>2 - 1 - 2</td>
              </tr>
            </tbody>
-         </table>`
-       );
-    } else if (name ==='Shredded - Fat Loss Plan') {
-      return (
-        ` <p className="lead py-2">
-          Try this training program out for weight loss.
+         </table>`;
+    } else if (name === 'Shredded - Fat Loss Plan') {
+      return ` <p className="lead py-2">
+          Try this starter training program out for weight loss.
         </p>
           <table className="table table-hover table-bordered">
           <thead className="thead-light">
@@ -284,7 +275,7 @@ module.exports = req => {
               </td>
             </tr>
             <tr>
-              <th scope="row">4</th>
+              <th scope="row">5</th>
               <td>Saturday or Sunday</td>
               <td />
               <td>
@@ -476,12 +467,10 @@ module.exports = req => {
               <td>1 - 1 - 1</td>
             </tr>
           </tbody>
-        </table>`
-      )
-    } else if (name ==='Tone - Body Recomposition Plan') {
-      return (
-        `<p className="lead py-2">
-          Try this training program out for toning up.
+        </table>`;
+    } else if (name === 'Tone - Body Recomposition Plan') {
+      return `<p className="lead py-2">
+          Try this starter training program out for toning up.
         </p>
           <table className="table table-hover table-bordered">
           <thead className="thead-light">
@@ -696,13 +685,16 @@ module.exports = req => {
               <td>1 - 1 - 1</td>
             </tr>
           </tbody>
-        </table>`
-      )
+        </table>`;
     }
   };
   return `
+    <!DOCTYPE html>
     <html>
       <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
@@ -712,6 +704,7 @@ module.exports = req => {
         <div className="row">
         <div style="background-image: url(../img/cover_photo.png) cover center"  className="col-md-10 text-center bg-dark text-white">
           <h3>${req.body[1].name}</h3>
+          <p></p>
         </div>
         <div classname="jumbotron">
           <p>
@@ -729,5 +722,5 @@ module.exports = req => {
       </div>
       </body>
     </html>
-  `
+  `;
 };

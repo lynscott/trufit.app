@@ -30,13 +30,18 @@ class StrengthPlan extends Component {
             alt=" Plan A"
           />
           <figcaption className="figure-caption">
-            12 Week Strength and Mass Program.
+            Includes:
+            <ul className="list-unstyled">
+              <li>12 Week Personalized Strength & Mass Program</li>
+              <li>Nutrition Guide</li>
+              <li>Supplement Guide</li>
+            </ul>
           </figcaption>
         </figure>
         <StripeCheckout
           name={title}
           description="Strength and Mass Program."
-          amount={3900}
+          amount={2730}
           token={token =>
             this.props.handleStrengthToken(token, history, auth._id)
           }
@@ -46,7 +51,7 @@ class StrengthPlan extends Component {
           bitcoin={true}
         >
           <button disabled={!auth} className="btn btn-success">
-            Buy Premium Plan $39
+            Buy Premium Plan <s>$39</s> $27.30
           </button>
         </StripeCheckout>
         {this.renderCaption()}
