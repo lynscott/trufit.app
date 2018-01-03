@@ -33,7 +33,7 @@ class LoginModal extends Component {
                   id="login-button"
                   className="btn btn-danger"
                 >
-                  <i className="fab fa-google" /> Login With Google
+                  <i className="fab fa-google" /> Continue With Google
                 </a>
                 <br />
                 <br />
@@ -42,7 +42,7 @@ class LoginModal extends Component {
                   id="login-button"
                   className="btn btn-primary"
                 >
-                  <i className="fab fa-facebook-f" /> Login With Facebook
+                  <i className="fab fa-facebook-f" /> Continue With Facebook
                 </a>
               </div>
               <div className="modal-footer">
