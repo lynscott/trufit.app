@@ -8,9 +8,37 @@ import { withRouter } from 'react-router-dom';
 const title = 'Strength Plan';
 
 class StrengthPlan extends Component {
-  renderCaption() {
+  renderLogin() {
+    const { history, auth } = this.props;
     if (!this.props.auth) {
-      return <p>* Login to purchase plans</p>;
+      return (
+        <button
+          className="btn btn-primary"
+          data-toggle="modal"
+          data-target="#exampleModal"
+        >
+          Sign-in To Purchase
+        </button>
+      );
+    } else {
+      return (
+        <StripeCheckout
+          name={title}
+          description="Strength and Mass Program."
+          amount={2900}
+          token={token =>
+            this.props.handleStrengthToken(token, history, auth._id)
+          }
+          stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
+          image={pic}
+          zipCode={true}
+          bitcoin={true}
+        >
+          <button disabled={!auth} className="btn btn-success">
+            Buy Premium Plan <s>$39</s> $29
+          </button>
+        </StripeCheckout>
+      );
     }
   }
 
@@ -38,23 +66,8 @@ class StrengthPlan extends Component {
             </ul>
           </figcaption>
         </figure>
-        <StripeCheckout
-          name={title}
-          description="Strength and Mass Program."
-          amount={2730}
-          token={token =>
-            this.props.handleStrengthToken(token, history, auth._id)
-          }
-          stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
-          image={pic}
-          zipCode={true}
-          bitcoin={true}
-        >
-          <button disabled={!auth} className="btn btn-success">
-            Buy Premium Plan <s>$39</s> $27.30
-          </button>
-        </StripeCheckout>
-        {this.renderCaption()}
+
+        {this.renderLogin()}
       </div>
     );
   }

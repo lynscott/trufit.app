@@ -18,7 +18,7 @@ class Nav extends Component {
             data-toggle="modal"
             data-target="#exampleModal"
           >
-            Login
+            Sign-in
           </a>
         );
       default:

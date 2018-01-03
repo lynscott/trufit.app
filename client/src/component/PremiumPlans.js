@@ -9,7 +9,7 @@ class PremiumPlans extends Component {
       <div>
         <div className="row justify-content-center">
           <h1>
-            New Years Sale!<br /> 30% Off Until 1/02/2018
+            New Year Sale!<br /> $10 off for the entire month of January.
           </h1>
         </div>
         <div className="row justify-content-center">
