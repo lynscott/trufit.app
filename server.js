@@ -6,6 +6,9 @@ const keys = require('./config/keys');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const LocalStrategy = require('passport-local');
 const cookieParser = require('cookie-parser');
 require('./models/User');
 const cookieSession = require('cookie-session');
@@ -15,6 +18,7 @@ const pdf = require('html-pdf');
 const sgMail = require('@sendgrid/mail');
 const stripe = require('stripe')(keys.stripeSecret);
 const mongoose = require('mongoose');
+const jwt = require('jwt-simple');
 const emailTemplate = require('./services/emailTemplate');
 const freePlanTemplate = require('./services/freePlanTemplate');
 const trainingTemplate = require('./services/trainingTemplate');
@@ -26,6 +30,36 @@ sgMail.setApiKey(keys.sendGridKey);
 const User = mongoose.model('users');
 const Plan = mongoose.model('plans');
 
+const localLogin = new LocalStrategy(
+  { usernameField: 'email' },
+  (email, password, done) => {
+    User.findOne({ email: email }, (err, user) => {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false);
+      }
+
+      user.comparePassword(password, (err, isMatch) => {
+        if (err) {
+          return done(err);
+        }
+        if (!isMatch) {
+          return done(null, false);
+        }
+
+        done(null, user);
+      });
+    });
+  }
+);
+
+function tokenForUser(user) {
+  timestamp = new Date().getTime();
+  return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
+}
+
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -35,6 +69,30 @@ passport.deserializeUser((id, done) => {
     done(null, user);
   });
 });
+
+//Set up options for jwt Strategy
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  secretOrKey: keys.secret
+};
+
+const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
+  //See if user id from payload exist in database
+  User.findById(payload.sub, (err, user) => {
+    if (err) {
+      return done(err, false);
+    }
+
+    if (user) {
+      done(null, user);
+    } else {
+      done(null, false);
+    }
+  });
+});
+
+passport.use(localLogin);
+passport.use(jwtLogin);
 
 passport.use(
   new GoogleStrategy(
@@ -176,6 +234,45 @@ app.get(
   }
 );
 
+app.post(
+  '/signin',
+  passport.authenticate('local', { session: false }),
+  async (req, res, next) => {
+    res.send({ token: tokenForUser(req.user) });
+  }
+);
+
+app.post('/signup', async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const gender = req.body.gender;
+  await User.findOne({ email: email }, (err, existingUser) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (existingUser) {
+      return res
+        .status(422)
+        .send({ error: 'This email address has already been used' });
+    }
+
+    const user = new User({
+      email,
+      password,
+      gender,
+      name
+    });
+    user.save(err => {
+      if (err) {
+        return next(err);
+      }
+      //Respond with user token
+      res.json({ token: tokenForUser(user) });
+    });
+  });
+});
+
 app.post('/api/intake/shred', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' });
@@ -255,6 +352,14 @@ app.post('/api/freeplans', async (req, res) => {
   res.sendFile('./tmp/trainingplan.pdf');
 });
 
+// app.post('/api/pdf', async (req, res) => {
+//   console.log(req.body);
+//   pdf.create(`${req.body}`).toFile('./trainingplan.pdf', (err, res) => {
+//     console.log(res);
+//   });
+//   res.send('200');
+// });
+
 app.post('/api/contactform', async (req, res) => {
   const { message, subject, email } = req.body;
   const msg = {
@@ -285,7 +390,7 @@ app.post('/api/stripe', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const charge = await stripe.charges.create({
-    amount: 2900,
+    amount: 3900,
     currency: 'usd',
     description: 'Training Plan',
     source: req.body.id

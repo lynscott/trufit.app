@@ -8,9 +8,6 @@ class PremiumPlans extends Component {
     return (
       <div>
         <div className="row justify-content-center">
-          <h1>
-            New Year Sale!<br /> $10 off for the entire month of January.
-          </h1>
         </div>
         <div className="row justify-content-center">
           <StrengthPlan />

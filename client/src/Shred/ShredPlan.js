@@ -25,7 +25,7 @@ class ShredPlan extends Component {
         <StripeCheckout
           name={title}
           description="A Weight Reduction Program."
-          amount={2900}
+          amount={3900}
           token={token => this.props.handleShredToken(token, history, auth._id)}
           stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
           image={pic}
@@ -33,7 +33,7 @@ class ShredPlan extends Component {
           bitcoin={true}
         >
           <button disabled={!auth} className="btn btn-success">
-            Buy Premium Plan <s>$39</s> $29
+            Buy Premium Plan $39
           </button>
         </StripeCheckout>
       );
