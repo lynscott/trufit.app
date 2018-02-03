@@ -25,7 +25,7 @@ class StrengthPlan extends Component {
         <StripeCheckout
           name={title}
           description="Strength and Mass Program."
-          amount={2900}
+          amount={3900}
           token={token =>
             this.props.handleStrengthToken(token, history, auth._id)
           }
@@ -35,7 +35,7 @@ class StrengthPlan extends Component {
           bitcoin={true}
         >
           <button disabled={!auth} className="btn btn-success">
-            Buy Premium Plan <s>$39</s> $29
+            Buy Premium Plan $39
           </button>
         </StripeCheckout>
       );
