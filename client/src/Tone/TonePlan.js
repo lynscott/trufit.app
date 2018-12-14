@@ -32,7 +32,7 @@ class TonePlan extends Component {
           zipCode={true}
           bitcoin={true}
         >
-          <button disabled={!auth} className="btn btn-success">
+          <button disabled={!auth.authenticated} className="btn btn-success">
             Buy Premium Plan $39
           </button>
         </StripeCheckout>
