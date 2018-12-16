@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import logo from '../img/logo.png';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
@@ -21,30 +21,31 @@ class Nav extends Component {
           >
             Sign-in
           </a>,
-        //   <a
-        //     className="nav-item nav-link px-2"
-        //     data-toggle="modal"
-        //     data-target="#signUpModal"
-        //   >
-        //     Sign-up
-        // </a>
+          <a
+            className="nav-item nav-link px-2"
+            data-toggle="modal"
+            data-target="#signUpModal"
+          >
+            Sign-up
+        </a>
         ]
       default:
         return [
           <Link
             key="1"
             className="nav-item nav-link active px-2"
-            to={`/dashboard/${this.props.auth.authenticated._id}`}
+            to={`/dashboard`}
           >
             Dashboard
           </Link>,
           <a
-            href="/api/logout"
+            href={localStorage.getItem('token') ? '/' : "/api/logout"}
             key="2"
             id="title"
+            onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
             className="nav-item nav-link px-2"
           >
-            Logout
+            Sign-out
           </a>
         ];
     }
@@ -93,13 +94,13 @@ class Nav extends Component {
               <Link className="nav-item nav-link px-2 " id="title" to="/about">
                 About
               </Link>
-              <Link
+              {/* <Link
                 className="nav-item nav-link px-2"
                 id="title"
                 to="/training"
               >
                 Online Training
-              </Link>
+              </Link> */}
               {this.renderContent()}
             </div>
           </div>
@@ -115,4 +116,4 @@ function mapStateToProps({ auth }) {
   return { auth };
 }
 
-export default connect(mapStateToProps, actions)(Nav);
+export default withRouter(connect(mapStateToProps, actions)(Nav));

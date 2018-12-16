@@ -1,8 +1,9 @@
-import { FETCH_USER, AUTH_USER, AUTH_ERROR } from '../actions';
+import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN } from '../actions';
 
 const initialState = {
   authenticated: null,
-  errorMessage: null
+  errorMessage: null,
+  user: null
 }
 
 export default function(state = initialState, action ) {
@@ -10,7 +11,7 @@ export default function(state = initialState, action ) {
     case FETCH_USER:
       return {
         ...state,
-        authenticated: action.payload || null
+        user: action.payload || null
       }
     case AUTH_USER:
       return {
@@ -21,6 +22,11 @@ export default function(state = initialState, action ) {
       return {
         ...state,
         errorMessage: action.payload
+      }
+    case MOUNT_TOKEN:
+      return {
+        ...state,
+        authenticated: action.payload
       }
     default:
       return state;
