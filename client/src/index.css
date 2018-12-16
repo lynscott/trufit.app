@@ -2,7 +2,7 @@ body,
 html {
   background-color: #f6f9fc;
   font-size: 18px;
-  font-family: 'Roboto', sans-serif;
+  /* font-family: 'Roboto', sans-serif; */
   margin: 0;
   padding: 0;
   background-color: #333;
@@ -173,9 +173,6 @@ iframe {
   font-size: 4em;
 }
 
-#footer {
-  padding-top: 3%;
-}
 
 #ig a {
   font-size: 1.6em;
@@ -344,11 +341,11 @@ button {
   margin-top: 10px;
 }
 
-form {
+/* form {
   margin-bottom: 40px;
   padding-bottom: 40px;
   border-bottom: 3px solid #e6ebf1;
-}
+} */
 
 #id-button,
 button:hover {

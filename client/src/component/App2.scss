@@ -1,0 +1,35 @@
+html,body{
+    font-family: 'Roboto', sans-serif;
+}
+
+.qoute-section{
+    border-top: #008ed6 3px solid;;
+    border-bottom: #008ed6 3px solid;;
+}
+
+.pricing-section{
+
+}
+
+.card-body{
+    padding:0;
+    color: black;
+}
+
+.card-title{
+    border: 3px solid white;
+}
+
+.section-row {
+    min-height: 250px;
+
+    .svg-inline--fa {
+        color: #008ed6;
+    }
+}
+
+.section-header{
+    text-decoration: #008ed6 underline;
+    font-family: 'Cinzel', serif;
+}
+

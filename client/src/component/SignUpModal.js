@@ -15,7 +15,7 @@ class SignUpModal extends Component {
         >
           <div className="modal-dialog" role="document">
             <div className="modal-content">
-              <div className="modal-header">
+              {/* <div className="modal-header">
                 <button
                   type="button"
                   className="close"
@@ -24,9 +24,9 @@ class SignUpModal extends Component {
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </div>
-              <div className="modal-body">
-                <h2>Sign Up Form</h2>
+              </div> */}
+              
+              <div className="modal-body p-0">
                 <SignUpForm/>
               </div>
               <div className="modal-footer">

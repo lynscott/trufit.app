@@ -29,26 +29,7 @@ class LoginModal extends Component {
                 </button>
               </div>
               <div className="modal-body">
-                <h2>Login</h2>
                 <LoginForm/>
-                <br/>
-                <h3>or</h3>
-                <a
-                  href="/auth/google"
-                  id="login-button"
-                  className="btn btn-danger"
-                >
-                  <i className="fab fa-google" /> Continue With Google
-                </a>
-                <br />
-                <br />
-                <a
-                  href="auth/facebook"
-                  id="login-button"
-                  className="btn btn-primary"
-                >
-                  <i className="fab fa-facebook-f" /> Continue With Facebook
-                </a>
               </div>
               <div className="modal-footer">
                 <button

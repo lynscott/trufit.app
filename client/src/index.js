@@ -26,7 +26,7 @@ ReactDOM.render(
         <Nav className="navbar" />
         <Switch>
           <Route exact path="/about" component={About} />
-          <Route exact path="/dashboard/:userid" component={Dashboard} />
+          <Route exact path="/dashboard" component={Dashboard} />
           <Route path="/training" component={OnlineTraining} />
           <Route
             exact

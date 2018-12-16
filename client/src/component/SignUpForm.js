@@ -40,8 +40,9 @@ class SignUpForm extends Component {
           type={field.type}
           {...field.input}
         >
-          <option value="none">Male</option>
-          <option value="Fat Loss">Female</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="none">Prefer Not To Say</option>
         </select>
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
@@ -71,7 +72,10 @@ class SignUpForm extends Component {
     const { handleSubmit } = this.props;
 
     return (
-      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+      <form className="p-4" onSubmit={handleSubmit(this.onSubmit.bind(this))} 
+        style={{backgroundColor:'lightgrey', margin:0, borderRadius:'5px'}}
+      >
+      <h2>Sign Up</h2>
         <Field
           placeholder="Name"
           name="name"
@@ -100,9 +104,18 @@ class SignUpForm extends Component {
           component={this.renderField}
         />
 
+        <p style={{textAlign:'left', fontSize:'15px', paddingLeft:'15px', paddingRight:'15px'}}>Your weight, height, and gender help determine a better caloric intake and BMR and are soley
+           used to help personalize your training plan and nutrition guide.</p>
         <Field
           placeholder="Current Weight"
           name="current_weight"
+          type="text"
+          component={this.renderField}
+        />
+
+        <Field
+          placeholder="Height"
+          name="height"
           type="text"
           component={this.renderField}
         />

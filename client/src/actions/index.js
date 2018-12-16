@@ -10,6 +10,7 @@ export const FETCH_PLAN = 'fetch_plan';
 export const AUTH_USER = 'auth_user'
 export const AUTH_ERROR = 'auth_error'
 export const USER_CREATED = 'user_created'
+export const MOUNT_TOKEN = 'MOUNT_TOKEN'
 
 export function selectType(type) {
   return {
@@ -103,19 +104,16 @@ export const fetchPlan = id => async dispatch => {
   dispatch({ type: FETCH_PLAN, payload: res.data });
 };
 
-export const signInUser = ({email, password}) => async dispatch => {
+export const signInUser = (history, {email, password}) => async dispatch => {
 
   try {
     const res = await axios.post(`/api/signin/`, {email, password});
     localStorage.setItem('token', res.data.token)
     dispatch({type: AUTH_USER, payload:res.data.token})
-
+    history.push(`/dashboard`)
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
   }
-
-
-  // history.push
 }
 
 export const signUpUser = (values) => async dispatch => {
@@ -127,4 +125,15 @@ export const signUpUser = (values) => async dispatch => {
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
   }
+}
+
+export const mountToken = (token) => async dispatch => {
+
+  dispatch({type:MOUNT_TOKEN, payload:token})
+}
+
+export const signUserOut =() => dispatch => {
+  localStorage.removeItem('token')
+
+  dispatch({type:AUTH_USER, payload:null})
 }

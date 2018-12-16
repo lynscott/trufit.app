@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Field, reset, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 import { signInUser } from '../actions';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 const afterSubmit = (result, dispatch) => dispatch(reset('LoginForm'));
@@ -17,6 +18,7 @@ class LoginForm extends Component {
           placeholder={field.placeholder}
           className={className}
           type={field.type}
+          style={{backgroundColor:'lightgrey'}}
           {...field.input}
         />
         <div className="invalid-feedback">
@@ -53,7 +55,7 @@ class LoginForm extends Component {
 
   async onSubmit(values) {
     console.log(values)
-    await this.props.signInUser(values);
+    await this.props.signInUser(this.props.history ,values);
     Alert.success(<h3>Success!</h3>, {
       position: 'bottom',
       effect: 'scale'
@@ -64,7 +66,9 @@ class LoginForm extends Component {
     const { handleSubmit } = this.props;
 
     return (
-      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+      <form className='p-4' onSubmit={handleSubmit(this.onSubmit.bind(this))}
+      >
+      <h2>Sign In</h2>
 
         <Field
           placeholder="Email"
@@ -82,10 +86,29 @@ class LoginForm extends Component {
 
         <button
           type="submit"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary mb-3"
         >
           Submit
         </button>
+
+        <br/>
+        <h4>or</h4>
+        <a
+          href="/auth/google"
+          id="login-button"
+          className="btn btn-danger"
+        >
+          <i className="fab fa-google" /> Sign In With Google
+        </a>
+        <br />
+        <br />
+        <a
+          href="auth/facebook"
+          id="login-button"
+          className="btn btn-primary"
+        >
+          <i className="fab fa-facebook-f" /> Sign In With Facebook
+        </a>
       </form>
     );
   }
@@ -109,4 +132,4 @@ export default reduxForm({
   validate,
   form: 'LoginForm',
   onSubmitSuccess: afterSubmit
-})(connect(null, { signInUser })(LoginForm));
+})(withRouter(connect(null, { signInUser })(LoginForm)));
