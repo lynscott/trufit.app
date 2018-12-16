@@ -54,11 +54,12 @@ class App extends Component {
         
           <div className="col">
           
-            <h1 className='section-header p-2' style={{ marginTop: "50vh" }}>
-            <Fade top cascade>
+          <Fade top>
+            <h1 className='section-header p-2' id='title-line' style={{ marginTop: "50vh", textDecoration: 'none' }}>
+            
             One Day At A Time
-            </Fade>
             </h1>
+            </Fade>
           
           <Fade top delay={1000}>
             <button 
