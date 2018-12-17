@@ -1,23 +1,24 @@
-import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import logo from '../img/logo.png';
-import { connect } from 'react-redux';
-import * as actions from '../actions';
-import Login from './Login';
-import SignUpModal from './SignUpModal';
-import LoadingBar from './LoadingBar';
+import React, { Component } from 'react'
+import { Link, withRouter } from 'react-router-dom'
+import logo from '../img/logo.png'
+import { connect } from 'react-redux'
+import * as actions from '../actions'
+import Login from './Login'
+import SignUpModal from './SignUpModal'
+import LoadingBar from './LoadingBar'
 
 class Nav extends Component {
   renderContent() {
-    switch (this.props.auth.authenticated) {
+    switch (this.props.auth.user) {
       case false:
-        return <LoadingBar />;
+        return <LoadingBar />
       case null:
         return [
           <a
             className="nav-item nav-link px-2"
             data-toggle="modal"
             data-target="#exampleModal"
+            key='1'
           >
             Sign-in
           </a>,
@@ -25,6 +26,7 @@ class Nav extends Component {
             className="nav-item nav-link px-2"
             data-toggle="modal"
             data-target="#signUpModal"
+            key='2'
           >
             Sign-up
         </a>
@@ -34,12 +36,12 @@ class Nav extends Component {
           <Link
             key="1"
             className="nav-item nav-link active px-2"
-            to={`/dashboard`}
+            to={'/dashboard'}
           >
             Dashboard
           </Link>,
           <a
-            href={localStorage.getItem('token') ? '/' : "/api/logout"}
+            href={localStorage.getItem('token') ? '/' : '/api/logout'}
             key="2"
             id="title"
             onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
@@ -47,14 +49,17 @@ class Nav extends Component {
           >
             Sign-out
           </a>
-        ];
+        ]
     }
   }
 
   componentDidMount() {
-    if (!localStorage.token) {
-      this.props.fetchUser();
+    if (localStorage.getItem('token')) {
+      let token = localStorage.getItem('token')
+      this.props.mountToken(token)
+      this.props.fetchUserLocal(token)
     }
+    
   }
 
   render() {
@@ -108,12 +113,12 @@ class Nav extends Component {
         <Login />
         <SignUpModal />
       </div>
-    );
+    )
   }
 }
 
 function mapStateToProps({ auth }) {
-  return { auth };
+  return { auth }
 }
 
-export default withRouter(connect(mapStateToProps, actions)(Nav));
+export default withRouter(connect(mapStateToProps, actions)(Nav))

@@ -11,6 +11,7 @@ const userSchema = new Schema ({
   img: String,
   gender: String,
   currentWeight: Number,
+  height: Number,
   email: {type:String, unique:true, lowercase:true},
   password: String,
   date: Date,

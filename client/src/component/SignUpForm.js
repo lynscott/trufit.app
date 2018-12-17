@@ -113,12 +113,22 @@ class SignUpForm extends Component {
           component={this.renderField}
         />
 
-        <Field
-          placeholder="Height"
-          name="height"
-          type="text"
-          component={this.renderField}
-        />
+        <div className = 'pl-3 pr-3 row align-items-center'>
+          <label>Height</label>
+          <Field
+            placeholder="Feet"
+            name="height_ft"
+            type="number"
+            component={this.renderField}
+          />
+
+          <Field
+            placeholder="Inches"
+            name="height_in"
+            type="number"
+            component={this.renderField}
+          />
+        </div>
 
         <Field
           placeholder="Gender"

@@ -71,7 +71,7 @@ iframe {
 
 #about-header {
   height: 200px;
-  background: url('./img/flex.jpg');
+  /* background: url('./img/flex.jpg'); */
   background-position: 0 -360px;
   background-attachment: fixed;
   color: #fff;
@@ -235,10 +235,10 @@ h1 {
 
 #header {
   background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
-    url('./img/main.jpg');
+    url('./img/mainV4.jpg');
   background-size: cover;
   /* background-attachment: fixed; */
-  background-position: center top;
+  background-position: center 90px;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;

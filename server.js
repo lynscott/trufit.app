@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const logger = require('morgan');
-const keys = require('./config/dev');
+const keys = require('./config/keys');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -22,6 +22,7 @@ const jwt = require('jwt-simple');
 const emailTemplate = require('./services/emailTemplate');
 const freePlanTemplate = require('./services/freePlanTemplate');
 const trainingTemplate = require('./services/trainingTemplate');
+const welcomeTemplate = require('./services/welcomeTemplate');
 const app = express();
 mongoose.connect(keys.mongoURI, {useMongoClient: true});
 
@@ -56,7 +57,14 @@ const localLogin = new LocalStrategy(
   }
 );
 
+
 function tokenForUser(user) {
+  timestamp = new Date().getTime();
+  return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
+}
+
+//TODO: Wire this up
+let refreshToken = (user) => {
   timestamp = new Date().getTime();
   return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 }
@@ -219,8 +227,32 @@ app.get(
 );
 
 app.get('/api/logged_user', (req, res) => {
-  res.send(req.user);
+
+  res.send({user:req.user})
+  
 });
+
+
+app.post('/api/logged_user_local', async (req, res) => {
+  // console.log(req.body.token)
+  let decoded = jwt.decode(req.body.token, keys.secret)
+  console.log(process.env.NODE_ENV, 'ENV')
+  User.findById(decoded.sub, (err, user) => {
+    if (err) {
+      return err;
+    }
+
+    if (user) {
+      user.password = ''
+      return res.send({user:user})
+      
+    } else {
+      return res.send({user:null});
+    }
+  });
+  
+});
+
 
 app.get('/api/logout', (req, res) => {
   req.logout();
@@ -240,7 +272,9 @@ app.post(
   '/api/signin',
   passport.authenticate('local', { session: false }),
   async (req, res, next) => {
-    res.send({ token: tokenForUser(req.user) });
+    //Remove password before sending user
+    req.user.password = ''
+    res.send({ token: tokenForUser(req.user), user:req.user });
   }
 );
 
@@ -249,6 +283,9 @@ app.post('/api/signup', async (req, res, next) => {
   const name = req.body.name
   const password = req.body.password1;
   const gender = req.body.gender;
+  const height = req.body.height_ft * 12 + req.body.height_in
+  const currentWeight = req.body.current_weight
+
   await User.findOne({ email: email }, (err, existingUser) => {
     if (err) {
       return next(err);
@@ -264,13 +301,34 @@ app.post('/api/signup', async (req, res, next) => {
       email,
       password,
       gender,
+      height,
+      currentWeight,
       name
-    });
-    user.save(err => {
+    })
+
+    let msg = {
+      to: email,
+      from: 'no-reply@LSFitness.com',
+      subject: 'Welcome to LS Fitness!',
+      text: 'Welcome',
+      html: welcomeTemplate(req)
+    };
+
+    let alert = {
+      to: 'lynscott@lsphysique.com',
+      from: 'no-reply@LSFitness.com',
+      subject: 'New User Sign Up',
+      text: 'New User',
+      html: emailTemplate(req)
+    };
+    
+    user.save(async (err) => {
       if (err) {
         return next(err);
       }
       //Respond with user token
+      await sgMail.send(msg)
+      await sgMail.send(alert)
       res.json({ token: tokenForUser(user) });
     });
   });
@@ -346,7 +404,7 @@ app.post('/api/freeplans', async (req, res) => {
   const { name, type, person, email } = req.body;
   const msg = {
     to: req.body[0].email,
-    from: 'no-reply@LsFitness.com',
+    from: 'no-reply@LSFitness.com',
     subject: 'Free Training Plan',
     text: req.body[1].name,
     html: freePlanTemplate(req)
@@ -367,7 +425,7 @@ app.post('/api/contactform', async (req, res) => {
   const { message, subject, email } = req.body;
   const msg = {
     to: 'lynscott@lsphysique.com',
-    from: 'no-reply@LsFitness.com',
+    from: 'no-reply@LSFitness.com',
     subject: 'New Message!',
     text: 'New Message',
     html: emailTemplate(req)

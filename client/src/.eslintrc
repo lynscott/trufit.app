@@ -1,0 +1,42 @@
+{
+    "plugins": [
+        "react"
+    ],
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "env": {
+        "es6": true,
+        "jest": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "rules": {
+        "linebreak-style": [
+            "warn",
+            "unix"
+        ],
+        "quotes": [
+            "warn",
+            "single"
+        ],
+        "semi": [
+            "warn",
+            "never"
+        ],
+        "no-undef": [
+            "off"
+        ],
+        "no-unreachable": [
+            "warn"
+        ],
+        "no-unused-vars": 0,
+        "no-console": 0
+    }
+}

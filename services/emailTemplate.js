@@ -9,11 +9,11 @@ module.exports = req => {
         <div classname="jumbotron">
           <p>
             From: ${req.body.name}<br/>
-            Subject: ${req.body.subject}<br/>
+            <br/>
             Email: ${req.body.email}
           </p>
           <p className="lead py-2">
-            ${req.body.message}
+            New User 
           </p>
           <p>
             Thanks for reaching out! We'll get back to you shortly.

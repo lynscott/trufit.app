@@ -1,53 +1,54 @@
-import React, { Component } from "react"
-import TypeList from "../containers/types.js"
-import TypeDetail from "../containers/type_detail"
-import PlanDetail from "../containers/plan_detail"
-import PlanList from "../containers/plans.js"
-import InfoBar from "../containers/user_info.js"
-import ClientRoll from "./Clients.js"
-import ContactForm from "./ContactForm.js"
-import PremiumPlans from "./PremiumPlans.js"
-import Footer from "./Footer.js"
-import { connect } from "react-redux"
-import * as actions from "../actions"
+import React, { Component } from 'react'
+import TypeList from '../containers/types.js'
+import TypeDetail from '../containers/type_detail'
+import PlanDetail from '../containers/plan_detail'
+import PlanList from '../containers/plans.js'
+import InfoBar from '../containers/user_info.js'
+import ClientRoll from './Clients.js'
+import ContactForm from './ContactForm.js'
+import PremiumPlans from './PremiumPlans.js'
+import Footer from './Footer.js'
+import { connect } from 'react-redux'
+import * as actions from '../actions'
 import Fade from 'react-reveal/Fade'
-import Alert from "react-s-alert"
-import logo from "../img/logo_sm.png"
-import { Spring } from "react-spring"
+import Alert from 'react-s-alert'
+import logo from '../img/logo_sm.png'
+import { Spring } from 'react-spring'
 import gif from '../img/dashboard.gif'
-import "react-s-alert/dist/s-alert-default.css"
-import "react-s-alert/dist/s-alert-css-effects/scale.css"
+import 'react-s-alert/dist/s-alert-default.css'
+import 'react-s-alert/dist/s-alert-css-effects/scale.css'
 import './App2.scss'
 
 class App extends Component {
   constructor(props) {
     super(props)
 
-    this.state = { users: [], text: "" }
+    this.state = { users: [], text: '' }
     this.sendEmail = this.sendEmail.bind(this)
   }
 
   componentDidMount() {
-    this.props.fetchUser()
+    //TODO: Create refresh token
     if (localStorage.getItem('token')) {
       let token = localStorage.getItem('token')
       this.props.mountToken(token)
+      this.props.fetchUserLocal(token)
     }
     
   }
 
   sendEmail(name, email, text) {
-    fetch("/email", {
-      method: "post",
+    fetch('/email', {
+      method: 'post',
       headers: new Headers({
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       }),
       body: JSON.stringify({ name: name, email: email, text: text })
     }).then(res => res.json())
   }
 
   render() {
-    // console.log(this.props)
+    console.log(this.props)
     return (
       <div className="container-fluid">
         <div className="row" id="header">
@@ -55,7 +56,7 @@ class App extends Component {
           <div className="col">
           
           <Fade top>
-            <h1 className='section-header p-2' id='title-line' style={{ marginTop: "50vh", textDecoration: 'none' }}>
+            <h1 className='section-header p-2' id='title-line' style={{ marginTop: '50vh', textDecoration: 'none' }}>
             
             One Day At A Time
             </h1>
