@@ -48,7 +48,7 @@ iframe {
 
 #about-header {
   height: 200px;
-  background: url('./img/flex.jpg');
+  /* background: url('./img/flex.jpg'); */
   background-position: 0 -360px;
   background-attachment: fixed;
   color: #fff;

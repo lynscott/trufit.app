@@ -65,10 +65,19 @@ export const intakeToneForm = (values, history, id) => async dispatch => {
   dispatch({ type: INTAKE_FORM, payload: res.data });
 };
 
+//FETCH USER OAUTH
 export const fetchUser = () => async dispatch => {
   const res = await axios.get('/api/logged_user/');
 
-  dispatch({ type: FETCH_USER, payload: res.data });
+  dispatch({ type: FETCH_USER, payload: res.data.user });
+};
+
+//FETCH USER LOCAL
+export const fetchUserLocal = (token) => async dispatch => {
+  // console.log(token)
+  const res = await axios.post('/api/logged_user_local', {token:token});
+
+  dispatch({ type: FETCH_USER, payload: res.data.user });
 };
 
 export const handleStrengthToken = (token, history, id) => async dispatch => {
@@ -101,7 +110,7 @@ export const fetchPlans = () => async dispatch => {
 export const fetchPlan = id => async dispatch => {
   const res = await axios.get(`/api/plans/${id}`);
 
-  dispatch({ type: FETCH_PLAN, payload: res.data });
+  dispatch({ type: FETCH_PLAN, payload: res.data});
 };
 
 export const signInUser = (history, {email, password}) => async dispatch => {
@@ -109,7 +118,7 @@ export const signInUser = (history, {email, password}) => async dispatch => {
   try {
     const res = await axios.post(`/api/signin/`, {email, password});
     localStorage.setItem('token', res.data.token)
-    dispatch({type: AUTH_USER, payload:res.data.token})
+    dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
     history.push(`/dashboard`)
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
@@ -121,7 +130,7 @@ export const signUpUser = (values) => async dispatch => {
   try {
     const res = await axios.post(`/api/signup/`, values);
     localStorage.setItem('token', res.data.token)
-    dispatch({type: AUTH_USER, payload:res.data.token})
+    dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
   }
@@ -135,5 +144,5 @@ export const mountToken = (token) => async dispatch => {
 export const signUserOut =() => dispatch => {
   localStorage.removeItem('token')
 
-  dispatch({type:AUTH_USER, payload:null})
+  dispatch({type:AUTH_USER, payload:null, user:null})
 }
