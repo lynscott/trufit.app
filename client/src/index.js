@@ -17,7 +17,7 @@ import StartTonePlan from './Tone/StartTonePlan'
 import Nav from './component/Nav'
 import ShowPlan from './component/ShowPlan'
 import AppRoutes from './component/AppRoutes'
-import { composeWithDevTools } from'redux-devtools-extension/developmentOnly'
+import { composeWithDevTools } from'redux-devtools-extension'
 
 const composeEnhancers = composeWithDevTools({
   // options like actionSanitizer, stateSanitizer
