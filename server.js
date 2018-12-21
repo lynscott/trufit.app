@@ -236,7 +236,7 @@ app.get('/api/logged_user', (req, res) => {
 app.post('/api/logged_user_local', async (req, res) => {
   // console.log(req.body.token)
   let decoded = jwt.decode(req.body.token, keys.secret)
-  console.log(process.env.NODE_ENV, 'ENV')
+  // console.log(process.env.NODE_ENV, 'ENV')
   User.findById(decoded.sub, (err, user) => {
     if (err) {
       return err;

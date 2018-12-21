@@ -3,12 +3,22 @@ html,body{
 }
 
 .qoute-section{
-    border-top: #008ed6 3px solid;;
-    border-bottom: #008ed6 3px solid;;
+    // border-top: #008ed6 3px solid;
+    border-bottom: #008ed6 3px solid;
 }
 
-.pricing-section{
-
+#price-block{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
+    url('../img/train.jpg');
+    background-size: cover;
+    /* background-attachment: fixed; */
+    background-position: bottom left;
+    //   height: 100vh;
+    color: white;
+    text-align: center;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    border-bottom: #008ed6 3px solid;
 }
 
 .card-body{
@@ -16,8 +26,19 @@ html,body{
     color: black;
 }
 
+.card-body, .card-title, .list-group-item, .card{
+    background-color: transparent;
+    // border: 1px white solid;
+    // opacity: 0.6;
+}
+
+.list-group-item{
+    border: 1px solid rgba(245, 239, 239, 0.43);
+}
+
 .card-title{
     border: 3px solid white;
+    opacity: 0.7;
 }
 
 .section-row {
@@ -29,8 +50,25 @@ html,body{
 }
 
 .section-header{
-    text-decoration: #008ed6 underline;
+    text-decoration: white underline;
     font-family: 'Cinzel', serif;
+}
+
+#icon-block {
+    // background-color:black;
+    
+    background-color: transparent;
+}
+
+#demo-block{
+    background-color: transparent;
+}
+
+#test-div{
+    border-top: white 3px solid;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
+    // border-bottom-left-radius:50%;
+    // border-bottom-right-radius:50%;
 }
 
 

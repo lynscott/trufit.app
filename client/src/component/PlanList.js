@@ -31,7 +31,7 @@ class PlanList extends Component {
   }
 
   render() {
-    return <div>{this.renderList()}</div>;
+    return <div>{this.renderList().length === 0 ? 'No Plans started, get started today!': this.renderList}</div>
   }
 }
 
