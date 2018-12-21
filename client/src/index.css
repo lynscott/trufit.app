@@ -235,13 +235,18 @@ h1 {
 
 #header {
   background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
-    url('./img/mainV4.jpg');
+    url('./img/Resize_main.JPG');
   background-size: cover;
+  background-repeat: no-repeat;
   /* background-attachment: fixed; */
   background-position: center 90px;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
+  /* filter: blur(4px);
+  -webkit-filter: blur(4px); */
+  /* transform: translate(-50%, -50%); */
+  z-index: 2;
   height: 100vh;
   color: white;
   text-align: center;
