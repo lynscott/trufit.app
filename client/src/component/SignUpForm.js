@@ -1,35 +1,55 @@
-import React, { Component } from 'react';
-import { Field, reset, reduxForm } from 'redux-form';
-import { connect } from 'react-redux';
-import { signUpUser } from '../actions';
-import Alert from 'react-s-alert';
+import React, { Component } from 'react'
+import { Field, reset, reduxForm } from 'redux-form'
+import { connect } from 'react-redux'
+import { signUpUser } from '../actions'
+import Alert from 'react-s-alert'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Tooltip } from 'reactstrap'
 
-const afterSubmit = (result, dispatch) => dispatch(reset('SignUpForm'));
+const afterSubmit = (result, dispatch) => dispatch(reset('SignUpForm'))
 
 class SignUpForm extends Component {
+  constructor(props) {
+    super(props)
+
+    this.toggle = this.toggle.bind(this)
+
+    this.state = { 
+      tooltipOpen: false, 
+    }
+
+  }
+
+
+  toggle = () => {
+    console.log('tooltip hover')
+    this.setState({tooltipOpen: !this.state.tooltipOpen})
+  }
+
   renderField(field) {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
-    }`;
+    }`
     return (
       <div className="form-group col">
         <input
           placeholder={field.placeholder}
           className={className}
           type={field.type}
+          style={{backgroundColor:'#e7e7e7'}}
           {...field.input}
         />
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
         </div>
       </div>
-    );
+    )
   }
 
   renderSelectField(field) {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
-    }`;
+    }`
     return (
       <div className="form-group col">
         <select
@@ -37,6 +57,7 @@ class SignUpForm extends Component {
           value="none"
           placeholder={field.placeholder}
           className={className}
+          style={{backgroundColor:'#e7e7e7'}}
           type={field.type}
           {...field.input}
         >
@@ -48,34 +69,36 @@ class SignUpForm extends Component {
           {field.meta.touched ? field.meta.error : ''}
         </div>
       </div>
-    );
+    )
   }
 
 
   async onSubmit(values) {
     console.log(values)
     try {
-      await this.props.signUpUser(values);
+      // await this.props.signUpUser(values)
+      this.props.closeForm()
       Alert.success(<h3>Success!</h3>, {
         position: 'bottom',
         effect: 'scale'
-      });
+      })
     } catch (error) {
       Alert.error(<h3>{error}</h3>, {
         position: 'bottom',
         effect: 'scale'
-      });
+      })
     }
   }
 
   render() {
-    const { handleSubmit } = this.props;
+    const { handleSubmit } = this.props
 
     return (
       <form className="p-4" onSubmit={handleSubmit(this.onSubmit.bind(this))} 
-        style={{backgroundColor:'lightgrey', margin:0, borderRadius:'5px'}}
+        style={{margin:0, borderRadius:'5px'}}
       >
-      <h2>Sign Up</h2>
+      <FontAwesomeIcon icon="user-circle" size={'3x'} />
+      <h2>Create An Account</h2>
         <Field
           placeholder="Name"
           name="name"
@@ -103,9 +126,13 @@ class SignUpForm extends Component {
           type="password"
           component={this.renderField}
         />
-
-        <p style={{textAlign:'left', fontSize:'15px', paddingLeft:'15px', paddingRight:'15px'}}>Your weight, height, and gender help determine a better caloric intake and BMR and are soley
-           used to help personalize your training plan and nutrition guide.</p>
+        
+        <FontAwesomeIcon id="ExtraInfoTooltip" icon="info-circle" />
+        {/* <Tooltip placement="right" isOpen={this.state.tooltipOpen} target="ExtraInfoTooltip" href='#' toggle={this.toggle}> */}
+          <p style={{textAlign:'left', fontSize:'15px', paddingLeft:'15px', paddingRight:'15px'}}>
+            Your weight, height, and gender help determine a better caloric intake and BMR and are soley
+            used to help personalize your training plan and nutrition guide.</p>
+        {/* </Tooltip> */}
         <Field
           placeholder="Current Weight"
           name="current_weight"
@@ -144,32 +171,32 @@ class SignUpForm extends Component {
           Submit
         </button>
       </form>
-    );
+    )
   }
 }
 
 function validate(values) {
-  const errors = {};
+  const errors = {}
   if (!values.name) {
-    errors.name = 'Required';
+    errors.name = 'Required'
   }
   if (!values.email) {
-    errors.email = 'Required.';
+    errors.email = 'Required.'
   }
   if (values.password1 !== values.password2) {
-    errors.password1 = 'Passwords must match.';
+    errors.password1 = 'Passwords must match.'
   }
   if (values.password) {
     if (values.password1.length < 8) {
-        errors.password1 = 'Password must be at least 8 characters long.';
+        errors.password1 = 'Password must be at least 8 characters long.'
     }
   }
 
-  return errors;
+  return errors
 }
 
 export default reduxForm({
   validate,
   form: 'SignUpForm',
   onSubmitSuccess: afterSubmit
-})(connect(null, { signUpUser })(SignUpForm));
+})(connect(null, { signUpUser })(SignUpForm))

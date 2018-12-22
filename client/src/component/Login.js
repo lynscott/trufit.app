@@ -1,7 +1,25 @@
-import React, { Component } from 'react';
-import LoginForm from './LoginForm';
+import React, { Component } from 'react'
+import LoginForm from './LoginForm'
+
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 class LoginModal extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      modal: false
+    }
+
+    this.toggle = this.toggle.bind(this)
+  }
+
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    })
+  }
+
+
   render() {
     return (
       <div>
@@ -16,9 +34,6 @@ class LoginModal extends Component {
           <div className="modal-dialog" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                {/* <h5 className="modal-title" id="exampleModalLabel">
-                  Login
-                </h5> */}
                 <button
                   type="button"
                   className="close"
@@ -44,7 +59,7 @@ class LoginModal extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 

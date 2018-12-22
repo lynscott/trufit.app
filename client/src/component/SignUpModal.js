@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import SignUpForm from './SignUpForm';
+import React, { Component } from 'react'
+import SignUpForm from './SignUpForm'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 class SignUpModal extends Component {
   render() {

@@ -3,11 +3,70 @@ import { Link, withRouter } from 'react-router-dom'
 import logo from '../img/logo.png'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import Login from './Login'
-import SignUpModal from './SignUpModal'
+import LoginForm from './LoginForm'
+import SignUpForm from './SignUpForm'
 import LoadingBar from './LoadingBar'
+import { Button } from 'reactstrap'
+
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 class Nav extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = { 
+      modal: false,
+      signup: false
+    }
+
+    this.toggle = this.toggle.bind(this)
+    this.signup = this.signup.bind(this)
+  }
+
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    })
+  }
+
+  signup() {
+    this.setState({
+      signup: !this.state.signup
+    })
+  }
+
+  signInModal = () => {
+    return(
+      <Modal isOpen={this.state.modal} toggle={this.toggle}>
+        <ModalHeader toggle={this.toggle}>Welcome Back!
+        </ModalHeader>
+        <ModalBody>
+          <LoginForm closeForm={this.toggle}/>
+        </ModalBody>
+        <ModalFooter>
+          {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+          <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+        </ModalFooter>
+      </Modal>
+    )
+  }
+
+  signUpModal = () => {
+    return(
+      <Modal isOpen={this.state.signup} toggle={this.signup}>
+        {/* <ModalHeader toggle={this.toggle}>Welcome Back!
+        </ModalHeader> */}
+        <ModalBody>
+          <SignUpForm closeForm={this.signup}/>
+        </ModalBody>
+        <ModalFooter>
+          {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+          <Button color="secondary" onClick={this.signup}>Cancel</Button>
+        </ModalFooter>
+      </Modal>   
+    )
+  }
+
   renderContent() {
     switch (this.props.auth.user) {
       case false:
@@ -16,16 +75,14 @@ class Nav extends Component {
         return [
           <a
             className="nav-item nav-link px-2"
-            data-toggle="modal"
-            data-target="#exampleModal"
             key='1'
+            onClick={this.toggle}
           >
             Sign-in
           </a>,
           <a
             className="nav-item nav-link px-2"
-            data-toggle="modal"
-            data-target="#signUpModal"
+            onClick={this.signup}
             key='2'
           >
             Sign-up
@@ -65,7 +122,7 @@ class Nav extends Component {
   render() {
     console.log(this.props)
     return (
-      <div>
+      <div className='row'>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
             className="navbar-brand mx-auto d-block"
@@ -82,6 +139,8 @@ class Nav extends Component {
             />
           </Link>
 
+          {/* {this.renderContent()} */}
+
           <button
             className="navbar-toggler"
             type="button"
@@ -96,9 +155,9 @@ class Nav extends Component {
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <div className="navbar-nav ml-auto">
-              <Link className="nav-item nav-link px-2 " id="title" to="/about">
+              {/* <Link className="nav-item nav-link px-2 " id="title" to="/about">
                 About
-              </Link>
+              </Link> */}
               {/* <Link
                 className="nav-item nav-link px-2"
                 id="title"
@@ -110,8 +169,8 @@ class Nav extends Component {
             </div>
           </div>
         </nav>
-        <Login />
-        <SignUpModal />
+        {this.signUpModal()}
+        {this.signInModal()}
       </div>
     )
   }
