@@ -1,37 +1,38 @@
-import React, { Component } from 'react';
-import { Field, reset, reduxForm } from 'redux-form';
-import { connect } from 'react-redux';
-import { signInUser } from '../actions';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import React, { Component } from 'react'
+import { Field, reset, reduxForm } from 'redux-form'
+import { connect } from 'react-redux'
+import { signInUser } from '../actions'
+import { withRouter } from 'react-router-dom'
+import Alert from 'react-s-alert'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const afterSubmit = (result, dispatch) => dispatch(reset('LoginForm'));
+const afterSubmit = (result, dispatch) => dispatch(reset('LoginForm'))
 
 class LoginForm extends Component {
   renderField(field) {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
-    }`;
+    }`
     return (
       <div className="form-group col">
         <input
           placeholder={field.placeholder}
           className={className}
           type={field.type}
-          style={{backgroundColor:'lightgrey'}}
+          style={{backgroundColor:'#e7e7e7'}}
           {...field.input}
         />
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
         </div>
       </div>
-    );
+    )
   }
 
   renderSelectField(field) {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
-    }`;
+    }`
     return (
       <div className="form-group col">
         <select
@@ -49,26 +50,28 @@ class LoginForm extends Component {
           {field.meta.touched ? field.meta.error : ''}
         </div>
       </div>
-    );
+    )
   }
 
 
   async onSubmit(values) {
     console.log(values)
-    await this.props.signInUser(this.props.history ,values);
-    Alert.success(<h3>Success!</h3>, {
-      position: 'bottom',
-      effect: 'scale'
-    });
+    await this.props.signInUser(this.props.history ,values)
+    // Alert.success(<h3>Success!</h3>, {
+    //   position: 'bottom',
+    //   effect: 'scale'
+    // })
+    this.props.closeForm()
   }
 
   render() {
-    const { handleSubmit } = this.props;
+    const { handleSubmit } = this.props
 
     return (
       <form className='p-4' onSubmit={handleSubmit(this.onSubmit.bind(this))}
       >
-      <h2>Sign In</h2>
+      <FontAwesomeIcon icon="user-circle" size={'4x'} />
+      <h2>Sign In To Your Account</h2>
 
         <Field
           placeholder="Email"
@@ -110,26 +113,26 @@ class LoginForm extends Component {
           <i className="fab fa-facebook-f" /> Sign In With Facebook
         </a>
       </form>
-    );
+    )
   }
 }
 
 function validate(values) {
-  const errors = {};
+  const errors = {}
 
   if (!values.email) {
-    errors.email = 'Required.';
+    errors.email = 'Required.'
   }
   if (!values.password) {
-    errors.password = 'Required.';
+    errors.password = 'Required.'
   }
 
 
-  return errors;
+  return errors
 }
 
 export default reduxForm({
   validate,
   form: 'LoginForm',
   onSubmitSuccess: afterSubmit
-})(withRouter(connect(null, { signInUser })(LoginForm)));
+})(withRouter(connect(null, { signInUser })(LoginForm)))

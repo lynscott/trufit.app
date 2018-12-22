@@ -1,9 +1,4 @@
 import React, { Component } from 'react'
-import TypeList from '../containers/types.js'
-import TypeDetail from '../containers/type_detail'
-import PlanDetail from '../containers/plan_detail'
-import PlanList from '../containers/plans.js'
-import InfoBar from '../containers/user_info.js'
 import ClientRoll from './Clients.js'
 import ContactForm from './ContactForm.js'
 import PremiumPlans from './PremiumPlans.js'
@@ -14,10 +9,17 @@ import Fade from 'react-reveal/Fade'
 import Alert from 'react-s-alert'
 import logo from '../img/logo_sm.png'
 import { Spring } from 'react-spring'
+import LoginForm from './LoginForm'
+import SignUpForm from './SignUpForm'
 import gif from '../img/dashboard.gif'
 import 'react-s-alert/dist/s-alert-default.css'
 import 'react-s-alert/dist/s-alert-css-effects/scale.css'
 import './App2.scss'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+
 
 const PriceBlock = ({ title, listItems, price }) => {
   return (
@@ -59,8 +61,29 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.state = { users: [], text: '' }
+    this.state = { 
+      users: [], 
+      text: '' ,
+      modal: false,
+      signup: false
+    }
+
     this.sendEmail = this.sendEmail.bind(this)
+    this.toggle = this.toggle.bind(this)
+    this.signup = this.signup.bind(this)
+  }
+
+
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    })
+  }
+
+  signup() {
+    this.setState({
+      signup: !this.state.signup
+    })
   }
 
   componentDidMount() {
@@ -99,23 +122,33 @@ class App extends Component {
             </Fade>
 
             <Fade top delay={1000}>
-              <button
-                data-toggle="modal"
-                data-target="#signUpModal"
-                className="btn btn-info"
-              >
-                Get Started
-              </button>
+            <Button color="info" onClick={this.signup}>Get Started</Button>
+            <Modal isOpen={this.state.signup} toggle={this.signup}>
+              {/* <ModalHeader toggle={this.toggle}>Welcome Back!
+              </ModalHeader> */}
+              <ModalBody>
+                <SignUpForm closeForm={this.signup}/>
+              </ModalBody>
+              <ModalFooter>
+                {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+                <Button color="secondary" onClick={this.signup}>Cancel</Button>
+              </ModalFooter>
+            </Modal>   
               {/* <br/> */}
               or
               {/* <br/> */}
-              <button
-                data-toggle="modal"
-                data-target="#exampleModal"
-                className="btn btn-primrary"
-              >
-                Sign In
-              </button>
+            <Button color="secondary" onClick={this.toggle}>Sign In</Button>
+            <Modal isOpen={this.state.modal} toggle={this.toggle}>
+              <ModalHeader toggle={this.toggle}>Welcome Back!
+              </ModalHeader>
+              <ModalBody>
+                <LoginForm closeForm={this.toggle}/>
+              </ModalBody>
+              <ModalFooter>
+                {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+                <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+              </ModalFooter>
+            </Modal>
             </Fade>
           </div>
         </div>
@@ -154,13 +187,13 @@ class App extends Component {
             />
             <IconBlock
               text={
-                'Custom nutrition plans tailored to help you reach your fitness goal. Complimentary with each training program.'
+                'Manage your nutrition plan and tailor it to your food prefrences and goals. Complimentary with each training program.'
               }
               iconClass={'fas fa-utensils py-2'}
             />
             <IconBlock
               text={
-                'Training environment to help you manage your goals, track your progress, and plan your training schedule.'
+                'Track your progress, map out your training schedule, and put in the work! Let the system handle the light lifting while you do the heavy lifting.'
               }
               iconClass={'fas fa-calendar-check py-2'}
             />
@@ -173,7 +206,7 @@ class App extends Component {
                 <p className="mb-0 font-italic text-dark">
                   Based on over 10 years of training experience each plan is
                   crafted with some my favorite excercises and techniques I've
-                  found to be most effective, whatever your fitness goal may be.
+                  found to be most effective in reaching your fitness goals.
                   <br />
                   {/* <br/> */}
                   {/* Not just for myself but for my clients as well. */}
@@ -226,13 +259,7 @@ class App extends Component {
             className="row justify-content-center p-4 text-white align-items-start">
             <Fade bottom delay={500}>
               <div className="col">
-                <button
-                  data-toggle="modal"
-                  className="btn btn-info"
-                  data-target="#signUpModal"
-                >
-                  Sign Up
-                </button>
+              <Button color="info" onClick={this.signup}>Get Started</Button>
               </div>
             </Fade>
           </div>
