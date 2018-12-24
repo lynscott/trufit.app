@@ -11,6 +11,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local');
 const cookieParser = require('cookie-parser');
 require('./models/User');
+require('./models/Plans');
 const cookieSession = require('cookie-session');
 const requireLogin = require('./middlewares/requireLogin');
 const fs = require('fs');
@@ -25,11 +26,13 @@ const trainingTemplate = require('./services/trainingTemplate');
 const welcomeTemplate = require('./services/welcomeTemplate');
 const app = express();
 mongoose.connect(keys.mongoURI, {useMongoClient: true});
+mongoose.model('exercises', new mongoose.Schema());
 
 sgMail.setApiKey(keys.sendGridKey);
 
 const User = mongoose.model('users');
 const Plan = mongoose.model('plans');
+const Exercises = mongoose.model('exercises');
 
 const localLogin = new LocalStrategy(
   { usernameField: 'email' },
@@ -182,12 +185,24 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+//START GETS
+
 app.get('/api/plans', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const userPlans = await Plan.find({ _user: req.user.id });
   res.send(userPlans);
+});
+
+
+app.get('/api/exercises', async (req, res) => {
+  // if (!req.user) {
+  //   return res.status(401).send({ error: 'You must log in!' });
+  // }
+  const exerciseList = await Exercises.find().select('-_id');
+  // console.log(exerciseList)
+  res.send(exerciseList);
 });
 
 app.param('id', async (req, res, next, id) => {
@@ -228,7 +243,12 @@ app.get(
 
 app.get('/api/logged_user', (req, res) => {
 
-  res.send({user:req.user})
+  if (req.user) {
+    res.send({user:req.user})
+  } else {
+    res.send({user:null})
+  }
+  
   
 });
 
@@ -266,6 +286,8 @@ app.get(
     res.redirect('/');
   }
 );
+
+//START POSTS
 
 //Authenticate User locally then supply jwt
 app.post(

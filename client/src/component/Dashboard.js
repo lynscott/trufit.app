@@ -7,6 +7,8 @@ import PlanList from './PlanList'
 import DashCalendar from './DashCalendar'
 import NutritionTable from './NutritionTable'
 import { scaleRotate as Menu } from 'react-burger-menu'
+import CreatePlanForm from './CreatePlanForm'
+import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import './Sidebar.scss'
 import './DashBoard.scss'
 
@@ -35,16 +37,56 @@ const JumboBlock = ({message}) => {
 
   return (
     <div className="jumbotron">
-      <h1 className="display-4">Affirmation</h1>
-      {date.toLocaleDateString()}
-      <p className="lead">Enter some text as a reminder why you won't quit!</p>
+      <h1 className="display-4">{date.toLocaleDateString()}</h1>
+      {/* {date.toLocaleDateString()} */}
+      {message}
       <hr className="my-4"/>
-      <p>{message}</p>
+      <p></p>
     </div>
   )
 }
 
 class Dashboard extends Component {
+  constructor(props) {
+    super(props)
+
+    // this.toggle = this.toggle.bind(this)
+
+    this.state = { 
+      // eslint-disable-next-line quotes
+      changeMessage: "Enter some text as a reminder why you won't quit!",
+      updateMessage:'',
+      update:false 
+    }
+
+  }
+
+  affirmationChange = () => {
+    if (this.state.update === false) {
+      return (<p className="lead" onClick={()=>this.setState({update:true})}>{this.state.changeMessage}</p>)
+    } else {
+      return  (
+              <React.Fragment>
+                <Form>
+                <Input 
+                  type="text"
+                  // value={this.state.updateMessage}
+                  onChange={(value)=>{
+                    console.log(value)
+                    this.setState({updateMessage:value})
+                  }}
+                  id='inputAF'  
+                  placeholder={this.state.changeMessage} />
+                  </Form>
+                <Button color="primary" onClick={()=>this.setState({
+                  changeMessage:this.state.updateMessage,
+                  update:false
+                })}>Update Affirmation</Button>{' '}
+                <Button color="secondary" onClick={()=>this.setState({update:false})}>Cancel</Button>{' '}
+              </React.Fragment>
+      )
+    }
+  }
 
   sideContent = () => {
     return (
@@ -77,9 +119,10 @@ class Dashboard extends Component {
         return (
           <React.Fragment>
             <JumboBlock
-              message={'Hello World 2'}
+              message={this.affirmationChange()}
             />
             {/* <h4>Overview</h4> */}
+            <CreatePlanForm/>
             <Block
               content={<DashCalendar/>}
               colSize={6}

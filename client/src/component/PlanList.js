@@ -15,7 +15,7 @@ class PlanList extends Component {
       return (
         <Link
           className="list-group-item list-group-item-action text-center bg-light"
-          to={`/dashboard/${this.props.auth._id}/plan/${plan._id}`}
+          to={`/dashboard/${this.props.auth.user._id}/plan/${plan._id}`}
           key={plan._id}
           id="plan-list"
         >
@@ -31,7 +31,7 @@ class PlanList extends Component {
   }
 
   render() {
-    return <div>{this.renderList().length === 0 ? 'No Plans started, get started today!': this.renderList}</div>
+    return <div>{this.renderList().length === 0 ? 'No Plans started, get started today!': this.renderList()}</div>
   }
 }
 

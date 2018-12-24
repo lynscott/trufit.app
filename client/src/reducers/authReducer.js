@@ -1,4 +1,4 @@
-import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN } from '../actions';
+import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN } from '../actions'
 
 const initialState = {
   token: null,
@@ -30,6 +30,6 @@ export default function(state = initialState, action ) {
         token: action.payload
       }
     default:
-      return state;
+      return state
   }
 }
