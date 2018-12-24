@@ -92,6 +92,8 @@ class App extends Component {
       let token = localStorage.getItem('token')
       this.props.mountToken(token)
       this.props.fetchUserLocal(token)
+    } else {
+      this.props.fetchUser()
     }
   }
 
@@ -200,7 +202,7 @@ class App extends Component {
           </div>
         </div>
         <div className="row p-3 bg-light justify-content-center qoute-section section-row align-items-center">
-          <div className="col-md-8">
+          <div className="col-md-6">
             <Fade bottom>
               <blockquote className="blockquote">
                 <p className="mb-0 font-italic text-dark">

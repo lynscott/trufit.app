@@ -97,7 +97,7 @@ class SignUpForm extends Component {
       <form className="p-4" onSubmit={handleSubmit(this.onSubmit.bind(this))} 
         style={{margin:0, borderRadius:'5px'}}
       >
-      <FontAwesomeIcon icon="user-circle" size={'3x'} />
+      <FontAwesomeIcon icon="user-plus" size={'3x'} />
       <h2>Create An Account</h2>
         <Field
           placeholder="Name"

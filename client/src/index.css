@@ -271,18 +271,17 @@ h1 {
   margin-top: 10%;
 } */
 
-#training {
+/* #training {
   background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
     url('./img/trainingV3.jpg');
   background-size: cover;
-  /* background-attachment: fixed; */
   background-position: center;
   height: 50vh;
   margin-bottom: 0px;
   padding-bottom: 0px;
   padding-top: 0px;
   text-align: center;
-}
+} */
 
 #mid {
   margin-bottom: 0px;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcrypt-nodejs');
 
-const planSchema = require('./Plans');
+// const planSchema = require('./Plans');
 
 const userSchema = new Schema ({
   googleID: String,

@@ -28,7 +28,7 @@ let testENV = () => {
 class AppRoutes extends Component {
 
     renderDash = (matchProps) => {
-        if (window.localStorage.getItem('token') !== null) {
+        if (window.localStorage.getItem('token') !== null || this.props.currentUser !== null) {
             return testENV()
         }
 
