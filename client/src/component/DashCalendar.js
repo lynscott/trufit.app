@@ -7,26 +7,58 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 const localizer = BigCalendar.momentLocalizer(moment)
+const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
 
 class DashCalendar extends Component {
+
+  getMonday = () => {
+    let d = new Date()
+    let day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? -6:1), // adjust when day is sunday
+        newDate = new Date(d.setDate(diff))
+    return newDate
+  }
+
+
+  formatDate = () => {
+    // let weekStart = this.getMonday
+    let planEvents = []
+    for (let i = 0; i < this.props.plan.template.weeks.length; i++) {
+      
+      for (let j = 0; j < weekArray.length; j++) {
+        console.log('array started')
+        let weekStart = this.getMonday()
+        let event = {
+          title: this.props.plan.template.weeks[i].day[weekArray[j]].type,
+          start: weekStart.setDate(weekStart.getDate() + j ),
+          end: weekStart.setDate(weekStart.getDate() + 0),
+          allDay: false,
+        }
+        console.log(weekStart.getDate(), j)
+        planEvents.push(event)
+        weekStart = this.getMonday()
+        console.log(weekStart)
+        
+      }
+      
+    }
+    console.log(planEvents)
+    return planEvents
+  }
+
   render() {
+
     return (
-    //   <div>
+      <div>
         <BigCalendar
           localizer={localizer}
-          events={[{
-            title: 'First Workout',
-            start: new Date('2/3/2019'),
-            end: new Date('2/3/2019'),
-            allDay: false,
-            resource: '',
-          }
-          ]}
-          date= {new Date()}
-          startAccessor= 'start' //{new Date()}
-          endAccessor= 'end' //{new Date('4/6/2019')}
+          events={this.props.plan ? this.formatDate(): []}
+          startAccessor="start"
+          endAccessor="end"
+          // date={new Date()}
         />
-    //   </div>
+        {/* {this.getMonday()} */}
+       </div>
     )
   }
 }

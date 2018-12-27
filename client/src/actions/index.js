@@ -12,6 +12,9 @@ export const AUTH_ERROR = 'auth_error'
 export const USER_CREATED = 'user_created'
 export const MOUNT_TOKEN = 'MOUNT_TOKEN'
 export const FETCH_EXERCISES = 'FETCH_EXERCISES'
+export const CREATE_NEW_PLAN = 'CREATE_NEW_PLAN'
+export const CREATE_NEW_PLAN_ERROR = 'CREATE_NEW_PLAN_ERROR'
+export const FETCH_PLAN_TEMPLATES = 'FETCH_PLAN_TEMPLATES'
 
 export function selectType(type) {
   return {
@@ -153,4 +156,22 @@ export const fetchExercises = () => async dispatch => {
   const res = await axios.get('/api/exercises')
 
   dispatch({ type: FETCH_EXERCISES, payload: res.data })
+}
+
+export const createNewPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/new_plan_template', values)
+    dispatch({type: CREATE_NEW_PLAN})
+  } catch (error) {
+    dispatch({type: CREATE_NEW_PLAN_ERROR, payload:'Error Occured'+ error})
+  }
+
+}
+
+export const fetchPlanTemps = () => async dispatch => {
+  const res = await axios.get('/api/plan_templates')
+  console.log(res.data, 'res from temp call')
+
+  dispatch({ type: FETCH_PLAN_TEMPLATES, payload: res.data })
 }

@@ -34,8 +34,8 @@ const PriceBlock = ({ title, listItems, price }) => {
             <h5 className="card-subtitle mb-2 text-light">{price}</h5>
             <Fade top cascade delay={500}>
               <ul className="list-group list-group-flush text-white">
-                {listItems.map(item => {
-                  return <li className="list-group-item">{item}</li>
+                {listItems.map((item, index) => {
+                  return <li key={index} className="list-group-item">{item}</li>
                 })}
               </ul>
             </Fade>
@@ -88,13 +88,14 @@ class App extends Component {
 
   componentDidMount() {
     //TODO: Create refresh token
-    if (localStorage.getItem('token')) {
-      let token = localStorage.getItem('token')
-      this.props.mountToken(token)
-      this.props.fetchUserLocal(token)
-    } else {
-      this.props.fetchUser()
-    }
+    this.props.fetchUser()
+    // if (localStorage.getItem('token')) {
+    //   let token = localStorage.getItem('token')
+    //   this.props.mountToken(token)
+    //   this.props.fetchUserLocal(token)
+    // } else {
+    //   this.props.fetchUser()
+    // }
   }
 
   sendEmail(name, email, text) {
@@ -207,8 +208,8 @@ class App extends Component {
               <blockquote className="blockquote">
                 <p className="mb-0 font-italic text-dark">
                   Based on over 10 years of training experience each plan is
-                  crafted with some my favorite excercises and techniques I've
-                  found to be most effective in reaching your fitness goals.
+                  crafted with some of my favorite exercises, and techniques I've
+                  found to be most effective in building quality muscle and burning fat.
                   <br />
                   {/* <br/> */}
                   {/* Not just for myself but for my clients as well. */}

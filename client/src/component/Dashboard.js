@@ -12,6 +12,8 @@ import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import './Sidebar.scss'
 import './DashBoard.scss'
 
+import ViewPlan from './ViewPlan'
+
 const Block = ({content, colSize, content2=null ,configs=null}) => {
 
   return (
@@ -122,9 +124,9 @@ class Dashboard extends Component {
               message={this.affirmationChange()}
             />
             {/* <h4>Overview</h4> */}
-            <CreatePlanForm/>
+            {/* <CreatePlanForm/> */}
             <Block
-              content={<DashCalendar/>}
+              content={<DashCalendar plan={this.props.plans[7]}/>}
               colSize={6}
               content2={this.sideContent()}
               configs= 'calendar-container'
@@ -146,12 +148,15 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchPlanTemps()
     if (!localStorage.getItem('token')) {
       this.props.fetchUser()
+      
     } else {
       let token = localStorage.getItem('token')
       this.props.mountToken(token)
       this.props.fetchUserLocal(token)
+      
     }
   }
 
@@ -174,7 +179,7 @@ class Dashboard extends Component {
         </Menu>
         <main className="bg-light justify-content-center" style={{paddingTop:'50px'}} id="page-wrap">
           {/* <div className=' bg-light'> */}
-
+          {/* <ViewPlan/> */}
           {this.renderContent()}
           {/* </div> */}
         </main>
@@ -183,8 +188,11 @@ class Dashboard extends Component {
   }
 }
 
-function mapStateToProps({ auth }) {
-  return { auth }
+function mapStateToProps(state, { auth }) {
+  return {
+     auth: state.auth,
+     plans: state.plans.planTemps 
+    }
 }
 
 export default connect(

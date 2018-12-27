@@ -196,6 +196,15 @@ app.get('/api/plans', async (req, res) => {
 });
 
 
+app.get('/api/plan_templates', async (req, res) => {
+  // if (!req.user) {
+  //   return res.status(401).send({ error: 'You must log in!' });
+  // }
+  const allPlans = await Plan.find().select('-_id');
+  // console.log(allPlans, 'all plans')
+  res.send(allPlans);
+});
+
 app.get('/api/exercises', async (req, res) => {
   // if (!req.user) {
   //   return res.status(401).send({ error: 'You must log in!' });
@@ -292,13 +301,34 @@ app.get(
 //Authenticate User locally then supply jwt
 app.post(
   '/api/signin',
-  passport.authenticate('local', { session: false }),
+  passport.authenticate('local', { session: true }),
   async (req, res, next) => {
     //Remove password before sending user
     req.user.password = ''
     res.send({ token: tokenForUser(req.user), user:req.user });
   }
 );
+
+app.post('/api/new_plan_template', async (req, res) => {
+  // if (!req.user && ) {
+  //   return res.status(401).send({ error: 'You must log in!' });
+  // }
+  let { plan, workouts } = req.body;
+  let plan_template = new Plan({
+    planName: plan.title,
+    category: plan.category,
+    logo: plan.logo,
+    template: plan,
+    workouts: workouts
+
+  });
+  plan_template = await plan_template.save();
+  // req.user.plans.push(plan.id);
+  // const user = await req.user.save();
+  res.status(200).send('Success');
+});
+
+
 
 app.post('/api/signup', async (req, res, next) => {
   const email = req.body.email;
@@ -361,7 +391,7 @@ app.post('/api/intake/shred', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const { age, height, weight, body_fat, activity_mod } = req.body;
-  var plan = new Plan({
+  let plan = new Plan({
     planName: 'Weight Loss',
     height,
     weight,
@@ -382,7 +412,7 @@ app.post('/api/intake/tone', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const { age, height, weight, body_fat, activity_mod } = req.body;
-  var plan = new Plan({
+  let plan = new Plan({
     planName: 'Tone & Sculpt',
     height,
     weight,
@@ -403,7 +433,7 @@ app.post('/api/intake/strength', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   const { age, height, weight, body_fat, activity_mod } = req.body;
-  var plan = new Plan({
+  let plan = new Plan({
     planName: 'Savage Strength',
     height,
     weight,
