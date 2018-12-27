@@ -11,7 +11,7 @@ import {
   touch
 } from 'redux-form'
 import { connect } from 'react-redux'
-import { signUpUser, fetchExercises } from '../actions'
+import { signUpUser, fetchExercises, createNewPlan } from '../actions'
 import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Tooltip, Input, Button, Row, Col, Container } from 'reactstrap'
@@ -27,34 +27,51 @@ const initialValues = {
             day:{
                 mon:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
+
                 },
                 tue:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 },
                 wed:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 },
                 thu:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 },
                 fri:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 },
                 sat:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 },
                 sun:{
                   type:null, 
-                  val:false
+                  val:false,
+                  
                 }
             }
         }]
+    }
+}
+
+const initWorkout = {
+    workout:{
+      name:null,
+      reps:null,
+      sets:null,
+      note:null
     }
 }
 
@@ -62,31 +79,73 @@ const initWeek = {
   day:{
       mon:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       tue:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       wed:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       thu:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       fri:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       sat:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       },
       sun:{
         type:null, 
-        val:false
+        val:false,
+        workout:[{
+          name:null,
+          reps:null,
+          sets:null,
+          note:null
+        }]
       }
   }
 }
@@ -118,11 +177,12 @@ class CreatePlanForm extends Component {
 
     let colSize = field.colSize ? field.colSize : ''
     return (
-      <div className={"form-group col" + colSize}>
+      <div className={'form-group col' + colSize} style={{marginLeft:'auto', marginRight:'auto'}}>
         <input
           placeholder={field.placeholder}
           className={className + ' list-inline-item'}
           type={field.type}
+          spellCheck ={true}
           style={{ backgroundColor: '#e7e7e7' }}
           {...field.input}
         />
@@ -134,7 +194,7 @@ class CreatePlanForm extends Component {
   }
 
   renderSelectField(field) {
-    console.log(field, 'select f')
+    // console.log(field, 'select f')
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
     }`
@@ -145,11 +205,11 @@ class CreatePlanForm extends Component {
           value="lift"
           placeholder={field.placeholder}
           className={className + ' list-inline-item'}
-          style={{ backgroundColor: '#e7e7e7' }}
+          style={{ backgroundColor: '#e7e7e7'}}
           type={field.type}
           onChange = {(value) => {
             console.log(value)
-            field.input.onChange(value)
+            field.input.onChange(value.label)
           }}
           {...field.input}
         >
@@ -172,7 +232,7 @@ class CreatePlanForm extends Component {
         classNamePrefix='workout-selector'
         onChange = {(value) => {
             console.log(value)
-            field.input.onChange(value)
+            field.input.onChange(value.label)
         }}
       />
     )
@@ -230,7 +290,7 @@ class CreatePlanForm extends Component {
           raised
           onClick={() => fields.push({})}
         >
-          Add another workout
+          Add another exercise
         </Button>
         </Col>
         </Row>
@@ -257,13 +317,14 @@ class CreatePlanForm extends Component {
             <React.Fragment>
               <Field
                 placeholder="Section Title"
-                name={`plan.weeks[${fields.index}].day[${fields.day}].title`}
+                name={`plan.weeks[${fields.index}].day[${fields.day}].workout.title`}
                 type="text"
                 colSize ={'-4'}
+                style={{marginLeft:'auto', marginRight:'auto'}}
                 component={this.renderField}
                 />
               <FieldArray
-                name={`plan.weeks[${fields.index}].day[${fields.day}].workout`}
+                name={`plan.weeks[${fields.index}].day[${fields.day}].workout.exercises`}
                 component={this.renderWorkoutArray}
               />
             </React.Fragment>
@@ -279,8 +340,27 @@ class CreatePlanForm extends Component {
       </React.Fragment>
     )
         
-  
-  };
+  }
+
+
+  renderCreateWorkout = (fields) => {
+    return (
+      <React.Fragment>
+          <Field
+            placeholder="Section Title"
+            name={`plan.weeks[${fields.index}].day[${fields.day}].title`}
+            type="text"
+            colSize ={'-4'}
+            style={{marginLeft:'auto', marginRight:'auto'}}
+            component={this.renderField}
+            />
+          <FieldArray
+            name={`plan.weeks[${fields.index}].day[${fields.day}].workout`}
+            component={this.renderWorkoutArray}
+          />
+        </React.Fragment>
+    )
+  }
 
   renderDayCheckbox = field => {
 
@@ -345,7 +425,7 @@ class CreatePlanForm extends Component {
         
       </Row>
       <Row className='justify-content-center m-3'>
-        <Col>
+        <Col style={{marginLeft:'auto', marginRight:'auto'}}>
         {renderOptions()}
         </Col>
       </Row>
@@ -446,21 +526,43 @@ class CreatePlanForm extends Component {
             />
           </React.Fragment>
         ))}
+        <Row className='justify-content-center'>
         <Button
-          className="add-week-button"
+          className="add-week-button col-3 m-3"
           raised
           onClick={() => fields.push(initWeek)}
         >
           Add another week
         </Button>
+        </Row>
       </React.Fragment>
     )
   };
 
   async onSubmit(values) {
-    console.log(values)
+    // console.log(values)
+    let weeks = this.props.values.plan.weeks
+    let dayKeys = Object.keys(weeks[0].day)
+    console.log(dayKeys)
+    let workouts = []
+    console.log(weeks)
+    for (let i = 0; i < weeks.length; i++) {
+      // console.log(weeks[i])
+      for (let j = 0; j < dayKeys.length; j++) {
+        // console.log(weeks[i].day[dayKeys[j]])
+        if (weeks[i].day[dayKeys[j]].workout) {
+          workouts.push(weeks[i].day[dayKeys[j]].workout)
+        }   
+      }
+      
+    }
+    let newValues = {
+      ...values,
+      workouts
+    }
+    console.log(newValues, 'Altered with workouts!')
     try {
-      // await this.props.signUpUser(values)
+      await this.props.createNewPlan(newValues)
       //   this.props.closeForm()
       Alert.success(<h3>Success!</h3>, {
         position: 'bottom',
@@ -475,7 +577,7 @@ class CreatePlanForm extends Component {
   }
 
   render() {
-    console.log(this.props.values)
+    console.log(this.props.values.plan)
     const { handleSubmit } = this.props
 
     return (
@@ -511,7 +613,7 @@ class CreatePlanForm extends Component {
 
         <FieldArray name="plan.weeks" component={this.renderWeeksFields} />
 
-        <Button type="submit" className="btn btn-outline-primary">
+        <Button type="submit" className="btn btn-outline-primary mt-4">
           Submit
         </Button>
       </form>
@@ -549,11 +651,11 @@ const mapStateToProps = state => {
 export default reduxForm({
   //   validate,
   form: 'CreatePlanForm',
-  onSubmitSuccess: afterSubmit,
+  // onSubmitSuccess: afterSubmit,
   initialValues
 })(
   connect(
     mapStateToProps,
-    { signUpUser, fetchExercises }
+    { signUpUser, fetchExercises, createNewPlan }
   )(CreatePlanForm)
 )

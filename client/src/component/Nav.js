@@ -98,10 +98,10 @@ class Nav extends Component {
             Dashboard
           </Link>,
           <a
-            href={localStorage.getItem('token') ? '/' : '/api/logout'}
+            href={'/api/logout'}
             key="2"
             id="title"
-            onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
+            // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
             className="nav-item nav-link px-2"
           >
             Sign-out
@@ -111,11 +111,12 @@ class Nav extends Component {
   }
 
   componentDidMount() {
-    if (localStorage.getItem('token')) {
-      let token = localStorage.getItem('token')
-      this.props.mountToken(token)
-      this.props.fetchUserLocal(token)
-    }
+    // if (localStorage.getItem('token')) {
+    //   let token = localStorage.getItem('token')
+    //   this.props.mountToken(token)
+    //   this.props.fetchUserLocal(token)
+    // }
+    this.props.fetchUser()
     
   }
 
