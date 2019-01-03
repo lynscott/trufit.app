@@ -12,6 +12,7 @@ import StartShredPlan from '../Shred/StartShredPlan'
 import StartTonePlan from '../Tone/StartTonePlan'
 import Nav from './Nav'
 import ShowPlan from './ShowPlan'
+import {Container} from 'reactstrap'
 
 let testENV = () => {
     if (process.env.NODE_ENV === 'development') {
@@ -37,7 +38,7 @@ class AppRoutes extends Component {
 
     render() {
         return (
-        <div>
+        <Container fluid>
             <Nav className="navbar" />
             <Switch>
                 <Route exact path="/about" component={About} />
@@ -65,7 +66,7 @@ class AppRoutes extends Component {
                 />
                 <Route exact path="/" component={App} />
             </Switch>
-        </div>
+        </Container>
         )
     }
 }

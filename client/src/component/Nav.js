@@ -123,7 +123,7 @@ class Nav extends Component {
   render() {
     console.log(this.props)
     return (
-      <div className='row'>
+      <div className='row' style={{marginBottom:'65px'}}>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
             className="navbar-brand mx-auto d-block"
@@ -134,8 +134,8 @@ class Nav extends Component {
             <img
               src={logo}
               className="d-inline-block align-top"
-              width="200"
-              height="60"
+              width="100"
+              height="30"
               alt="logo"
             />
           </Link>

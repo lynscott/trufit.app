@@ -5,10 +5,10 @@ class Footer extends Component {
   render() {
     return (
       <div>
-          <div className="row">
+          <div className="row" style={{fontSize:'12px'}}>
             <div className="col-md-8">
               <ul className="nav mx-0" id="footer">
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <Link className="nav-link" to="/about">
                     About
                   </Link>
@@ -17,7 +17,7 @@ class Footer extends Component {
                   <Link className="nav-link" to="/training">
                     Online Training
                   </Link>
-                </li>
+                </li> */}
                 <li className="nav-item">
                   <a
                     className="nav-link"
