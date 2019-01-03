@@ -5,11 +5,19 @@ import moment from 'moment'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+import { Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap'
 
 const localizer = BigCalendar.momentLocalizer(moment)
 const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
 
 class DashCalendar extends Component {
+  constructor(props){
+    super(props)
+
+    this.state = {
+      nextWorkout: null
+    }
+  }
 
   getMonday = () => {
     let d = new Date()
@@ -20,13 +28,34 @@ class DashCalendar extends Component {
   }
 
 
+  eventCard = ({ event })  => {
+    return (
+      <span className='text-center event-card-div' style={{textAlign:'center', backgroundColor:'green'}}>
+        <strong>{event.title}</strong>
+        {/* {event.desc && ':  ' + event.desc} */}
+      </span>
+    )
+  }
+
+
+  nextWorkoutCard = () => {
+    return (
+      <Card body className="text-center">
+        <CardTitle>Upcoming Session: {this.state.nextWorkout.title}</CardTitle>
+        <CardText>{new Date(this.state.nextWorkout.start).toDateString()}</CardText>
+        <Button color='danger'>Mark Completed</Button>
+      </Card>
+    )
+  }
+
+
   formatDate = () => {
     // let weekStart = this.getMonday
     let planEvents = []
     for (let i = 0; i < this.props.plan.template.weeks.length; i++) {
       
       for (let j = 0; j < weekArray.length; j++) {
-        console.log('array started')
+        // console.log('array started')
         let weekStart = this.getMonday()
         let event = {
           title: this.props.plan.template.weeks[i].day[weekArray[j]].type,
@@ -34,31 +63,42 @@ class DashCalendar extends Component {
           end: weekStart.setDate(weekStart.getDate() + 0),
           allDay: false,
         }
-        console.log(weekStart.getDate(), j)
+        // console.log(weekStart.getDate(), j)
         planEvents.push(event)
         weekStart = this.getMonday()
-        console.log(weekStart)
+        if (new Date(event.start).getDate() === new Date().getDate()) {
+          this.state.nextWorkout = event
+        }
         
       }
+
       
     }
-    console.log(planEvents)
+    // this.state.nextWorkout = planEvents[0]
+    // console.log(planEvents)
     return planEvents
   }
 
   render() {
 
     return (
-      <div>
-        <BigCalendar
-          localizer={localizer}
-          events={this.props.plan ? this.formatDate(): []}
-          startAccessor="start"
-          endAccessor="end"
-          // date={new Date()}
-        />
-        {/* {this.getMonday()} */}
-       </div>
+      <Row className='justify-content-around'>
+        <Col md='6'>
+          <BigCalendar
+            localizer={localizer}
+            events={this.props.plan ? this.formatDate(): []}
+            startAccessor="start"
+            endAccessor="end"
+            // components={{
+            //   event: this.eventCard,
+            // }}
+            // date={new Date()}
+          />
+        </Col>
+        <Col md='3' className='align-self-center'>
+          {this.state.nextWorkout? this.nextWorkoutCard() : null}
+        </Col>
+      </Row>
     )
   }
 }

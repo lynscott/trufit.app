@@ -1,3 +1,39 @@
-.calendar-container{
+.calendar-container, .rbc-calendar{
     min-height: 400px;
+}
+
+.rbc-event-content{
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.rbc-btn-group{
+    display: none;
+}
+
+.rbc-toolbar-label{
+    font-size: 25px;
+}
+
+.sidebar-col{
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
+    color: white;
+
+    .list-group-item, .lead{
+        color: white;
+    }
+
+    .card-title{
+        color: white;
+        border-radius: 10px;
+    }
+
+    .list-group-item:hover{
+        background-color: grey;
+    }
+
+    // .list-group-item:active{
+    //     background-color: grey;
+    // }
+
 }
