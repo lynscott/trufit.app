@@ -16,7 +16,9 @@ const userSchema = new Schema ({
   password: String,
   date: Date,
   plans: [String],
-  provider: String
+  provider: String,
+  isAdmin: Boolean,
+  isBetaTester: Boolean
 });
 
 
@@ -25,8 +27,8 @@ const userSchema = new Schema ({
 userSchema.pre('save', function(next) {
   // get access to the user model
   const user = this;
-  console.log(user.password, 'password')
-  console.log(user, 'user model')
+  // console.log(user.password, 'password')
+  // console.log(user, 'user model')
   if (user.password === undefined) {return next('No password present')}
 
 
@@ -46,10 +48,10 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.methods.comparePassword = function(candidatePassword, userPassword ,callback) {
-  console.log(bcrypt.compareSync(candidatePassword, userPassword))
+  // console.log(bcrypt.compareSync(candidatePassword, userPassword))
   bcrypt.compare(candidatePassword, userPassword, function(err, isMatch) {
     if (err) { return callback(err); }
-    console.log(candidatePassword, userPassword)
+    // console.log(candidatePassword, userPassword)
     callback(null, isMatch);
   });
 }

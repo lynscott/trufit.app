@@ -7,8 +7,10 @@ import AuthReducer from './authReducer'
 import PlanReducer from './planReducer'
 import AdminReducer from './adminReducer'
 import {reducer as formReducer } from 'redux-form'
+import { connectRouter } from 'connected-react-router'
 
-const rootReducer = combineReducers({
+const rootReducer = (history) => combineReducers({
+  router: connectRouter(history),
   types: TypesReducer,
   goals: GoalsReducer,
   activeType: ActiveType,

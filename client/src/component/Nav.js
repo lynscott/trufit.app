@@ -14,7 +14,7 @@ class Nav extends Component {
   constructor(props) {
     super(props)
 
-    this.state = { 
+    this.state = {
       modal: false,
       signup: false
     }
@@ -36,34 +36,37 @@ class Nav extends Component {
   }
 
   signInModal = () => {
-    return(
+    return (
       <Modal isOpen={this.state.modal} toggle={this.toggle}>
-        <ModalHeader toggle={this.toggle}>Welcome Back!
-        </ModalHeader>
+        <ModalHeader toggle={this.toggle}>Welcome Back!</ModalHeader>
         <ModalBody>
-          <LoginForm closeForm={this.toggle}/>
+          <LoginForm closeForm={this.toggle} />
         </ModalBody>
         <ModalFooter>
           {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
-          <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          <Button color="secondary" onClick={this.toggle}>
+            Cancel
+          </Button>
         </ModalFooter>
       </Modal>
     )
   }
 
   signUpModal = () => {
-    return(
+    return (
       <Modal isOpen={this.state.signup} toggle={this.signup}>
         {/* <ModalHeader toggle={this.toggle}>Welcome Back!
         </ModalHeader> */}
         <ModalBody>
-          <SignUpForm closeForm={this.signup}/>
+          <SignUpForm closeForm={this.signup} />
         </ModalBody>
         <ModalFooter>
           {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
-          <Button color="secondary" onClick={this.signup}>Cancel</Button>
+          <Button color="secondary" onClick={this.signup}>
+            Cancel
+          </Button>
         </ModalFooter>
-      </Modal>   
+      </Modal>
     )
   }
 
@@ -73,27 +76,19 @@ class Nav extends Component {
         return <LoadingBar />
       case null:
         return [
-          <a
-            className="nav-item nav-link px-2"
-            key='1'
-            onClick={this.toggle}
-          >
+          <a className="nav-item nav-link px-2" key="1" onClick={this.toggle}>
             Sign-in
           </a>,
-          <a
-            className="nav-item nav-link px-2"
-            onClick={this.signup}
-            key='2'
-          >
+          <a className="nav-item nav-link px-2" onClick={this.signup} key="2">
             Sign-up
-        </a>
+          </a>
         ]
       default:
         return [
           <Link
             key="1"
             className="nav-item nav-link active px-2"
-            to={'/dashboard'}
+            to={'/dashboard/overview'}
           >
             Dashboard
           </Link>,
@@ -117,13 +112,12 @@ class Nav extends Component {
     //   this.props.fetchUserLocal(token)
     // }
     this.props.fetchUser()
-    
   }
 
   render() {
     console.log(this.props)
     return (
-      <div className='row' style={{marginBottom:'65px'}}>
+      <div className="row" style={{ marginBottom: '65px' }}>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
             className="navbar-brand mx-auto d-block"
@@ -181,4 +175,9 @@ function mapStateToProps({ auth }) {
   return { auth }
 }
 
-export default withRouter(connect(mapStateToProps, actions)(Nav))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    actions
+  )(Nav)
+)
