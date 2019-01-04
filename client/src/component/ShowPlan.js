@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import pic from '../img/logo.png';
 import PlanHeader from './PlanHeader';
 import { findDOMNode } from 'react-dom';
-import $ from 'jquery';
+// import $ from 'jquery';
 
 import { fetchPlan, fetchUser } from '../actions';
 
@@ -52,8 +52,8 @@ class ShowPlan extends Component {
 
   planPDF = () => {
     const el = findDOMNode(this.refs.user_plan);
-    const userPlan = $(el);
-    console.log(userPlan);
+    // const userPlan = $(el);
+    // console.log(userPlan);
   };
 
   render() {

@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import ReactPDF from '@react-pdf/renderer';
+import ReactPDF from '@react-pdf/renderer'
  
 // Create styles
 const styles = StyleSheet.create({

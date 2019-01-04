@@ -43,7 +43,8 @@ class DashCalendar extends Component {
       <Card body className="text-center">
         <CardTitle>Upcoming Session: {this.state.nextWorkout.title}</CardTitle>
         <CardText>{new Date(this.state.nextWorkout.start).toDateString()}</CardText>
-        <Button color='danger'>Mark Completed</Button>
+        <Button color='danger' className='my-3'>Mark Completed</Button>
+        <Button color='warning'>Skip</Button>
       </Card>
     )
   }
@@ -62,8 +63,9 @@ class DashCalendar extends Component {
           start: weekStart.setDate(weekStart.getDate() + j ),
           end: weekStart.setDate(weekStart.getDate() + 0),
           allDay: false,
+          workout: this.props.plan.template.weeks[i].day[weekArray[j]]
         }
-        // console.log(weekStart.getDate(), j)
+        // console.log(event)
         planEvents.push(event)
         weekStart = this.getMonday()
         if (new Date(event.start).getDate() === new Date().getDate()) {
@@ -80,10 +82,10 @@ class DashCalendar extends Component {
   }
 
   render() {
-
+    // console.log()
     return (
       <Row className='justify-content-around'>
-        <Col md='6'>
+        <Col md='7'>
           <BigCalendar
             localizer={localizer}
             events={this.props.plan ? this.formatDate(): []}
@@ -95,9 +97,11 @@ class DashCalendar extends Component {
             // date={new Date()}
           />
         </Col>
-        <Col md='3' className='align-self-center'>
+        <Col md='5' className='align-self-center'>
+        <Button color='info'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
         </Col>
+
       </Row>
     )
   }
