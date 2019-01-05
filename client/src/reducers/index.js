@@ -6,6 +6,7 @@ import ActivePlan from './activeplanReducer'
 import AuthReducer from './authReducer'
 import PlanReducer from './planReducer'
 import AdminReducer from './adminReducer'
+import NutritionReducer from './nutritionReducer'
 import {reducer as formReducer } from 'redux-form'
 import { connectRouter } from 'connected-react-router'
 
@@ -18,7 +19,8 @@ const rootReducer = (history) => combineReducers({
   form: formReducer,
   auth: AuthReducer,
   plans: PlanReducer,
-  admin: AdminReducer
+  admin: AdminReducer,
+  nutrition: NutritionReducer
 })
 
 export default rootReducer

@@ -32,7 +32,7 @@ import {
   ListGroupItem,
   FormText,
   Row,
-  Col
+  Col, CardGroup, CardDeck
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
@@ -161,7 +161,8 @@ class Dashboard extends Component {
   renderDashTopStats = () => {
     return (
       <Row style={{ padding: 0, marginBottom: '10px' }}>
-        <Col md="4" className="py-3">
+        <CardDeck className='col-md'>
+        {/* <Col md="4" className="py-3"> */}
           <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
             <CardHeader>Current Goal:</CardHeader>
             <CardBody>
@@ -177,8 +178,8 @@ class Dashboard extends Component {
             </CardBody>
             {/* <CardFooter>Footer</CardFooter> */}
           </Card>
-        </Col>
-        <Col md="4" className="py-3">
+        {/* </Col> */}
+        {/* <Col md="4" className="py-3"> */}
           <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
             <CardHeader>Upload New Progress Picture</CardHeader>
             <CardBody>
@@ -197,8 +198,8 @@ class Dashboard extends Component {
             </CardBody>
             {/* <CardFooter>Footer</CardFooter> */}
           </Card>
-        </Col>
-        <Col md="4" className="py-3">
+        {/* </Col> */}
+        {/* <Col md="4" className="py-3"> */}
           <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
             <CardHeader>Plan Completion</CardHeader>
             <CardBody>
@@ -214,7 +215,8 @@ class Dashboard extends Component {
             </CardBody>
             {/* <CardFooter>Footer</CardFooter> */}
           </Card>
-        </Col>
+        {/* </Col> */}
+        </CardDeck>
       </Row>
     )
   }

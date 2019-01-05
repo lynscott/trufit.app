@@ -1,4 +1,6 @@
 import axios from 'axios'
+import ndb from 'nutrient-database'
+
 export const TYPE_SELECTED = 'type_selected'
 export const PLAN_SELECTED = 'plan_selected'
 export const CONTACT = 'contact'
@@ -15,6 +17,10 @@ export const FETCH_EXERCISES = 'FETCH_EXERCISES'
 export const CREATE_NEW_PLAN = 'CREATE_NEW_PLAN'
 export const CREATE_NEW_PLAN_ERROR = 'CREATE_NEW_PLAN_ERROR'
 export const FETCH_PLAN_TEMPLATES = 'FETCH_PLAN_TEMPLATES'
+export const FOOD_SEARCH = 'FOOD_SEARCH'
+export const FOOD_SELECTED = 'FOOD_SELECTED'
+
+const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
 export function selectType(type) {
   return {
@@ -171,7 +177,54 @@ export const createNewPlan = (values) => async dispatch => {
 
 export const fetchPlanTemps = () => async dispatch => {
   const res = await axios.get('/api/plan_templates')
-  console.log(res.data, 'res from temp call')
+  // console.log(res.data, 'res from temp call')
 
   dispatch({ type: FETCH_PLAN_TEMPLATES, payload: res.data })
 }
+
+
+export const foodSearch = (term) => async dispatch => {
+
+  // console.log(term)
+  let formatRes = (res) => {
+    if (res.list) {
+      let foods = []
+      for (let i = 0; i < res.list.item.length; i++) {
+        foods.push({'label':res.list.item[i].name, 'value':res.list.item[i].ndbno})      
+      }
+      // console.log(foods)
+      return foods
+    } else {
+      return []
+    }
+    
+  }
+
+  ndb.search(term,'Standard Reference',10,'', API_KEY,(err, response) => {
+    // console.log(response)
+    dispatch({type: FOOD_SEARCH, payload:formatRes(response)})
+  })
+  
+}
+
+export const foodSelect = (foodID) => async dispatch => {
+
+  let parseFood = (food) => {
+    let foodItem = {}
+    foodItem.name = food[0].food.desc.name
+    foodItem.calories = food[0].food.nutrients[1].value
+    foodItem.protein = food[0].food.nutrients[2].value
+    foodItem.fats = food[0].food.nutrients[3].value
+    foodItem.carb = food[0].food.nutrients[4].value
+    foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
+    //Conversion form gram to oz
+    foodItem.serving = 3.5
+ 
+    return foodItem
+  }
+
+  ndb.foodReport(foodID ,API_KEY,(err, response) => {
+    console.log(response)
+    dispatch({type:FOOD_SELECTED, payload:parseFood(response.foods)})
+  })
+} 
