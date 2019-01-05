@@ -8,6 +8,7 @@ import Dashboard from '../DashBoard/Dashboard'
 import OnlineTraining from './OnlineTraining'
 import DashRoutes from '../DashBoard/DashRoutes'
 import DashSideBar from '../DashBoard/DashSideBar'
+import NutritionDash from '../DashBoard/NutritionDash'
 import StartStrengthPlan from '../Strength/StartStrengthPlan'
 import StartShredPlan from '../Shred/StartShredPlan'
 import StartTonePlan from '../Tone/StartTonePlan'
@@ -55,7 +56,8 @@ class AppRoutes extends Component {
     return (
       <Row>
         <DashSideBar user={this.props.currentUser} />
-        <div style={{ backgroundColor: 'white' }}> placeholder nutrition </div>
+        <NutritionDash/>
+        {/* <div style={{ backgroundColor: 'white' }}> placeholder nutrition </div> */}
       </Row>
     )
   }
