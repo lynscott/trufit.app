@@ -104,7 +104,7 @@ class DashSideBar extends React.Component {
                 to="/dashboard/nutrition"
                 style={{ textDecoration: 'none' }}
               >
-                <ListGroupItem tag="button">Nutrition</ListGroupItem>
+                <ListGroupItem active tag="button">Nutrition</ListGroupItem>
               </Link>
               <Link to="/dashboard/plans" style={{ textDecoration: 'none' }}>
                 <ListGroupItem tag="button">My Plans</ListGroupItem>

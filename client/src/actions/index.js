@@ -200,7 +200,7 @@ export const foodSearch = (term) => async dispatch => {
     
   }
 
-  ndb.search(term,'Standard Reference',10,'', API_KEY,(err, response) => {
+  ndb.search(term,'Standard Reference',100,'', API_KEY,(err, response) => {
     // console.log(response)
     dispatch({type: FOOD_SEARCH, payload:formatRes(response)})
   })
@@ -212,13 +212,18 @@ export const foodSelect = (foodID) => async dispatch => {
   let parseFood = (food) => {
     let foodItem = {}
     foodItem.name = food[0].food.desc.name
+    foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
+    foodItem.serving = 3.5
+    foodItem.baseCal = food[0].food.nutrients[1].value
+    foodItem.baseFats = food[0].food.nutrients[3].value
+    foodItem.baseCarb = food[0].food.nutrients[4].value
+    foodItem.baseProtein = food[0].food.nutrients[2].value
     foodItem.calories = food[0].food.nutrients[1].value
-    foodItem.protein = food[0].food.nutrients[2].value
     foodItem.fats = food[0].food.nutrients[3].value
     foodItem.carb = food[0].food.nutrients[4].value
-    foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
+    foodItem.protein = food[0].food.nutrients[2].value
+
     //Conversion form gram to oz
-    foodItem.serving = 3.5
  
     return foodItem
   }
