@@ -5,3 +5,12 @@ td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.selected-row{
+    background-color: #008ed6 !important;
+    color:white;
+}
+
+.selected-row:hover {
+    background-color: #008ed6;
+}

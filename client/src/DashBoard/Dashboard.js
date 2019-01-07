@@ -7,7 +7,6 @@ import classnames from 'classnames'
 
 import DashCalendar from './DashCalendar'
 import NutritionTable from './NutritionTable'
-// import { scaleRotate as Menu } from 'react-burger-menu'
 // import CreatePlanForm from './CreatePlanForm'
 import {
   Button,
@@ -49,7 +48,7 @@ const Block = ({ content, colSize, content2 = null, configs = null }) => {
 }
 
 const data = {
-  labels: ['Carbs', 'Protien', 'Fats'],
+  labels: ['Carbs', 'Protein', 'Fats'],
   datasets: [
     {
       data: [100, 250, 75],
@@ -59,7 +58,7 @@ const data = {
   ]
 }
 
-const data2 = {
+export const data2 = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
   datasets: [
     {

@@ -10,9 +10,9 @@ const userProfileSchema = new Schema ({
   messages: String,
   events: String,
   progressPics: [String],
-  macros: Number,
+  macros: [Number],
   trainingTracker: Number,
-  nutritionTracker: [String],
+  nutritionItems: [Object],
   email: {type:String, unique:true, lowercase:true},
   _user: { type: Schema.Types.ObjectId, ref: 'User' }
 });
