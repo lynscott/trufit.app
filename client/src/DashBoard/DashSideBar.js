@@ -1,6 +1,8 @@
 // import * as icons from 'Constants/SVGIcons'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import * as actions from '../actions'
+import { connect } from 'react-redux'
 import {
   Col,
   Card,
@@ -22,9 +24,9 @@ class DashSideBar extends React.Component {
 
     this.state = {
       page: 'Course-List',
-      changeMessage: 'Enter some text as a reminder why you won\'t quit!',
       updateMessage: '',
-      update: false
+      update: false,
+      currentTab: 'overview'
     }
   }
 
@@ -36,7 +38,7 @@ class DashSideBar extends React.Component {
           style={{ fontSize: '1.2rem' }}
           onClick={() => this.setState({ update: true })}
         >
-          {this.state.changeMessage}
+          {this.props.profile ? this.props.profile.affirmation : ''}
         </p>
       )
     } else {
@@ -47,25 +49,23 @@ class DashSideBar extends React.Component {
               type="text"
               style={{ marginBottom: '8px' }}
               onChange={e => {
-                console.log(
-                  this.state.updateMessage,
-                  'text value',
-                  e.target.value
-                )
                 this.setState({ updateMessage: e.target.value })
               }}
               id="inputAF"
-              placeholder={this.state.changeMessage}
+              placeholder={
+                this.props.profile ? this.props.profile.affirmation : ''
+              }
             />
           </Form>
           <Button
             color="info"
             style={{ marginBottom: '5px' }}
-            onClick={() => {
-              this.setState({
-                changeMessage: this.state.updateMessage,
-                update: false
+            onClick={async () => {
+              await this.props.updateProfile({
+                keys: ['affirmation'],
+                affirmation: this.state.updateMessage
               })
+              this.setState({ update: false })
             }}
           >
             Update Affirmation
@@ -85,6 +85,7 @@ class DashSideBar extends React.Component {
   }
 
   render() {
+    console.log(this.props)
     return (
       <Col className="sidebar-col" md="3">
         <Card>
@@ -98,22 +99,46 @@ class DashSideBar extends React.Component {
             </CardText>
             <ListGroup flush>
               <Link to="/dashboard/overview" style={{ textDecoration: 'none' }}>
-                <ListGroupItem tag="button">Overview</ListGroupItem>
+                <ListGroupItem
+                  active={this.state.currentTab === 'overview' ? true : false}
+                  onClick={() => this.setState({ currentTab: 'overview' })}
+                  tag="button"
+                >
+                  Overview
+                </ListGroupItem>
               </Link>
               <Link
                 to="/dashboard/nutrition"
                 style={{ textDecoration: 'none' }}
               >
-                <ListGroupItem active tag="button">Nutrition</ListGroupItem>
+                <ListGroupItem
+                  active={this.state.currentTab === 'nutrition' ? true : false}
+                  onClick={() => this.setState({ currentTab: 'nutrition' })}
+                  tag="button"
+                >
+                  Nutrition
+                </ListGroupItem>
               </Link>
               <Link to="/dashboard/plans" style={{ textDecoration: 'none' }}>
-                <ListGroupItem tag="button">My Plans</ListGroupItem>
+                <ListGroupItem
+                  active={this.state.currentTab === 'plans' ? true : false}
+                  onClick={() => this.setState({ currentTab: 'plans' })}
+                  tag="button"
+                >
+                  My Plans
+                </ListGroupItem>
               </Link>
               <Link
                 to="/dashboard/account-settings"
                 style={{ textDecoration: 'none' }}
               >
-                <ListGroupItem tag="button">Account Settings</ListGroupItem>
+                <ListGroupItem
+                  active={this.state.currentTab === 'settings' ? true : false}
+                  onClick={() => this.setState({ currentTab: 'settings' })}
+                  tag="button"
+                >
+                  Account Settings
+                </ListGroupItem>
               </Link>
             </ListGroup>
           </CardBody>
@@ -122,4 +147,8 @@ class DashSideBar extends React.Component {
     )
   }
 }
-export default DashSideBar
+
+export default connect(
+  null,
+  actions
+)(DashSideBar)

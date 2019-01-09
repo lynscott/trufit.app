@@ -19,6 +19,7 @@
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
     "bcrypt-nodejs": "0.0.3",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "concurrently": "^3.6.1",
     "cookie-parser": "^1.4.3",

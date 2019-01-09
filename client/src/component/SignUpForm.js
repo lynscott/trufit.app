@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { signUpUser } from '../actions'
 import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Tooltip } from 'reactstrap'
+import { Tooltip, Input, Button } from 'reactstrap'
+import Fade from 'react-reveal/Fade'
 
 const afterSubmit = (result, dispatch) => dispatch(reset('SignUpForm'))
 
@@ -14,16 +15,15 @@ class SignUpForm extends Component {
 
     this.toggle = this.toggle.bind(this)
 
-    this.state = { 
-      tooltipOpen: false, 
+    this.state = {
+      tooltipOpen: false,
+      page: 1
     }
-
   }
-
 
   toggle = () => {
     console.log('tooltip hover')
-    this.setState({tooltipOpen: !this.state.tooltipOpen})
+    this.setState({ tooltipOpen: !this.state.tooltipOpen })
   }
 
   renderField(field) {
@@ -36,7 +36,7 @@ class SignUpForm extends Component {
           placeholder={field.placeholder}
           className={className}
           type={field.type}
-          style={{backgroundColor:'#e7e7e7'}}
+          style={{ backgroundColor: '#e7e7e7' }}
           {...field.input}
         />
         <div className="invalid-feedback">
@@ -57,7 +57,7 @@ class SignUpForm extends Component {
           value="none"
           placeholder={field.placeholder}
           className={className}
-          style={{backgroundColor:'#e7e7e7'}}
+          style={{ backgroundColor: '#e7e7e7' }}
           type={field.type}
           {...field.input}
         >
@@ -73,12 +73,40 @@ class SignUpForm extends Component {
   }
 
 
+  renderSelectActivityLevel(field) {
+    const className = `form-control ${
+      field.meta.touched && field.meta.error ? 'is-invalid' : ''
+    }`
+    return (
+      <div className="form-group col">
+        <label>{field.label}</label>
+        <Input
+          width="100%"
+          placeholder={field.placeholder}
+          className={className}
+          style={{ backgroundColor: '#e7e7e7' }}
+          type='select'
+          {...field.input}
+        >
+          <option value={1.25}>Little or no exercise.</option>
+          <option value={1.3}>Exercise/sports 1-3 days/week.</option>
+          <option value={1.55}>Moderate exercise/sports 3-5 days/week.</option>
+          <option value={1.725}>Hard exercise every day.</option>
+          <option value={1.9}>Hard exercise 2 or more times per day, or training for marathon, or triathlon.</option>
+        </Input>
+        <div className="invalid-feedback">
+          {field.meta.touched ? field.meta.error : ''}
+        </div>
+      </div>
+    )
+  }
+
   async onSubmit(values) {
     console.log(values)
     try {
-      // await this.props.signUpUser(values)
+      await this.props.signUpUser(values)
       this.props.closeForm()
-      Alert.success(<h3>Success!</h3>, {
+      Alert.success(<h3>Success! A welcome email has been sent.</h3>, {
         position: 'bottom',
         effect: 'scale'
       })
@@ -94,11 +122,17 @@ class SignUpForm extends Component {
     const { handleSubmit } = this.props
 
     return (
-      <form className="p-4" onSubmit={handleSubmit(this.onSubmit.bind(this))} 
-        style={{margin:0, borderRadius:'5px'}}
+      <form
+        className="p-3"
+        onSubmit={handleSubmit(this.onSubmit.bind(this))}
+        style={{ margin: 0, borderRadius: '5px' }}
       >
-      <FontAwesomeIcon icon="user-plus" size={'3x'} />
-      <h2>Create An Account</h2>
+        <FontAwesomeIcon icon="user-plus" size={'3x'} />
+        <h2>Create An Account</h2>
+
+        { this.state.page === 1 ?
+        <Fade top cascade>
+        <React.Fragment>
         <Field
           placeholder="Name"
           name="name"
@@ -126,12 +160,27 @@ class SignUpForm extends Component {
           type="password"
           component={this.renderField}
         />
-        
+        </React.Fragment>
+        </Fade>
+        : null}
+
+        { this.state.page === 2 ?
+        <Fade right>
+        <React.Fragment>
         <FontAwesomeIcon id="ExtraInfoTooltip" icon="info-circle" />
         {/* <Tooltip placement="right" isOpen={this.state.tooltipOpen} target="ExtraInfoTooltip" href='#' toggle={this.toggle}> */}
-          <p style={{textAlign:'left', fontSize:'15px', paddingLeft:'15px', paddingRight:'15px'}}>
-            Your weight, height, and gender help determine a better caloric intake and BMR and are soley
-            used to help personalize your training plan and nutrition guide.</p>
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '14px',
+            paddingLeft: '10px',
+            paddingRight: '10px'
+          }}
+        >
+          Your weight, height, age, and gender help estimate your bodies meabolic rate 
+          and are soley used to help personalize your training plan and
+          nutrition guide.
+        </p>
         {/* </Tooltip> */}
         <Field
           placeholder="Current Weight"
@@ -140,7 +189,7 @@ class SignUpForm extends Component {
           component={this.renderField}
         />
 
-        <div className = 'pl-3 pr-3 row align-items-center'>
+        <div className="pl-1 pr-1 row align-items-center">
           <label>Height</label>
           <Field
             placeholder="Feet"
@@ -158,18 +207,34 @@ class SignUpForm extends Component {
         </div>
 
         <Field
+            placeholder="Age"
+            name="age"
+            type="number"
+            component={this.renderField}
+        />
+
+        <Field
           placeholder="Gender"
           name="gender"
           type="text"
           component={this.renderSelectField}
         />
 
-        <button
-          type="submit"
-          className="btn btn-outline-primary"
-        >
+        <Field
+          placeholder="Activity Level"
+          label = "Choose a current level of activity that best fits you."
+          name="activity_mod"
+          type="number"
+          component={this.renderSelectActivityLevel}
+        />
+        </React.Fragment> 
+        </Fade>: null}
+
+        {this.state.page === 2? <Button className='mx-3' color='secondary' onClick={()=>this.setState({page:1})}>Previous</Button>: null}
+        {this.state.page === 1? <Button color='success' onClick={()=> this.setState({page:2})}>Next</Button> :
+        <button type="submit" className="btn btn-outline-primary">
           Submit
-        </button>
+        </button>}
       </form>
     )
   }
@@ -188,8 +253,26 @@ function validate(values) {
   }
   if (values.password) {
     if (values.password1.length < 8) {
-        errors.password1 = 'Password must be at least 8 characters long.'
+      errors.password1 = 'Password must be at least 8 characters long.'
     }
+  }
+  if (!values.current_weight) {
+    errors.current_weight = 'Required.'
+  }
+  if (!values.height_ft) {
+    errors.height_ft = 'Required.'
+  }
+  if (!values.height_in) {
+    errors.height_in = 'Required.'
+  }
+  if (!values.age) {
+    errors.age = 'Required.'
+  }
+  if (!values.gender) {
+    errors.gender = 'Required.'
+  }
+  if (!values.activity_mod) {
+    errors.activity_mod = 'Required.'
   }
 
   return errors
@@ -199,4 +282,9 @@ export default reduxForm({
   validate,
   form: 'SignUpForm',
   onSubmitSuccess: afterSubmit
-})(connect(null, { signUpUser })(SignUpForm))
+})(
+  connect(
+    null,
+    { signUpUser }
+  )(SignUpForm)
+)

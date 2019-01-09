@@ -13,6 +13,7 @@ import StartStrengthPlan from '../Strength/StartStrengthPlan'
 import StartShredPlan from '../Shred/StartShredPlan'
 import StartTonePlan from '../Tone/StartTonePlan'
 import Nav from './Nav'
+import keys from '../config/keys'
 import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
 import { Container, Row } from 'reactstrap'
@@ -20,17 +21,13 @@ import { Container, Row } from 'reactstrap'
 class AppRoutes extends Component {
   componentDidMount() {
     this.props.fetchPlanTemps()
-    if (!localStorage.getItem('token')) {
-      this.props.fetchUser()
-    } else {
-      let token = localStorage.getItem('token')
-      this.props.mountToken(token)
-      this.props.fetchUserLocal(token)
-    }
+    this.props.fetchUser()
+    this.props.fetchProfile()
+
   }
 
   testENV = () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
       return this.renderOverview()
     } else {
       return (
@@ -55,7 +52,7 @@ class AppRoutes extends Component {
   renderNutrition = () => {
     return (
       <Row>
-        <DashSideBar user={this.props.currentUser} />
+        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <NutritionDash/>
         {/* <div style={{ backgroundColor: 'white' }}> placeholder nutrition </div> */}
       </Row>
@@ -67,7 +64,7 @@ class AppRoutes extends Component {
       // <DeviceOverview/>
 
       <Row>
-        <DashSideBar user={this.props.currentUser} />
+        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <div style={{ backgroundColor: 'white' }}> placeholder plans </div>
       </Row>
     )
@@ -76,7 +73,7 @@ class AppRoutes extends Component {
   renderAccountSettings = () => {
     return (
       <Row>
-        <DashSideBar user={this.props.currentUser} />
+        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <div style={{ backgroundColor: 'white' }}> placeholder account </div>
       </Row>
     )
@@ -85,7 +82,7 @@ class AppRoutes extends Component {
   renderOverview = () => {
     return (
       <Row>
-        <DashSideBar user={this.props.currentUser} />
+        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <Dashboard />
       </Row>
     )
@@ -144,9 +141,8 @@ class AppRoutes extends Component {
 
 const mapStateToProps = state => {
   return {
-    currentUser: state.auth.user
-    // token: state.user.userToken,
-    // userGroup: state.user.userGroup
+    currentUser: state.auth.user,
+    userProfile: state.auth.userProfile
   }
 }
 
