@@ -28,6 +28,7 @@ class AppRoutes extends Component {
 
   testENV = () => {
     if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
+      //this.props.currentUser ? console.log(keys.preAccessList.includes(this.props.currentUser.email)) : 'null'
       return this.renderOverview()
     } else {
       return (
@@ -43,7 +44,7 @@ class AppRoutes extends Component {
       window.localStorage.getItem('token') !== null ||
       this.props.currentUser !== null
     ) {
-      return this.testENV()
+      return this.renderOverview()
     }
 
     return <Redirect to="/" />
