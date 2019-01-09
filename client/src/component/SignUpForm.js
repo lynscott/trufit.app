@@ -104,7 +104,7 @@ class SignUpForm extends Component {
   async onSubmit(values) {
     console.log(values)
     try {
-      await this.props.signUpUser(values)
+      // await this.props.signUpUser(values)
       this.props.closeForm()
       Alert.success(<h3>Success! A welcome email has been sent.</h3>, {
         position: 'bottom',
@@ -232,8 +232,8 @@ class SignUpForm extends Component {
 
         {this.state.page === 2? <Button className='mx-3' color='secondary' onClick={()=>this.setState({page:1})}>Previous</Button>: null}
         {this.state.page === 1? <Button color='success' onClick={()=> this.setState({page:2})}>Next</Button> :
-        <button type="submit" className="btn btn-outline-primary">
-          Submit
+        <button type="submit" disabled className="btn btn-outline-danger">
+          Disabled
         </button>}
       </form>
     )
