@@ -1,9 +1,10 @@
-import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN } from '../actions'
+import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN, FETCH_PROFILE, UPDATE_PROFILE } from '../actions'
 
 const initialState = {
   token: null,
   errorMessage: null,
-  user: null
+  user: null,
+  userProfile: null
 }
 
 export default function(state = initialState, action ) {
@@ -28,6 +29,16 @@ export default function(state = initialState, action ) {
       return {
         ...state,
         token: action.payload
+      }
+    case FETCH_PROFILE:
+      return {
+        ...state,
+        userProfile: action.payload.profile
+      }
+    case UPDATE_PROFILE:
+      return {
+        ...state,
+        userProfile : action.payload
       }
     default:
       return state

@@ -42,41 +42,41 @@ class NutritionDash extends Component {
         ]
       },
 
+
       products: [
-        // {
-        //   name: 'Oats',
-        //   serving: 0.5,
-        //   calories: 0,
-        //   fats: 30,
-        //   carb: 70,
-        //   protein: 200
-        // }
         { name: 'Total', serving:'', serving_label:'', calories: 0, fats: 0, protein: 0, carb: 0 },
-        // { name: '%', calories:0 ,fats: 20, protein: 40, carb: 40 }
       ]
     }
   }
 
+  componentDidMount = () => {
+     setTimeout(()=>this.calculateTotals(), 1000)
+    
+  }
 
-  updateMacros = (newValue) => {
+
+  updateMacros = async (newValue) => {
       let i = this.state.index
-        console.log('correct', newValue)
-        this.setState(() => {
-        this.state.products[i].fats = Math.round(
-          this.state.products[i].baseFats * (Number(newValue) / 3.5)
-        )
-        this.state.products[i].carb = Math.round(
-          this.state.products[i].baseCarb * (Number(newValue) / 3.5)
-        )
-        this.state.products[i].protein = Math.round(
-          this.state.products[i].baseProtein * (Number(newValue) / 3.5)
-        )
-        this.state.products[i].calories = Math.round(
-          this.state.products[i].baseCal * (Number(newValue) / 3.5)
-        )
-        
+
+        await this.props.updateFoodItem({index:i , update:newValue})
         this.calculateTotals()
-        })
+        // console.log('correct', newValue)
+        // this.setState(() => {
+        // this.props.profile.nutritionItems[i].fats = Math.round(
+        //   this.props.profile.nutritionItems[i].baseFats * (Number(newValue) / 3.5)
+        // )
+        // this.props.profile.nutritionItems[i].carb = Math.round(
+        //   this.props.profile.nutritionItems[i].baseCarb * (Number(newValue) / 3.5)
+        // )
+        // this.props.profile.nutritionItems[i].protein = Math.round(
+        //   this.props.profile.nutritionItems[i].baseProtein * (Number(newValue) / 3.5)
+        // )
+        // this.props.profile.nutritionItems[i].calories = Math.round(
+        //   this.props.profile.nutritionItems[i].baseCal * (Number(newValue) / 3.5)
+        // )
+        
+        // this.calculateTotals()
+        // } )
         
   }
 
@@ -172,7 +172,7 @@ class NutritionDash extends Component {
         hover={true}
         condensed={false}
         bootstrap4={true}
-        data={this.state.products}
+        data={this.props.profile ? this.props.profile.nutritionItems.concat(this.state.products) : []}
         columns={columns}
         rowEvents={this.rowEvents}
         rowClasses={this.rowClasses}
@@ -180,9 +180,9 @@ class NutritionDash extends Component {
         // onTableChange = {this.onTableChange}
         cellEdit={cellEditFactory({
           mode: 'click',
-          beforeSaveCell: (oldValue, newValue, row, column) => {
-            console.log(newValue)
-            //HACK: For some reason changes top selection
+          beforeSaveCell: async (oldValue, newValue, row, column) => {
+            console.log(newValue, row)
+            // await this.props.removeFooditem({index:this.state.index, replace:row})
             this.updateMacros(newValue)
             this.setState({ rowSelected: false })
           }
@@ -215,10 +215,10 @@ class NutritionDash extends Component {
             <CardBody>
               <CardText> */}
               <h5>Recommended Macros:</h5>
-              <h3><Badge color="primary" pill>Protein: 200g</Badge></h3>
-              <h3><Badge color="warning" pill>Carbs: 100g</Badge></h3>
-              <h3><Badge color="danger" pill>Fats: 70g</Badge></h3>
-              <h3><Badge color="info" pill>Calories: 1800</Badge></h3>
+              <h4><Badge color="primary" pill>Protein: 200g</Badge></h4>
+              <h4><Badge color="warning" pill>Carbs: 100g</Badge></h4>
+              <h4><Badge color="danger" pill>Fats: 70g</Badge></h4>
+              <h4><Badge color="info" pill>Calories: 1800</Badge></h4>
               {/* </CardText>
             </CardBody>
           </Card> */}
@@ -252,18 +252,22 @@ class NutritionDash extends Component {
 
 
   calculateTotals = () => {
-    this.state.products.splice(-1)
+    // if (this.props.profile.nutritionItems.length !== 0) {
+      this.state.products.splice(-1)
+    // }
+    
 
     let carbs = 0
     let prot = 0
     let fats = 0
     let cals = 0
-    for (let i = 0; i < this.state.products.length; i++) {
-      fats = Number(this.state.products[i].fats) + Number(fats)
-      carbs = Number(this.state.products[i].carb) + Number(carbs)
-      prot = Number(this.state.products[i].protein) + Number(prot)
-      cals = Number(this.state.products[i].calories) + Number(cals)
-    }
+    for (let i = 0; i < this.props.profile.nutritionItems.length; i++) {
+      fats = Number(this.props.profile.nutritionItems[i].fats) + Number(fats)
+      carbs = Number(this.props.profile.nutritionItems[i].carb) + Number(carbs)
+      prot = Number(this.props.profile.nutritionItems[i].protein) + Number(prot)
+      cals = Number(this.props.profile.nutritionItems[i].calories) + Number(cals)
+    } 
+    
 
     this.setState(()=>{
       this.state.doughnutData.datasets[0].data = [Math.round(carbs), Math.round(prot), Math.round(fats)]
@@ -274,8 +278,8 @@ class NutritionDash extends Component {
         carb: Math.round(carbs),
         protein: Math.round(prot)
       })
-    // this.forceUpdate()
     })
+    this.forceUpdate()
   }
 
   addItemButton = () => {
@@ -284,12 +288,14 @@ class NutritionDash extends Component {
         className="my-2"
         color={'primary'}
         disabled={this.props.foodSelected ? false : true}
-        onClick={() => {
+        onClick={async () => {
+
+          await this.props.updateProfile({keys:['nutritionItems'], nutritionItems:this.props.foodSelected})
           this.setState(()=>{
-            this.state.products.unshift(this.props.foodSelected)
+            // this.state.products.unshift(this.props.foodSelected)
             this.calculateTotals()
           })
-          this.forceUpdate()
+          // this.forceUpdate()
         }}
       >
         Add Food Item
@@ -315,27 +321,30 @@ class NutritionDash extends Component {
           this.props.foodSearch(value)
         }}
       />
-      <h6>Data Provided by USDA</h6>
+      <h6>Nutrition Data Provided by USDA Food Database</h6>
       </React.Fragment>
     )
   }
 
   manualEntryButton = () => {
+    let emtpyItem = {
+      name: '',
+      serving_label: '',
+      serving: 0,
+      calories: 0,
+      fats: 0,
+      carb: 0,
+      protein: 0
+    }
+
     return (
       <Button
         className="my-2"
         color="danger"
-        onClick={() => {
-          this.state.products.unshift({
-            name: '',
-            serving_label: '',
-            serving: 0,
-            calories: 0,
-            fats: 0,
-            carb: 0,
-            protein: 0
-          })
-          this.forceUpdate()
+        onClick={ async () => {
+
+          await this.props.updateProfile({keys:['nutritionItems'], nutritionItems:emtpyItem})
+          // this.forceUpdate()
         }}
       >
         Manual Entry
@@ -349,8 +358,8 @@ class NutritionDash extends Component {
         className="my-2"
         color="warning"
         disabled={!this.state.rowSelected}
-        onClick={() => {
-          this.state.products.splice(this.state.index, 1)
+        onClick={async () => {
+          await this.props.updateFoodItem({index:this.state.index})
           this.calculateTotals()
           this.setState({ rowSelected: false })
         }}
@@ -382,7 +391,8 @@ class NutritionDash extends Component {
 const mapStateToProps = state => {
   return {
     terms: state.nutrition.searchList,
-    foodSelected: state.nutrition.foodSelected
+    foodSelected: state.nutrition.foodSelected,
+    profile: state.auth.userProfile
   }
 }
 

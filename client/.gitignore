@@ -9,6 +9,7 @@
 # production
 /build
 dev.js
+dev0
 
 # misc
 .DS_Store

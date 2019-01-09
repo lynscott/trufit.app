@@ -19,6 +19,8 @@ export const CREATE_NEW_PLAN_ERROR = 'CREATE_NEW_PLAN_ERROR'
 export const FETCH_PLAN_TEMPLATES = 'FETCH_PLAN_TEMPLATES'
 export const FOOD_SEARCH = 'FOOD_SEARCH'
 export const FOOD_SELECTED = 'FOOD_SELECTED'
+export const FETCH_PROFILE = 'FETCH_PROFILE'
+export const UPDATE_PROFILE = 'UPDATE_PROFILE'
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
@@ -78,7 +80,7 @@ export const intakeToneForm = (values, history, id) => async dispatch => {
 //FETCH USER OAUTH
 export const fetchUser = () => async dispatch => {
   const res = await axios.get('/api/logged_user/')
-  console.log(res.data)
+  // console.log(res.data)
 
   dispatch({ type: FETCH_USER, payload: res.data.user })
 }
@@ -125,12 +127,11 @@ export const fetchPlan = id => async dispatch => {
 }
 
 export const signInUser = (history, {email, password}) => async dispatch => {
-
   try {
     const res = await axios.post('/api/signin/', {email, password})
-    localStorage.setItem('token', res.data.token)
+    // localStorage.setItem('token', res.data.token)
     dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
-    history.push('/dashboard')
+    history.push('/dashboard/overview')
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
   }
@@ -232,4 +233,24 @@ export const foodSelect = (foodID) => async dispatch => {
     console.log(response)
     dispatch({type:FOOD_SELECTED, payload:parseFood(response.foods)})
   })
-} 
+}
+
+export const fetchProfile = () => async dispatch => {
+  let res = await axios.get('/api/user_profile')
+
+  dispatch({ type: FETCH_PROFILE, payload:res.data })
+}
+
+export const updateProfile = (values) => async dispatch => {
+  console.log(values, 'fired')
+  let res = await axios.post('/api/update_profile', values)
+
+  dispatch({ type: UPDATE_PROFILE, payload:res.data  })
+}
+
+export const updateFoodItem = (values) => async dispatch => {
+  console.log(values)
+  let res = await axios.post('/api/update_food_item', values)
+
+  dispatch({ type: UPDATE_PROFILE, payload:res.data  })
+}

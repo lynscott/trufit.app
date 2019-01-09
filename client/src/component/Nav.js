@@ -42,7 +42,7 @@ class Nav extends Component {
         <ModalBody>
           <LoginForm closeForm={this.toggle} />
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter style={{padding:'0.5rem'}}>
           {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
           <Button color="secondary" onClick={this.toggle}>
             Cancel
@@ -60,7 +60,7 @@ class Nav extends Component {
         <ModalBody>
           <SignUpForm closeForm={this.signup} />
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter style={{padding:'0.5rem'}}>
           {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
           <Button color="secondary" onClick={this.signup}>
             Cancel
