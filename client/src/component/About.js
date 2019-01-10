@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../img/about_logo.png';
+// import logo from '../img/about_logo.png';
 import Footer from './Footer';
 
 class About extends Component {
@@ -122,11 +122,11 @@ class About extends Component {
               </p> */}
             </div>
             <div className="col-md-6 justify-content-center">
-              <img
+              {/* <img
                 src={logo}
                 alt=""
                 className="about-img img-fluid rounded-circle d-none d-md-block"
-              />
+              /> */}
             </div>
           </div>
         </section>

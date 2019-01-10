@@ -19,6 +19,7 @@
     "npm": "^6.5.0",
     "nutrient-database": "^1.1.8",
     "react": "^16.7.0",
+    "react-beautiful-dnd": "^10.0.3",
     "react-big-calendar": "^0.20.2",
     "react-bootstrap-table-next": "^2.0.0",
     "react-bootstrap-table2-editor": "^1.2.2",
