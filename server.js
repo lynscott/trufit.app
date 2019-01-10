@@ -323,54 +323,40 @@ app.post('/api/update_profile', async (req, res, next) => {
 	requireLogin(req, res, next)
 	let keys = req.body.keys
 	// console.log(keys ,req.body[keys[0]])
-	let userProfile = await UserProfile.findOne({ _user: req.user.id })
-	if (userProfile) {
+	await UserProfile.findOne({ _user: req.user.id }, (err, prof) => {
+		if (err) return res.send(500, { error: err })
 		for (let i = 0; i < keys.length; i++) {
 			if (keys[i] === 'nutritionItems') {
-				userProfile[keys[i]].push(req.body[keys[i]])
+				prof[keys[i]].push(req.body[keys[i]])
 			} else {
-				userProfile[keys[i]] = req.body[keys[i]]
+				prof[keys[i]] = req.body[keys[i]]
 			}
 		}
-		userProfile.save()
-		res.status(200).send(userProfile)
-	} else {
-		res.status(401).send('No Profile Found')
-	}
+		prof.save()
+		res.status(200).send(prof)
+	})
 })
 
 app.post('/api/update_food_item', async (req, res, next) => {
 	requireLogin(req, res, next)
 	let index = req.body.index
-  // console.log(keys ,req.body[keys[0]])
-  console.log(req.body)
-	let userProfile = await UserProfile.findOne({ _user: req.user.id })
-	if (userProfile) {
+
+	// console.log(req.body)
+	await UserProfile.findOne({ _user: req.user.id }, async (err, prof) => {
+		if (err) return res.send(500, { error: err })
 		if (req.body.replace) {
-			userProfile.nutritionItems.splice(index, 1, req.body.replace)
-			userProfile.save()
-			res.status(200).send(userProfile)
-    } else if (req.body.update) {
-      console.log('inside update')
-      userProfile.nutritionItems[index].fats = userProfile.nutritionItems[index].baseFats * req.body.update
-      userProfile.nutritionItems[index].carb = userProfile.nutritionItems[index].baseCarb * req.body.update
-      userProfile.nutritionItems[index].protein = userProfile.nutritionItems[index].baseProtein * req.body.update
-      userProfile.nutritionItems[index].calories = userProfile.nutritionItems[index].baseCal * req.body.update
-      userProfile.nutritionItems[index].serving = req.body.update
-			userProfile.save(function (err) {
-        if(err) {
-            console.error('ERROR!', err);
-        }
-    });
-			res.status(200).send(userProfile)
-    } else {
-			userProfile.nutritionItems.splice(index, 1)
-			userProfile.save()
-			res.status(200).send(userProfile)
-		} 
-	} else {
-		res.status(401).send('No Profile Found')
-	}
+			prof.nutritionItems.splice(index, 1, req.body.replace)
+			prof.save()
+			res.status(200).send(prof)
+		} else if ( req.body.schedule){
+			prof.nutritionSchedule.push(req,body.schedule)
+			prof.save()
+		} else {
+			prof.nutritionItems.splice(index, 1)
+			prof.save()
+			res.status(200).send(prof)
+		}
+	})
 })
 
 app.post('/api/signup', async (req, res, next) => {

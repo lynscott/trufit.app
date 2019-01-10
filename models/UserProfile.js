@@ -15,6 +15,7 @@ const userProfileSchema = new Schema ({
   macros: {type:[Number], default:[]},
   calories: String,
   trainingTracker: Number,
+  nutritionSchedule: {type:Schema.Types.Mixed, default:[{time:String, items:[Object]}]},
   nutritionItems: {type:Array, default:[{ name: 'Total', serving:'', serving_label:'', calories: 0, fats: 0, protein: 0, carb: 0 }]},
   email: {type:String, unique:true, lowercase:true},
   _user: { type: Schema.Types.ObjectId, ref: 'User' }

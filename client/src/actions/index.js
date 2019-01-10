@@ -254,3 +254,9 @@ export const updateFoodItem = (values) => async dispatch => {
 
   dispatch({ type: UPDATE_PROFILE, payload:res.data  })
 }
+
+export const saveMealTime = (values) => async dispatch => {
+  let res = await axios.post('/api/update_food_item', values)
+
+  dispatch({ type: UPDATE_PROFILE, payload:res.data  })
+}
