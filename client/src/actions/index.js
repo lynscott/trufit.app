@@ -223,6 +223,8 @@ export const foodSelect = (foodID) => async dispatch => {
     foodItem.fats = food[0].food.nutrients[3].value
     foodItem.carb = food[0].food.nutrients[4].value
     foodItem.protein = food[0].food.nutrients[2].value
+    foodItem.active = false
+    foodItem.id = food[0].food.desc.ndbno
 
     //Conversion form gram to oz
  

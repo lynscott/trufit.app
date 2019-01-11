@@ -1,9 +1,10 @@
 
 
-td {
+td, .truncate {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: fit-content;
 }
 
 .selected-row{
@@ -13,4 +14,13 @@ td {
 
 .selected-row:hover {
     background-color: #008ed6;
+}
+
+.react-bootstrap-table {
+    overflow-x: scroll;
+    
+    
+    .table-mobile{
+        table-layout: auto !important;
+    }
 }
