@@ -191,7 +191,8 @@ export const foodSearch = (term) => async dispatch => {
     if (res.list) {
       let foods = []
       for (let i = 0; i < res.list.item.length; i++) {
-        foods.push({'label':res.list.item[i].name, 'value':res.list.item[i].ndbno})      
+        // let name = res.list.item[i].name.split(',')[0]+' '+res.list.item[i].name.split(',')[1] + ' ' + res.list.item[i].name.split(',')[2]
+        foods.push({'label':res.list.item[i].name.replace(',',' '), 'value':res.list.item[i].ndbno})      
       }
       // console.log(foods)
       return foods
@@ -211,8 +212,10 @@ export const foodSearch = (term) => async dispatch => {
 export const foodSelect = (foodID) => async dispatch => {
 
   let parseFood = (food) => {
+    let name = food[0].food.desc.name.replace(',',' ')
+
     let foodItem = {}
-    foodItem.name = food[0].food.desc.name
+    foodItem.name = name
     foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
     foodItem.serving = 3.5
     foodItem.baseCal = food[0].food.nutrients[1].value
