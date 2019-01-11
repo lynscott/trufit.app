@@ -242,7 +242,7 @@ class NutritionDash extends Component {
               let isMatch = false
               if (names.length > 0) {
                 for (let i = 0; i < names.length; i++) {
-                  for (let j = 0; j < names[j].length; j++) {
+                  for (let j = 0; j < names[i].length; j++) {
                     if (names[i][j].id === item.id) {
                       isMatch = true // skip
                       continue
