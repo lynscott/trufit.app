@@ -339,19 +339,21 @@ app.post('/api/update_profile', async (req, res, next) => {
 
 app.post('/api/update_food_item', async (req, res, next) => {
 	requireLogin(req, res, next)
-	let index = req.body.index
 
-	// console.log(req.body)
+	console.log(req.body)
 	await UserProfile.findOne({ _user: req.user.id }, async (err, prof) => {
 		if (err) return res.send(500, { error: err })
 		if (req.body.replace) {
+			let index = req.body.index
 			prof.nutritionItems.splice(index, 1, req.body.replace)
 			prof.save()
 			res.status(200).send(prof)
 		} else if ( req.body.schedule){
-			prof.nutritionSchedule.push(req,body.schedule)
+			prof.nutritionSchedule.push(req.body.schedule)
 			prof.save()
+			res.status(200).send(prof)
 		} else {
+			let index = req.body.index
 			prof.nutritionItems.splice(index, 1)
 			prof.save()
 			res.status(200).send(prof)

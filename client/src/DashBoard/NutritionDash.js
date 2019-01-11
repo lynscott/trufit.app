@@ -13,7 +13,10 @@ import {
   NavItem,
   NavLink,
   Badge,
-  Container
+  Container,
+  ListGroup,
+  ListGroupItem,
+  Card, CardTitle, CardText, CardGroup, Collapse
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
@@ -24,6 +27,7 @@ import cellEditFactory from 'react-bootstrap-table2-editor'
 import classnames from 'classnames'
 import { Pie, Doughnut } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
+import windowSize from 'react-window-size'
 
 const recommendedMacros = 1800
 
@@ -102,7 +106,9 @@ class NutritionDash extends Component {
         }
       ],
       items: [],
-      selected: []
+      openMeals:true,
+      selected: [],
+      time: null
       //TODO: obj for meals as time and list of items  {time:[{foodObj}...]} this can be an array nutritionSchedule
     }
   }
@@ -117,6 +123,10 @@ class NutritionDash extends Component {
       this.setState(() => {
         this.state.items = this.props.profile.nutritionItems
       })
+    }
+
+    if (prevProps.windowWidth !== this.props.windowWidth) {
+      this.forceUpdate()
     }
   }
 
@@ -207,9 +217,14 @@ class NutritionDash extends Component {
       userSelect: 'none',
       padding: 10,
       margin: `0 0 ${8}px 0`,
+      color: 'white',
+      borderRadius: '5px',
+      boxShadow: 'grey 3px 5px 2px 3px',
+      border: '2px solid white',
 
       // change background colour if dragging
-      background: isDragging ? 'lightgreen' : 'grey',
+      background: isDragging ? 'lightgreen' : 'linear-gradient(135deg, grey, #008ed6 70%)',
+      // backgroundImage: 'linear-gradient(to top, rgba(0, 0, 0, 0, 1), #008ed6)',
 
       // styles we need to apply on draggables
       ...draggableStyle
@@ -217,22 +232,38 @@ class NutritionDash extends Component {
 
     let draggableFoodItems = () => {
       let names = this.props.profile
-        ? this.props.profile.nutritionSchedule[0].items
+        ? this.props.profile.nutritionSchedule.map(item => {
+            return item.items
+          })
         : null
       return this.props.profile
         ? this.state.items
-            .filter(item => {
-              if (names.includes(item.name)) {
-                return false // skip
+            .filter((item, index) => {
+              let isMatch = false
+              if (names.length > 0) {
+                for (let i = 0; i < names.length; i++) {
+                  for (let j = 0; j < names[j].length; j++) {
+                    if (names[i][j].id === item.id) {
+                      isMatch = true // skip
+                      continue
+                    }
+                  }
+                }
+                if (isMatch) {
+                  return false
+                }
+                return true
+              } else {
+                return true
               }
-              return true
             })
             .map((item, index) => (
               <Draggable key={index} draggableId={item.name} index={index}>
                 {(provided, snapshot) => (
-                  <Row>
+                  // <Row>
+                    <ListGroupItem tag="button" action>
                     <div
-                      className="col-md-12"
+                      className="col-md-12 p-2"
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -243,7 +274,8 @@ class NutritionDash extends Component {
                     >
                       {item.name}
                     </div>
-                  </Row>
+                    </ListGroupItem>
+                  // </Row>
                 )}
               </Draggable>
             ))
@@ -251,16 +283,29 @@ class NutritionDash extends Component {
     }
 
     let saveMealTime = async time => {
-      await this.props.saveMealTime({ time: time, items: [] })
-      this.setState({ selected: [] })
+      let makeTime = timeString => {
+        let date = new Date()
+        date.setHours(timeString.split(':')[0])
+        date.setMinutes(timeString.split(':')[1])
+        return date
+      }
+
+      await this.props.updateFoodItem({
+        schedule: {
+          time: makeTime(this.state.time),
+          items: this.state.selected
+        }
+      })
+      this.setState({ selected: [], meal: null })
     }
 
     let foodList = () => {
       return (
+        <Col md="6">
         <Droppable droppableId="foodlist">
           {(provided, snapshot) => (
             <Row>
-              <Col md="12">
+
                 <div
                   ref={provided.innerRef}
                   style={{
@@ -268,20 +313,21 @@ class NutritionDash extends Component {
                   }}
                   {...provided.droppableProps}
                 >
-                  <h4>Food List + button to add another time?</h4>
+                  <h4>Food List </h4>
                   {draggableFoodItems()}
                   {provided.placeholder}
                 </div>
-              </Col>
+              
             </Row>
           )}
         </Droppable>
+        </Col>
       )
     }
 
     let schedule = () => {
       return (
-        <Col md="12">
+        <Col md="6">
           <Droppable droppableId="schedule_1">
             {(provided, snapshot) => (
               <div
@@ -293,14 +339,22 @@ class NutritionDash extends Component {
                 }}
                 {...provided.droppableProps}
               >
+                {/* <Col md='4' className='justify-content-center'> */}
                 <h4>
                   Time
-                  <Input type="time" />
+                  <Input
+                    onChange={e => {
+                      console.log(e.target.value)
+                      this.setState({ time: e.target.value })
+                    }}
+                    type="time"
+                  />
                 </h4>
+                {/* </Col> */}
                 {this.state.selected.map((item, index) => (
                   <Draggable key={index} draggableId={item.name} index={index}>
                     {(provided, snapshot) => (
-                      <div
+                      <div className='p-2'
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
@@ -327,12 +381,58 @@ class NutritionDash extends Component {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         {/* <Container fluid> */}
-        <Button color="success">Save Meal</Button>
+        <Button
+          onClick={() => saveMealTime()}
+          disabled={
+            this.state.selected.length < 0 || this.state.time === null
+              ? true
+              : false
+          }
+          className="my-2"
+          color="success"
+        >
+          Save Meal
+        </Button>
+        <Row>
         {foodList()}
-        <br />
+        {/* <br /> */}
         {schedule()}
+        </Row>
         {/* </Container> */}
       </DragDropContext>
+    )
+  }
+
+  renderMealSchedule = () => {
+    return (
+      <Row>
+        <Col md="12">
+        <Button color='success' onClick={()=>this.setState({openMeals:!this.state.openMeals})}>
+        {this.state.openMeals ? 'Hide Meals':'Show Meals'}
+        </Button>
+        <Collapse isOpen={this.state.openMeals}>
+          <CardGroup>
+          {this.props.profile
+              ? this.props.profile.nutritionSchedule.map(sched => {
+
+                return(
+                  <Card body className='m-1' inverse color="dark">
+                  <CardTitle>{new Date(sched.time).toLocaleTimeString()}</CardTitle>
+                  {sched
+                        ? sched.items.map(item => {
+                            return(
+                  <CardText className='truncate px-1'>{item.name}</CardText>
+                            )
+                          }) : null}
+                  <Button color="primary" className='m-2'>Remove Meal</Button>
+                </Card> 
+                )
+              })
+          : null}
+          </CardGroup>
+          </Collapse>
+        </Col>
+      </Row>
     )
   }
 
@@ -418,6 +518,7 @@ class NutritionDash extends Component {
     //     </Table>
     //   )
     // }
+    console.log(window.innerWidth)
 
     return (
       <BootstrapTable
@@ -434,6 +535,7 @@ class NutritionDash extends Component {
         columns={columns}
         rowEvents={this.rowEvents}
         rowClasses={this.rowClasses}
+        classes = {this.props.windowWidth < 500 === true ? 'table-mobile bg-light':'bg-light'}
         cellEdit={cellEditFactory({
           mode: 'click',
           beforeSaveCell: (oldValue, newValue, row, column) => {
@@ -650,6 +752,7 @@ class NutritionDash extends Component {
     return (
       <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
         {this.displayMacros()}
+        {this.renderMealSchedule()}
         <Nav tabs>
           <NavItem>
             <NavLink
@@ -712,7 +815,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
+export default windowSize(connect(
   mapStateToProps,
   actions
-)(NutritionDash)
+)(NutritionDash))
