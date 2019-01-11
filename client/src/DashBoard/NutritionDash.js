@@ -16,7 +16,11 @@ import {
   Container,
   ListGroup,
   ListGroupItem,
-  Card, CardTitle, CardText, CardGroup, Collapse
+  Card,
+  CardTitle,
+  CardText,
+  CardGroup,
+  Collapse
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
@@ -106,7 +110,7 @@ class NutritionDash extends Component {
         }
       ],
       items: [],
-      openMeals:true,
+      openMeals: true,
       selected: [],
       time: null
       //TODO: obj for meals as time and list of items  {time:[{foodObj}...]} this can be an array nutritionSchedule
@@ -114,15 +118,42 @@ class NutritionDash extends Component {
   }
 
   componentDidMount = () => {
-    setTimeout(() => this.calculateTotals(), 1000)
+    // setTimeout(() => this.calculateTotals(), 1000)
   }
 
   componentDidUpdate = (prevProps, prevState) => {
     //TODO: replace this with new nutrition list props
+    let names = this.props.profile
+      ? this.props.profile.nutritionSchedule.map(item => {
+          return item.items
+        })
+      : null
     if (prevProps.profile !== this.props.profile) {
       this.setState(() => {
-        this.state.items = this.props.profile.nutritionItems
+        this.state.items = this.props.profile.nutritionItems.filter(
+          (item, index) => {
+            let isMatch = false
+            if (names.length > 0) {
+              for (let i = 0; i < names.length; i++) {
+                for (let j = 0; j < names[i].length; j++) {
+                  if (names[i][j].id === item.id) {
+                    isMatch = true // skip
+                    continue
+                  }
+                }
+              }
+              if (isMatch) {
+                return false
+              }
+              return true
+            } else {
+              return true
+            }
+          }
+        )
       })
+      // this.forceUpdate()
+      this.calculateTotals()
     }
 
     if (prevProps.windowWidth !== this.props.windowWidth) {
@@ -132,9 +163,6 @@ class NutritionDash extends Component {
 
   updateMacros = async newValue => {
     let i = this.state.index
-
-    // await this.props.updateFoodItem({index:i , update:newValue})
-    // this.calculateTotals()
     let newRow = this.props.profile.nutritionItems[i]
 
     console.log('correct', newValue)
@@ -172,7 +200,7 @@ class NutritionDash extends Component {
 
   onDragEnd = result => {
     const { source, destination } = result
-    console.log(result)
+    // console.log(source.index, source)
 
     // dropped outside the list
     if (!destination) {
@@ -186,12 +214,7 @@ class NutritionDash extends Component {
         destination.index
       )
 
-      // let state = { items }
-
-      // if (source.droppableId === 'schedule') {
       let state = { [this.id2List[source.droppableId]]: items }
-      // }
-      // console.log(source.droppableId)
 
       this.setState(state)
     } else {
@@ -201,6 +224,7 @@ class NutritionDash extends Component {
         source,
         destination
       )
+      // console.log(result)
 
       this.setState({
         [this.id2List[source.droppableId]]: result[source.droppableId],
@@ -215,7 +239,7 @@ class NutritionDash extends Component {
     let getItemStyle = (isDragging, draggableStyle) => ({
       // some basic styles to make the items look a bit nicer
       userSelect: 'none',
-      padding: 10,
+      padding: 5,
       margin: `0 0 ${8}px 0`,
       color: 'white',
       borderRadius: '5px',
@@ -223,7 +247,9 @@ class NutritionDash extends Component {
       border: '2px solid white',
 
       // change background colour if dragging
-      background: isDragging ? 'lightgreen' : 'linear-gradient(135deg, grey, #008ed6 70%)',
+      background: isDragging
+        ? 'lightgreen'
+        : 'linear-gradient(135deg, grey, #008ed6 70%)',
       // backgroundImage: 'linear-gradient(to top, rgba(0, 0, 0, 0, 1), #008ed6)',
 
       // styles we need to apply on draggables
@@ -261,20 +287,23 @@ class NutritionDash extends Component {
               <Draggable key={index} draggableId={item.name} index={index}>
                 {(provided, snapshot) => (
                   // <Row>
-                    <ListGroupItem tag="button" action>
-                    <div
-                      className="col-md-12 p-2"
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={getItemStyle(
-                        snapshot.isDragging,
-                        provided.draggableProps.style
-                      )}
-                    >
-                      {item.name}
-                    </div>
-                    </ListGroupItem>
+                  // <ListGroupItem color='dark' tag="button" action>
+                  <div
+                    className="col-md-12 p-2 my-2"
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                  >
+                    <p>{item.name}</p>
+                    <p style={{ display: 'inline' }}>
+                      {'Serving: ' + item.serving + 'oz'}
+                    </p>
+                  </div>
+                  // </ListGroupItem>
                   // </Row>
                 )}
               </Draggable>
@@ -301,33 +330,35 @@ class NutritionDash extends Component {
 
     let foodList = () => {
       return (
-        <Col md="6">
+        // <Col md="6" className='py-2'>
         <Droppable droppableId="foodlist">
           {(provided, snapshot) => (
-            <Row>
-
-                <div
-                  ref={provided.innerRef}
-                  style={{
-                    backgroundColor: snapshot.isDraggingOver ? 'blue' : 'white'
-                  }}
-                  {...provided.droppableProps}
-                >
-                  <h4>Food List </h4>
-                  {draggableFoodItems()}
-                  {provided.placeholder}
-                </div>
-              
-            </Row>
+            // <Row>
+            <Col md="6" className="py-2">
+              <div //className='col-md-6 py-2'
+                ref={provided.innerRef}
+                style={{
+                  backgroundColor: snapshot.isDraggingOver
+                    ? 'blue'
+                    : 'lightgrey',
+                  borderRadius: '8px'
+                }}
+                {...provided.droppableProps}
+              >
+                <h4>Food List </h4>
+                {draggableFoodItems()}
+                {provided.placeholder}
+              </div>
+            </Col>
           )}
         </Droppable>
-        </Col>
+        // </Col>
       )
     }
 
     let schedule = () => {
       return (
-        <Col md="6">
+        <Col md="6" className="py-2">
           <Droppable droppableId="schedule_1">
             {(provided, snapshot) => (
               <div
@@ -335,26 +366,47 @@ class NutritionDash extends Component {
                 style={{
                   backgroundColor: snapshot.isDraggingOver
                     ? 'lightblue'
-                    : 'lightgrey'
+                    : 'grey',
+                  borderRadius: '8px'
                 }}
                 {...provided.droppableProps}
               >
-                {/* <Col md='4' className='justify-content-center'> */}
-                <h4>
-                  Time
-                  <Input
-                    onChange={e => {
-                      console.log(e.target.value)
-                      this.setState({ time: e.target.value })
-                    }}
-                    type="time"
-                  />
-                </h4>
-                {/* </Col> */}
+                <Row className="justify-content-center py-2">
+                  <Col md="3">
+                    <Button
+                      onClick={() => saveMealTime()}
+                      disabled={
+                        this.state.selected.length === 0 ||
+                        this.state.time === null
+                          ? true
+                          : false
+                      }
+                      className="my-2"
+                      color="success"
+                    >
+                      Save Meal
+                    </Button>
+                  </Col>
+                  <Col md="4">
+                    <h5>Meal Time*</h5>
+                  </Col>
+                  <Col md="5">
+                    <Input
+                      onChange={e => {
+                        console.log(e.target.value)
+                        this.setState({ time: e.target.value })
+                      }}
+                      // style={{maxWidth:'fit-content'}}
+                      type="time"
+                    />
+                  </Col>
+                </Row>
                 {this.state.selected.map((item, index) => (
                   <Draggable key={index} draggableId={item.name} index={index}>
                     {(provided, snapshot) => (
-                      <div className='p-2'
+                      // <ListGroupItem tag="button" action>
+                      <div
+                        className="p-2"
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
@@ -364,7 +416,11 @@ class NutritionDash extends Component {
                         )}
                       >
                         {item.name}
+                        <br />
+                        <br />
+                        {'Serving: ' + item.serving + 'oz'}
                       </div>
+                      // </ListGroupItem>
                     )}
                   </Draggable>
                 ))}
@@ -381,22 +437,10 @@ class NutritionDash extends Component {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         {/* <Container fluid> */}
-        <Button
-          onClick={() => saveMealTime()}
-          disabled={
-            this.state.selected.length < 0 || this.state.time === null
-              ? true
-              : false
-          }
-          className="my-2"
-          color="success"
-        >
-          Save Meal
-        </Button>
-        <Row>
-        {foodList()}
-        {/* <br /> */}
-        {schedule()}
+        <Row className="my-4">
+          {foodList()}
+          {/* <br /> */}
+          {schedule()}
         </Row>
         {/* </Container> */}
       </DragDropContext>
@@ -404,32 +448,66 @@ class NutritionDash extends Component {
   }
 
   renderMealSchedule = () => {
+    let removeMeal = async i => {
+      await this.props.updateFoodItem({ removeSchedule: i })
+    }
+
     return (
       <Row>
-        <Col md="12">
-        <Button color='success' onClick={()=>this.setState({openMeals:!this.state.openMeals})}>
-        {this.state.openMeals ? 'Hide Meals':'Show Meals'}
-        </Button>
-        <Collapse isOpen={this.state.openMeals}>
-          <CardGroup>
-          {this.props.profile
-              ? this.props.profile.nutritionSchedule.map(sched => {
-
-                return(
-                  <Card body className='m-1' inverse color="dark">
-                  <CardTitle>{new Date(sched.time).toLocaleTimeString()}</CardTitle>
-                  {sched
-                        ? sched.items.map(item => {
-                            return(
-                  <CardText className='truncate px-1'>{item.name}</CardText>
-                            )
-                          }) : null}
-                  <Button color="primary" className='m-2'>Remove Meal</Button>
-                </Card> 
-                )
-              })
-          : null}
-          </CardGroup>
+        <Col md="12" className="text-left">
+          <Button
+            color="info"
+            className="my-2"
+            onClick={() => this.setState({ openMeals: !this.state.openMeals })}
+          >
+            {this.state.openMeals ? 'Hide Meals' : 'Show Meals'}
+          </Button>
+          <Collapse isOpen={this.state.openMeals}>
+            <CardGroup>
+              {this.props.profile
+                ? this.props.profile.nutritionSchedule.map((sched, index) => {
+                    return (
+                      <Card
+                        body
+                        key={index}
+                        className="m-1"
+                        inverse
+                        color="dark"
+                      >
+                        <CardTitle
+                          style={{
+                            fontWeight:'bold',
+                            textAlign:'center'
+                          }}
+                        >
+                          {new Date(sched.time).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </CardTitle>
+                        {sched
+                          ? sched.items.map((item, i) => {
+                              return (
+                                <CardText key={i} className="truncate px-3">
+                                  {item.name}
+                                  <br />
+                                  {item.serving + 'oz'}
+                                </CardText>
+                              )
+                            })
+                          : null}
+                        <Button
+                          color="primary"
+                          onClick={() => removeMeal(index)}
+                          className="m-2"
+                        >
+                          Remove Meal
+                        </Button>
+                      </Card>
+                    )
+                  })
+                : null}
+            </CardGroup>
           </Collapse>
         </Col>
       </Row>
@@ -445,7 +523,6 @@ class NutritionDash extends Component {
           label: value + 1
         }
       })
-      // console.log(list)
       return list
     }
 
@@ -484,42 +561,6 @@ class NutritionDash extends Component {
       }
     ]
 
-    // let table = () => {
-    //   return (
-    //     <Table responsive>
-    //       <thead>
-    //         <tr>
-    //           {columns.map(item => {
-    //             return <th>{item.text}</th>
-    //           })}
-    //         </tr>
-    //       </thead>
-    //       <tbody>
-    //         {this.state.products.map((product, index) => {
-    //           let keys = Object.keys(product)
-    //           return (
-    //             <tr
-    //               onClick={() =>
-    //                 this.setState(() => {
-    //                   return {
-    //                     index: index,
-    //                     rowSelected: true
-    //                   }
-    //                 })
-    //               }
-    //             >
-    //               {keys.map(key => {
-    //                 return <td>{product[key]}</td>
-    //               })}
-    //             </tr>
-    //           )
-    //         })}
-    //       </tbody>
-    //     </Table>
-    //   )
-    // }
-    console.log(window.innerWidth)
-
     return (
       <BootstrapTable
         keyField="name"
@@ -535,7 +576,11 @@ class NutritionDash extends Component {
         columns={columns}
         rowEvents={this.rowEvents}
         rowClasses={this.rowClasses}
-        classes = {this.props.windowWidth < 500 === true ? 'table-mobile bg-light':'bg-light'}
+        classes={
+          this.props.windowWidth < 500 === true
+            ? 'table-mobile bg-light'
+            : 'bg-light'
+        }
         cellEdit={cellEditFactory({
           mode: 'click',
           beforeSaveCell: (oldValue, newValue, row, column) => {
@@ -752,7 +797,6 @@ class NutritionDash extends Component {
     return (
       <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
         {this.displayMacros()}
-        {this.renderMealSchedule()}
         <Nav tabs>
           <NavItem>
             <NavLink
@@ -792,6 +836,9 @@ class NutritionDash extends Component {
             {this.renderTable()}
           </TabPane>
           <TabPane tabId="2">
+            <Row className="my-3">
+              <Col md="12">{this.renderMealSchedule()}</Col>
+            </Row>
             <Row>
               <Col md="12">{this.makeSchedule()}</Col>
             </Row>
@@ -815,7 +862,9 @@ const mapStateToProps = state => {
   }
 }
 
-export default windowSize(connect(
-  mapStateToProps,
-  actions
-)(NutritionDash))
+export default windowSize(
+  connect(
+    mapStateToProps,
+    actions
+  )(NutritionDash)
+)
