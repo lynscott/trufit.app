@@ -113,13 +113,12 @@ class NutritionDash extends Component {
       openMeals: true,
       selected: [],
       time: null
-      //TODO: obj for meals as time and list of items  {time:[{foodObj}...]} this can be an array nutritionSchedule
     }
   }
 
-  componentDidMount = () => {
-    // setTimeout(() => this.calculateTotals(), 1000)
-  }
+  // componentDidMount = () => {
+  //   // setTimeout(() => this.calculateTotals(), 1000)
+  // }
 
   componentDidUpdate = (prevProps, prevState) => {
     //TODO: replace this with new nutrition list props
@@ -234,7 +233,7 @@ class NutritionDash extends Component {
   }
 
   makeSchedule = () => {
-    console.log(this.state)
+    // console.log(this.state)
 
     let getItemStyle = (isDragging, draggableStyle) => ({
       // some basic styles to make the items look a bit nicer
@@ -345,7 +344,7 @@ class NutritionDash extends Component {
                 }}
                 {...provided.droppableProps}
               >
-                <h4>Food List </h4>
+                <h5 style={{fontWeight:'lighter'}}>Select Items For Meal:</h5>
                 {draggableFoodItems()}
                 {provided.placeholder}
               </div>
@@ -371,8 +370,9 @@ class NutritionDash extends Component {
                 }}
                 {...provided.droppableProps}
               >
-                <Row className="justify-content-center py-2">
-                  <Col md="3">
+                <Row className="align-items-center py-2">
+                  <Col md="6">
+                    
                     <Button
                       onClick={() => saveMealTime()}
                       disabled={
@@ -386,16 +386,18 @@ class NutritionDash extends Component {
                     >
                       Save Meal
                     </Button>
+                  {/* </Col>
+                  <Col md="4" position='middle'> */}
+                    
                   </Col>
-                  <Col md="4">
-                    <h5>Meal Time*</h5>
-                  </Col>
-                  <Col md="5">
+                  <Col md="6">
+                  <h5 style={{fontWeight:'lighter', color:'white', display:'inline'}}>Set Time:</h5>
                     <Input
                       onChange={e => {
                         console.log(e.target.value)
                         this.setState({ time: e.target.value })
                       }}
+                      placeholder='Set Time'
                       // style={{maxWidth:'fit-content'}}
                       type="time"
                     />
@@ -406,7 +408,7 @@ class NutritionDash extends Component {
                     {(provided, snapshot) => (
                       // <ListGroupItem tag="button" action>
                       <div
-                        className="p-2"
+                        className="p-2 bg-dark"
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
@@ -436,13 +438,11 @@ class NutritionDash extends Component {
     //Groups of food items as meals with times, courld be a form element
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        {/* <Container fluid> */}
         <Row className="my-4">
-          {foodList()}
           {/* <br /> */}
           {schedule()}
+          {foodList()}
         </Row>
-        {/* </Container> */}
       </DragDropContext>
     )
   }
@@ -526,14 +526,32 @@ class NutritionDash extends Component {
       return list
     }
 
+    let isLastRow = (rowIndex) => {
+      console.log( rowIndex, this.props.profile.nutritionItems.length)
+      if (rowIndex === this.props.profile.nutritionItems.length) {
+          return false
+      }
+      return true
+    }
+
     let columns = [
       {
         dataField: 'name',
-        text: 'Food Item'
+        text: 'Food Item',
+        editable: (cell, row, rowIndex, colIndex) => {
+          // console.log(cell, colIndex)
+          if (rowIndex === this.props.profile.nutritionItems.length) {
+            return false
+          }
+          return true
+        }
       },
       {
         dataField: 'serving_label',
-        text: 'Serving'
+        text: 'Serving',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return true
+        }
       },
       {
         dataField: 'serving',
@@ -545,19 +563,31 @@ class NutritionDash extends Component {
       },
       {
         dataField: 'calories',
-        text: 'Calories'
+        text: 'Calories',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
       },
       {
         dataField: 'fats',
-        text: 'Fats (g)'
+        text: 'Fats (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
       },
       {
         dataField: 'carb',
-        text: 'Carbs (g)'
+        text: 'Carbs (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
       },
       {
         dataField: 'protein',
-        text: 'Protein (g)'
+        text: 'Protein (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
       }
     ]
 
@@ -574,7 +604,7 @@ class NutritionDash extends Component {
             : []
         }
         columns={columns}
-        rowEvents={this.rowEvents}
+        // rowEvents={this.rowEvents}
         rowClasses={this.rowClasses}
         classes={
           this.props.windowWidth < 500 === true
@@ -582,15 +612,20 @@ class NutritionDash extends Component {
             : 'bg-light'
         }
         cellEdit={cellEditFactory({
-          mode: 'click',
+          mode: 'dbclick',
+          blurToSave:true,
+          autoSelectText: true,
           beforeSaveCell: (oldValue, newValue, row, column) => {
             console.log(newValue, row)
-
-            this.updateMacros(newValue)
-            this.setState({ rowSelected: false })
+            
+            //TODO: Add new action for text val updates
+            if (!isNaN(newValue) && newValue !== ' '){
+              this.updateMacros(newValue)
+            }
+            // this.setState({ rowSelected: false })
           }
         })}
-        // selectRow={this.selectRow}
+        selectRow={this.selectRow}
       />
     )
   }
@@ -598,6 +633,19 @@ class NutritionDash extends Component {
   rowClasses = (row, rowIndex) => {
     if (rowIndex === this.state.index && this.state.rowSelected) {
       return 'selected-row'
+    }
+  }
+
+
+  selectRow = {
+    mode: 'checkbox',
+    clickToSelect: true,
+    hideSelectColumn: true,
+    clickToEdit: true,
+    onSelect: (row, isSelect, rowIndex, e) => {
+      console.log(rowIndex)
+      this.rowClasses(rowIndex)
+      this.setState({ index: rowIndex,rowSelected: true })
     }
   }
 
@@ -652,14 +700,14 @@ class NutritionDash extends Component {
     )
   }
 
-  selectRow = {
-    mode: 'radio',
-    onSelect: (row, isSelect, rowIndex, e) => {
-      console.log(rowIndex)
-      // row.name = 'Test'
-      this.setState({ index: rowIndex })
-    }
-  }
+  // selectRow = {
+  //   mode: 'radio',
+  //   onSelect: (row, isSelect, rowIndex, e) => {
+  //     console.log(rowIndex)
+  //     // row.name = 'Test'
+  //     this.setState({ index: rowIndex })
+  //   }
+  // }
 
   calculateTotals = () => {
     // if (this.props.profile.nutritionItems.length !== 0) {
@@ -694,6 +742,7 @@ class NutritionDash extends Component {
     })
     this.forceUpdate()
   }
+
 
   addItemButton = () => {
     return (
@@ -827,7 +876,7 @@ class NutritionDash extends Component {
               <Row className="justify-content-center">
                 <Col md="6">{this.selectFoodItem()}</Col>
               </Row>
-              <Row className="justify-content-center">
+              <Row className="align-items-center justify-content-center">
                 <Col md="3">{this.addItemButton()}</Col>
                 <Col md="3">{this.manualEntryButton()}</Col>
                 <Col md="3">{this.removeItemButton()}</Col>
