@@ -94,9 +94,9 @@ class DashSideBar extends React.Component {
           </CardHeader>
           <CardBody>
             <CardTitle>{new Date().toLocaleDateString()}</CardTitle>
-            <CardText style={{ padding: '10px' }}>
+            {/* <CardText style={{ padding: '10px' }}> */}
               {this.affirmationChange()}
-            </CardText>
+            {/* </CardText> */}
             <ListGroup flush>
               <Link to="/dashboard/overview" style={{ textDecoration: 'none' }}>
                 <ListGroupItem
