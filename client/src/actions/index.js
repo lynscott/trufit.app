@@ -247,7 +247,7 @@ export const fetchProfile = () => async dispatch => {
 }
 
 export const updateProfile = (values) => async dispatch => {
-  console.log(values, 'fired')
+  // console.log(values, 'fired')
   let res = await axios.post('/api/update_profile', values)
 
   dispatch({ type: UPDATE_PROFILE, payload:res.data  })

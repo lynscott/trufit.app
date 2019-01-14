@@ -1,63 +1,63 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import pic from '../img/logo.png';
-import PlanHeader from './PlanHeader';
-import { findDOMNode } from 'react-dom';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import pic from '../img/logo.png'
+import PlanHeader from './PlanHeader'
+import { findDOMNode } from 'react-dom'
 // import $ from 'jquery';
 
-import { fetchPlan, fetchUser } from '../actions';
+import { fetchPlan, fetchUser } from '../actions'
 
 class ShowPlan extends Component {
   componentDidMount() {
-    const { id } = this.props.match.params;
-    this.props.fetchPlan(id);
+    const { id } = this.props.match.params
+    this.props.fetchPlan(id)
   }
 
   findBMR() {
-    const { weight, height, age } = this.props.plan;
-    const { gender } = this.props.auth;
-    const inToCm = height * 2.54;
-    const lbsToKg = weight / 2.2;
+    const { weight, height, age } = this.props.plan
+    const { gender } = this.props.auth
+    const inToCm = height * 2.54
+    const lbsToKg = weight / 2.2
     if (gender === 'male') {
-      const BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * (age + 5);
-      return Math.round(BMR);
+      const BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * (age + 5)
+      return Math.round(BMR)
     } else if (gender === 'female') {
-      const BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age - 161;
-      return Math.round(BMR);
+      const BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age - 161
+      return Math.round(BMR)
     }
   }
 
   pathSelect() {
-    const { activity_mod } = this.props.plan;
+    const { activity_mod } = this.props.plan
     if (1.2 === activity_mod || activity_mod === 1.375) {
-      return 'Fitness';
+      return 'Fitness'
     } else if (activity_mod === 1.55) {
-      return 'Life Style';
+      return 'Life Style'
     } else if (activity_mod === 1.725 || activity_mod === 1.9) {
-      return 'Athlete';
+      return 'Athlete'
     }
   }
 
   calorieSelect() {
-    const { planName } = this.props.plan;
-    const calories = this.findBMR() * this.props.plan.activity_mod;
+    const { planName } = this.props.plan
+    const calories = this.findBMR() * this.props.plan.activity_mod
     if (planName === 'Savage Strength') {
-      return calories + 300;
+      return calories + 300
     } else if (planName === 'Weight Loss') {
-      return calories - 800;
+      return calories - 800
     } else if (planName === 'Tone & Sculpt') {
-      return calories - 400;
+      return calories - 400
     }
   }
 
   planPDF = () => {
-    const el = findDOMNode(this.refs.user_plan);
+    const el = findDOMNode(this.refs.user_plan)
     // const userPlan = $(el);
     // console.log(userPlan);
   };
 
   render() {
-    const { plan } = this.props;
+    const { plan } = this.props
 
     if (!plan) {
       return (
@@ -71,7 +71,7 @@ class ShowPlan extends Component {
             style={{ width: 75 }}
           />
         </div>
-      );
+      )
     }
     return (
       <section ref="user_plan">
@@ -179,12 +179,12 @@ class ShowPlan extends Component {
           </div>
         </div>
       </section>
-    );
+    )
   }
 }
 
 function mapStateToProps({ plans, auth }, ownProps) {
-  return { plan: plans[ownProps.match.params.id], auth: auth };
+  return { plan: plans[ownProps.match.params.id], auth: auth }
 }
 
-export default connect(mapStateToProps, { fetchPlan, fetchUser })(ShowPlan);
+export default connect(mapStateToProps, { fetchPlan, fetchUser })(ShowPlan)

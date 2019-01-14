@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as actions from '../actions'
-// import PlanList from './PlanList'
 import classnames from 'classnames'
 
 import DashCalendar from './DashCalendar'
@@ -27,11 +26,8 @@ import {
   FormGroup,
   Label,
   Input,
-  ListGroup,
-  ListGroupItem,
-  FormText,
   Row,
-  Col, CardGroup, CardDeck
+  Col, CardGroup, CardDeck, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
@@ -42,7 +38,7 @@ const Block = ({ content, colSize, content2 = null, configs = null }) => {
   return (
     <div className="row px-0 justify-content-around">
       <div className={`col-md-${colSize} ${configs}`}>{content}</div>
-      <div className={'col-md-5'}>{content2}</div>
+      <div className={'col-md-6'}>{content2}</div>
     </div>
   )
 }
@@ -92,8 +88,14 @@ class Dashboard extends Component {
     this.state = {
       // eslint-disable-next-line quotes
       activeTab: '1',
-      activePage: 'overview'
+      activePage: 'overview',
+      dropOpen: false,
+      currentGoal: 'No Goal Selected'
     }
+  }
+
+  componentDidMount = async () => {
+    await this.props.fetchProfile()
   }
 
   toggle(tab) {
@@ -102,6 +104,12 @@ class Dashboard extends Component {
         activeTab: tab
       })
     }
+  }
+
+  toggleDrop = () => {
+    this.setState(prevState => ({
+      dropOpen: !prevState.dropOpen
+    }))
   }
 
   renderOverviewTabs = () => {
@@ -136,11 +144,11 @@ class Dashboard extends Component {
             <h2>Week Ahead</h2>
             <DashCalendar plan={this.props.plans[7]} />
             <hr />
-            <h2>Current Macros</h2>
+            <h2>Nutrition</h2>
             <Block
               content={<NutritionTable />}
               content2={<Pie data={data} />}
-              colSize={7}
+              colSize={5}
             />
             <hr />
           </TabPane>
@@ -166,12 +174,23 @@ class Dashboard extends Component {
             <CardHeader>Current Goal:</CardHeader>
             <CardBody>
               <CardTitle style={{ border: 'none', color: 'white' }}>
-                Weight Loss
+              {this.props.profile.currentGoal.text}
               </CardTitle>
               <CardText>
-                <Progress animated value={50}>
-                  50%
-                </Progress>
+              <Dropdown isOpen={this.state.dropOpen} direction={'right'} toggle={this.toggleDrop}>
+                <DropdownToggle caret>
+                Change Goal
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Loss', value:-400}})}>Weight Loss</DropdownItem>
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem>
+                  {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
+                  <DropdownItem divider />
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Gain', value:400}})}>Weight Gain</DropdownItem>
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem>
+                  {/* <DropdownItem>Quo Action</DropdownItem> */}
+                </DropdownMenu>
+              </Dropdown>
               </CardText>
               {/* <Button>Go somewhere</Button> */}
             </CardBody>
@@ -224,7 +243,7 @@ class Dashboard extends Component {
     console.log(this.props.user)
     return (
       <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
-        {this.renderDashTopStats()}
+        {this.props.profile? this.renderDashTopStats():null}
         {this.renderOverviewTabs()}
       </Col>
     )
@@ -234,7 +253,8 @@ class Dashboard extends Component {
 function mapStateToProps(state, { auth }) {
   return {
     user: state.auth.user,
-    plans: state.plans.planTemps
+    plans: state.plans.planTemps,
+    profile: state.auth.userProfile
   }
 }
 
