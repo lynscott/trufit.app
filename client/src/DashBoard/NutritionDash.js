@@ -35,23 +35,6 @@ import windowSize from 'react-window-size'
 
 const recommendedMacros = 1800
 
-const data = {
-  labels: ['Carbs', 'Protein', 'Fats'],
-  datasets: [
-    {
-      data: [100, 250, 75],
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-      hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-    }
-  ]
-}
-
-// fake data generator
-const getItems = list =>
-  list.map((item, index) => ({
-    id: `item-${item.name[0] + index}`,
-    content: item.name
-  }))
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -116,9 +99,10 @@ class NutritionDash extends Component {
     }
   }
 
-  // componentDidMount = () => {
-  //   // setTimeout(() => this.calculateTotals(), 1000)
-  // }
+  componentDidMount = async () => {
+    await this.props.fetchProfile()
+    this.calculateTotals()
+  }
 
   componentDidUpdate = (prevProps, prevState) => {
     //TODO: replace this with new nutrition list props
@@ -187,6 +171,7 @@ class NutritionDash extends Component {
       index: this.state.index,
       replace: newRow
     })
+    this.setState({rowSelected:false})
     this.calculateTotals()
   }
 
@@ -526,14 +511,6 @@ class NutritionDash extends Component {
       return list
     }
 
-    let isLastRow = (rowIndex) => {
-      console.log( rowIndex, this.props.profile.nutritionItems.length)
-      if (rowIndex === this.props.profile.nutritionItems.length) {
-          return false
-      }
-      return true
-    }
-
     let columns = [
       {
         dataField: 'name',
@@ -546,25 +523,38 @@ class NutritionDash extends Component {
           return true
         }
       },
-      {
-        dataField: 'serving_label',
-        text: 'Serving',
-        editable: (cell, row, rowIndex, colIndex) => {
-          return true
-        }
-      },
+      // {
+      //   dataField: 'serving_label',
+      //   text: 'Serving',
+      //   editable: (cell, row, rowIndex, colIndex) => {
+      //     if (rowIndex === this.props.profile.nutritionItems.length) {
+      //       return false
+      //     }
+      //     return true
+      //   }
+      // },
       {
         dataField: 'serving',
         text: 'Amount(oz)',
         editor: {
           type: Type.SELECT,
           options: makeArray()
+        },
+        editable: (cell, row, rowIndex, colIndex) => {
+          if (rowIndex === this.props.profile.nutritionItems.length) {
+            return false
+          }
+          return true
         }
       },
       {
         dataField: 'calories',
         text: 'Calories',
         editable: (cell, row, rowIndex, colIndex) => {
+          // console.log(cell, row)
+          if (row.id === 'manual') {
+            return true
+          }
           return false
         }
       },
@@ -604,7 +594,6 @@ class NutritionDash extends Component {
             : []
         }
         columns={columns}
-        // rowEvents={this.rowEvents}
         rowClasses={this.rowClasses}
         classes={
           this.props.windowWidth < 500 === true
@@ -615,12 +604,17 @@ class NutritionDash extends Component {
           mode: 'dbclick',
           blurToSave:true,
           autoSelectText: true,
-          beforeSaveCell: (oldValue, newValue, row, column) => {
-            console.log(newValue, row)
+          beforeSaveCell: async (oldValue, newValue, row, column) => {
+            // console.log(newValue, row, 'before save log')
             
-            //TODO: Add new action for text val updates
             if (!isNaN(newValue) && newValue !== ' '){
               this.updateMacros(newValue)
+            } else {
+              // console.log('send to save')
+              await this.props.updateFoodItem({
+                index: this.state.index,
+                replace: row
+              })
             }
             // this.setState({ rowSelected: false })
           }
@@ -631,7 +625,8 @@ class NutritionDash extends Component {
   }
 
   rowClasses = (row, rowIndex) => {
-    if (rowIndex === this.state.index && this.state.rowSelected) {
+    if (rowIndex === this.state.index && this.state.rowSelected && 
+      rowIndex !== this.props.profile.nutritionItems.length) {
       return 'selected-row'
     }
   }
@@ -642,10 +637,13 @@ class NutritionDash extends Component {
     clickToSelect: true,
     hideSelectColumn: true,
     clickToEdit: true,
+    nonSelectable: [this.props.profile ? this.props.profile.nutritionItems.length: ''],
     onSelect: (row, isSelect, rowIndex, e) => {
-      console.log(rowIndex)
+      // console.log(rowIndex)
+      if (rowIndex !== this.props.profile.nutritionItems.length) {
       this.rowClasses(rowIndex)
       this.setState({ index: rowIndex,rowSelected: true })
+      }
     }
   }
 
@@ -682,7 +680,7 @@ class NutritionDash extends Component {
           </h4>
           <h4>
             <Badge color="info" pill>
-              Calories: 1800
+              Calories: {Number(this.props.profile.calories) + this.props.profile.currentGoal.value}
             </Badge>
           </h4>
           {/* </CardText>
@@ -700,14 +698,6 @@ class NutritionDash extends Component {
     )
   }
 
-  // selectRow = {
-  //   mode: 'radio',
-  //   onSelect: (row, isSelect, rowIndex, e) => {
-  //     console.log(rowIndex)
-  //     // row.name = 'Test'
-  //     this.setState({ index: rowIndex })
-  //   }
-  // }
 
   calculateTotals = () => {
     // if (this.props.profile.nutritionItems.length !== 0) {
@@ -737,7 +727,8 @@ class NutritionDash extends Component {
         fats: fats.toFixed(2),
         calories: Math.round(cals),
         carb: carbs.toFixed(2),
-        protein: prot.toFixed(2)
+        protein: prot.toFixed(2),
+        id:'total'
       })
     })
     this.forceUpdate()
@@ -791,13 +782,14 @@ class NutritionDash extends Component {
 
   manualEntryButton = () => {
     let emtpyItem = {
-      name: '',
-      serving_label: '',
+      name: 'Enter a name for the item',
+      serving_label: 'Enter a serving',
       serving: 0,
       calories: 0,
       fats: 0,
       carb: 0,
-      protein: 0
+      protein: 0,
+      id: 'manual'
     }
 
     return (
@@ -899,7 +891,7 @@ class NutritionDash extends Component {
 
   render() {
     // console.log(this.props)
-    return this.renderNutritionTabs()
+    return this.props.profile? this.renderNutritionTabs():null
   }
 }
 

@@ -340,7 +340,7 @@ app.post('/api/update_profile', async (req, res, next) => {
 app.post('/api/update_food_item', async (req, res, next) => {
 	requireLogin(req, res, next)
 
-	console.log(req.body.removeSchedule)
+	// console.log(req.body.removeSchedule)
 	await UserProfile.findOne({ _user: req.user.id }, async (err, prof) => {
 		if (err) return res.send(500, { error: err })
 		if (req.body.replace) {
@@ -353,7 +353,7 @@ app.post('/api/update_food_item', async (req, res, next) => {
 			prof.save()
 			res.status(200).send(prof)
 		} else if (req.body.removeSchedule || req.body.removeSchedule === 0) {
-			console.log('removing', req.body.removeSchedule)
+			// console.log('removing', req.body.removeSchedule)
 			let index = req.body.removeSchedule
 			prof.nutritionSchedule.splice(index, 1)
 			prof.save()
