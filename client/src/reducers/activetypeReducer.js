@@ -1,9 +1,13 @@
-import {TYPE_SELECTED} from '../actions';
+import {TYPE_SELECTED} from '../actions'
 
-export default function(state = "", action) {
+let initState = {
+  activeType: null
+}
+
+export default function(state = '', action) {
   switch(action.type) {
   case TYPE_SELECTED:
-    return action.payload;
+    return action.payload
   default:
     //nothin;
   }
