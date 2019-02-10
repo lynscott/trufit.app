@@ -29,7 +29,7 @@ import './NutritionDash.scss'
 import { Type } from 'react-bootstrap-table2-editor'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import classnames from 'classnames'
-import { Pie, Doughnut } from 'react-chartjs-2'
+import { Pie, Doughnut, HorizontalBar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 
@@ -70,6 +70,20 @@ class NutritionDash extends Component {
       serving: 1,
       rowSelected: false,
       index: 0,
+      horizontalBarData: {
+        labels: ['Carbs', 'Protein', 'Fats'],
+        datasets: [
+          {
+            data: [100, 250, 75],
+            backgroundColor: 'rgba(255,99,132,0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1,
+            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+            hoverBorderColor: 'rgba(255,99,132,1)',
+            label: '(g)',
+          }
+        ]
+      },
       doughnutData: {
         labels: ['Carbs', 'Protein', 'Fats'],
         datasets: [
@@ -420,11 +434,10 @@ class NutritionDash extends Component {
       )
     }
 
-    //Groups of food items as meals with times, courld be a form element
+    //Groups of food items as meals with times, could be a form element
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Row className="my-4">
-          {/* <br /> */}
           {schedule()}
           {foodList()}
         </Row>
@@ -616,7 +629,6 @@ class NutritionDash extends Component {
                 replace: row
               })
             }
-            // this.setState({ rowSelected: false })
           }
         })}
         selectRow={this.selectRow}
@@ -657,30 +669,30 @@ class NutritionDash extends Component {
   displayMacros = () => {
     return (
       <Row className="justify-content-center py-2">
-        <Col md="4" position="middle">
+        <Col md="4" className='align-self-center' position="middle">
           {/* <Card body inverse color="info" style={{ borderColor: '#333' }}>
             <CardHeader>Recommended Macros:</CardHeader>
             <CardBody>
               <CardText> */}
           <h5>Recommended Macros:</h5>
           <h4>
-            <Badge color="primary" pill>
+            <Badge color="primary" >
               Protein: 200g
             </Badge>
           </h4>
           <h4>
-            <Badge color="warning" pill>
+            <Badge color="warning" >
               Carbs: 100g
             </Badge>
           </h4>
           <h4>
-            <Badge color="danger" pill>
+            <Badge color="danger" >
               Fats: 70g
             </Badge>
           </h4>
           <h4>
-            <Badge color="info" pill>
-              Calories: {Number(this.props.profile.calories) + this.props.profile.currentGoal.value}
+            <Badge color="info" >
+              Calories: {(Number(this.props.profile.calories) + this.props.profile.currentGoal.value).toFixed()}
             </Badge>
           </h4>
           {/* </CardText>
@@ -689,9 +701,9 @@ class NutritionDash extends Component {
         </Col>
         <Col md="6">
           <h5>Your Diets Macros:</h5>
-          <Doughnut
+          <HorizontalBar
             legend={{ position: 'bottom' }}
-            data={this.state.doughnutData}
+            data={this.state.horizontalBarData}
           />
         </Col>
       </Row>
@@ -717,7 +729,7 @@ class NutritionDash extends Component {
     }
 
     this.setState(() => {
-      this.state.doughnutData.datasets[0].data = [
+      this.state.horizontalBarData.datasets[0].data = [
         Math.round(carbs),
         Math.round(prot),
         Math.round(fats)
