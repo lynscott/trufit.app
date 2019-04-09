@@ -211,6 +211,7 @@ export const foodSearch = (term) => async dispatch => {
 
 export const foodSelect = (foodID) => async dispatch => {
 
+  //TODO: Move this to a constants folder
   let parseFood = (food) => {
     let name = food[0].food.desc.name.replace(',',' ')
 

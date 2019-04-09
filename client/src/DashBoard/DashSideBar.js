@@ -125,7 +125,7 @@ class DashSideBar extends React.Component {
                   onClick={() => this.setState({ currentTab: 'plans' })}
                   tag="button"
                 >
-                  My Plans
+                  Training
                 </ListGroupItem>
               </Link>
               <Link

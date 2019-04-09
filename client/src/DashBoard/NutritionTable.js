@@ -4,7 +4,7 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import { connect } from 'react-redux'
 import Moment from 'react-moment'
 import * as actions from '../actions'
-import { Card, CardTitle, CardText, CardGroup, Button } from 'reactstrap'
+import { Card, CardTitle, CardText, CardGroup, Button, Badge, Col } from 'reactstrap'
 
 const products = [
   { meal: 'Meal 1', fats: 20, carb: 50, protein: 100, total: 300 },
@@ -57,7 +57,7 @@ class NextMeal extends Component {
         ? -1
         : 0
     )
-    console.log(times)
+    // console.log(times)
 
     let clock = timeArray => {
       if (timeArray[0].time > new Date()) {
@@ -83,10 +83,13 @@ class NextMeal extends Component {
         </CardTitle>
         {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
           return (
-            <CardText key={i} className="truncate px-3">
-              {item.name}
-              <br />
-              {item.serving + 'oz'}
+            <CardText key={i} className="row">
+            <Col md='6'>
+              <h5><Badge color='light'> {item.name}</Badge></h5>
+              </Col>
+              <Col md='6'>
+              <h5><Badge color='success'>{item.serving + 'oz'}</Badge></h5>
+              </Col>
             </CardText>
           )
         })}

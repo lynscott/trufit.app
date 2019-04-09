@@ -95,7 +95,7 @@ class LoginForm extends Component {
         </button>
 
         <br/>
-        <h4>or</h4>
+        {/* <h4>or</h4>
         <a
           href="/auth/google"
           id="login-button"
@@ -111,7 +111,7 @@ class LoginForm extends Component {
           className="btn btn-primary"
         >
           <i className="fab fa-facebook-f" /> Sign In With Facebook
-        </a>
+        </a> */}
       </form>
     )
   }
