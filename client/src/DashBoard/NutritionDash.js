@@ -486,10 +486,15 @@ class NutritionDash extends Component {
                         {sched
                           ? sched.items.map((item, i) => {
                               return (
-                                <CardText key={i} className="truncate px-3">
-                                  {item.name}
-                                  <br />
+                                <CardText key={i} className="row justify-content-center">
+                                  <Col md='6' className='truncate text-center'>
+                                  <Badge color='light'>{item.name}</Badge>
+                                  </Col>
+                                  <Col md='6' className='text-center'>
+                                  <Badge color='warning'>
                                   {item.serving + 'oz'}
+                                  </Badge>
+                                  </Col>
                                 </CardText>
                               )
                             })

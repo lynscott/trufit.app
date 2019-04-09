@@ -169,8 +169,9 @@ class SignUpForm extends Component {
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >
+      <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2>
         <FontAwesomeIcon icon="user-plus" size={'3x'} />
-        <h2>Create An Account</h2>
+        <h3>Create An Account</h3>
 
         {this.state.page === 1 ? (
           <Fade top cascade>
@@ -233,7 +234,7 @@ class SignUpForm extends Component {
                   }}
                 >
                   Your weight, height, age, and gender help estimate your bodies
-                  meabolic rate and are soley used to help personalize your
+                  metabolic rate and are solely used to help personalize your
                   training plan and nutrition guide.
                 </p>
               </Tooltip>

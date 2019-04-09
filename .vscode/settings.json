@@ -1,0 +1,21 @@
+{
+    "editor.snippetSuggestions": "top",
+   "editor.rulers": [
+       80,
+       120
+   ],
+   "editor.tabCompletion": true,
+   "prettier.semi": false,
+   "todohighlight.keywords":[
+       "HACK:","NOTE:",
+       {
+           "text":"DEPRECATED:",
+           "backgroundColor":"#D3D3D3",
+           "color": "#1c1c1c"
+       },{
+           "text":"UNCHECKED:",
+           "backgroundColor": "blue",
+           "color": "#aaa"
+       }
+   ]
+}

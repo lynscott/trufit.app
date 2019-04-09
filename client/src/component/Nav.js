@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import logo from '../img/logo.png'
+import logo from '../img/logo2_edit.png'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
 import LoginForm from './LoginForm'
@@ -115,13 +115,13 @@ class Nav extends Component {
   }
 
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div className="row" style={{ marginBottom: '65px' }}>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
             className="navbar-brand mx-auto d-block"
-            style={{ width: 150 }}
+            style={{ width: 150, padding:0 }}
             id="title"
             to="/"
           >
@@ -129,7 +129,7 @@ class Nav extends Component {
               src={logo}
               className="d-inline-block align-top"
               width="100"
-              height="30"
+              height="50"
               alt="logo"
             />
           </Link>
