@@ -120,14 +120,14 @@ class Nav extends Component {
       <div className="row" style={{ marginBottom: '65px' }}>
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
-            className="navbar-brand mx-auto d-block"
+            className="navbar-brand mx-auto d-none d-md-block"
             style={{ width: 150, padding:0 }}
             id="title"
             to="/"
           >
             <img
               src={logo}
-              className="d-inline-block align-top"
+              className="d-inline-block align-top "
               width="100"
               height="50"
               alt="logo"
