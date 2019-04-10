@@ -116,43 +116,48 @@ class App extends Component {
           <div className="col">
             <Fade top>
               <h1
-                className="section-header p-2"
+                className="section-header p-2 d-none d-md-block"
                 id="title-line"
                 style={{ marginTop: '50vh', textDecoration: 'none' }}
               >
                 One Day At A Time
               </h1>
             </Fade>
-
-            <Fade top delay={1000}>
-            <Button color="info" onClick={this.signup}>Get Started</Button>
-            <Modal isOpen={this.state.signup} toggle={this.signup}>
-              {/* <ModalHeader toggle={this.toggle}>Welcome Back!
-              </ModalHeader> */}
-              <ModalBody>
-                <SignUpForm closeForm={this.signup}/>
-              </ModalBody>
-              <ModalFooter style={{padding:'0.5rem'}}>
-                {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
-                <Button color="secondary" onClick={this.signup}>Cancel</Button>
-              </ModalFooter>
-            </Modal>   
-              {/* <br/> */}
-              or
-              {/* <br/> */}
-            <Button color="secondary" onClick={this.toggle}>Sign In</Button>
-            <Modal isOpen={this.state.modal} toggle={this.toggle}>
-              <ModalHeader toggle={this.toggle}>Welcome Back!
-              </ModalHeader>
-              <ModalBody>
-                <LoginForm closeForm={this.toggle}/>
-              </ModalBody>
-              <ModalFooter style={{padding:'0.5rem'}}>
-                {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
-                <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-              </ModalFooter>
-            </Modal>
-            </Fade>
+            <div className='row pt-3' >
+              <Fade top delay={1000}>
+                <div className='col'>
+                  <Button color="info" onClick={this.signup}>Get Started</Button>
+                </div>
+                <Modal isOpen={this.state.signup} toggle={this.signup}>
+                  {/* <ModalHeader toggle={this.toggle}>Welcome Back!
+                  </ModalHeader> */}
+                  <ModalBody>
+                    <SignUpForm closeForm={this.signup}/>
+                  </ModalBody>
+                  <ModalFooter style={{padding:'0.5rem'}}>
+                    {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+                    <Button color="secondary" onClick={this.signup}>Cancel</Button>
+                  </ModalFooter>
+                </Modal>   
+                  {/* <br/> */}
+                  {/* or */}
+                  {/* <br/> */}
+                <div className='col'>
+                  <Button color="secondary" onClick={this.toggle}>Sign In</Button>
+                </div>
+                <Modal isOpen={this.state.modal} toggle={this.toggle}>
+                  <ModalHeader toggle={this.toggle}>Welcome Back!
+                  </ModalHeader>
+                  <ModalBody>
+                    <LoginForm closeForm={this.toggle}/>
+                  </ModalBody>
+                  <ModalFooter style={{padding:'0.5rem'}}>
+                    {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
+                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                  </ModalFooter>
+                </Modal>
+              </Fade>
+              </div>
           </div>
         </div>
         <div className='row justify-content-center p-3' id="test-div">
@@ -202,11 +207,11 @@ class App extends Component {
             />
           </div>
         </div>
-        <div className="row p-3 bg-light justify-content-center qoute-section section-row align-items-center">
+        <div className="row p-3 bg-light justify-content-center quote-section section-row align-items-center">
           <div className="col-md-6">
             <Fade bottom>
               <blockquote className="blockquote">
-                <p className="mb-0 font-italic text-dark">
+                <p className="mb-0 font-italic text-dark" style={{fontSize:'medium'}}>
                   Based on over 10 years of training experience each plan is
                   crafted with some of my favorite exercises, and techniques I've
                   found to be most effective in building quality muscle and burning fat.
