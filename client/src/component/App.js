@@ -109,25 +109,26 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div className="container-fluid bg-light">
         <div className="row" id="header">
-          <div className="col">
+          <div className="col d-none d-md-block">
             <Fade top>
               <h1
-                className="section-header p-2 d-none d-md-block"
+                className="section-header p-2"
                 id="title-line"
                 style={{ marginTop: '50vh', textDecoration: 'none' }}
               >
                 One Day At A Time
               </h1>
+              <Button className='mb-3' color="info" onClick={this.signup}>Get Started</Button>
+              {/* <Button className='my-3' color="secondary" onClick={this.toggle}>Sign In</Button> */}
             </Fade>
             <div className='row pt-3' >
               <Fade top delay={1000}>
-                <div className='col'>
-                  <Button color="info" onClick={this.signup}>Get Started</Button>
-                </div>
+                {/* <div className='col'> */}
+                {/* </div> */}
                 <Modal isOpen={this.state.signup} toggle={this.signup}>
                   {/* <ModalHeader toggle={this.toggle}>Welcome Back!
                   </ModalHeader> */}
@@ -142,9 +143,8 @@ class App extends Component {
                   {/* <br/> */}
                   {/* or */}
                   {/* <br/> */}
-                <div className='col'>
-                  <Button color="secondary" onClick={this.toggle}>Sign In</Button>
-                </div>
+                {/* <div className='col'> */}
+                {/* </div> */}
                 <Modal isOpen={this.state.modal} toggle={this.toggle}>
                   <ModalHeader toggle={this.toggle}>Welcome Back!
                   </ModalHeader>
@@ -195,7 +195,7 @@ class App extends Component {
             />
             <IconBlock
               text={
-                'Manage your nutrition plan and tailor it to your food prefrences and goals. Complimentary with each training program.'
+                'Manage your nutrition plan and tailor it to your food preferences and goals. Complimentary with each training program.'
               }
               iconClass={'fas fa-utensils py-2'}
             />
@@ -242,24 +242,24 @@ class App extends Component {
               <PriceBlock
                 listItems={[
                   'Start/Stop Any Plan Anytime',
-                  'Complete Training & Nutrition',
+                  'Training & Nutrition Tracking',
                   'Excludes Downloads'
                 ]}
-                title={'Unlimited Plan '}
+                title={'Self Training'}
                 price={'$8/month'}
               />
               <PriceBlock
                 listItems={[
                   'Virtual Personal Training',
-                  'Maximum Customization',
-                  'Weekly One on One Check-Ins'
+                  'Weekly Check-ins',
+                  'Excludes Downloads'
                 ]}
-                title={'Unlimited Training'}
+                title={'Personal Training'}
                 price={'$18/month'}
               />
               <PriceBlock
-                listItems={['PDF Download', 'Virtual Training System', 'One Time Payment']}
-                title={'Single Plan'}
+                listItems={['PDF Download', 'Excludes Online System', 'One Time Payment']}
+                title={'Training Plan'}
                 price={'$30'}
               />
           </div>
