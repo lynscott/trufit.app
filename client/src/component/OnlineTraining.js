@@ -29,7 +29,7 @@ class OnlineTraining extends Component {
                   <div className="card-body">
                     <h4 className="card-title">$59.99/Month</h4>
                     <p className="card-text">
-                      Fitness program for those just starting thier fitness
+                      Fitness program for those just starting their fitness
                       journey.
                     </p>
                     <ul className="list-group">
