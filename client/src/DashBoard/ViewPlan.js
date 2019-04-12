@@ -1,11 +1,11 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { Tooltip, Input, Button, Row, Col, Container } from 'reactstrap'
-import BootstrapTable from 'react-bootstrap-table-next'
+// import BootstrapTable from 'react-bootstrap-table-next'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import ReactPDF from '@react-pdf/renderer'
+
  
 // Create styles
 const styles = StyleSheet.create({
@@ -51,11 +51,11 @@ const MyDocument = () => (
       })} */}
       <View style={styles.section}>
         <Text>
-            <BootstrapTable keyField='id' 
+            {/* <BootstrapTable keyField='id' 
             striped={true} bordered={true} hover={true} condensed={true}
             bootstrap4 ={true} data={[]} 
             columns={ columns }
-            />
+            /> */}
         </Text>
       </View>
       <View style={styles.section}>
@@ -98,11 +98,11 @@ class ViewPlan extends React.Component {
                                     <Row>
                                         <Text>{workout.title}</Text>
                                         <Text>
-                                            <BootstrapTable keyField='id' 
+                                            {/* <BootstrapTable keyField='id' 
                                             striped={true} bordered={true} hover={true} condensed={true}
                                             bootstrap4 ={true} data={workout.exercises} 
                                             columns={ columns }
-                                            />
+                                            /> */}
                                         </Text>
                                     </Row>
                                 )

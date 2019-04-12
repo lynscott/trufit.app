@@ -7,11 +7,9 @@ import { connect } from 'react-redux'
 import * as actions from '../actions'
 import Fade from 'react-reveal/Fade'
 import Alert from 'react-s-alert'
-import logo from '../img/logo_sm.png'
 import { Spring } from 'react-spring'
 import LoginForm from './LoginForm'
 import SignUpForm from './SignUpForm'
-import gif from '../img/dashboard.gif'
 import 'react-s-alert/dist/s-alert-default.css'
 import 'react-s-alert/dist/s-alert-css-effects/scale.css'
 import './App2.scss'
@@ -177,7 +175,7 @@ class App extends Component {
               <Fade left>
                 <img
                   className="d-block w-100 img-fluid rounded"
-                  src={gif}
+                  src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/dashboard.gif'}
                   alt="gif"
                 />
               </Fade>

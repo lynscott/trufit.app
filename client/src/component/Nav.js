@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import logo from '../img/logo2_edit.png'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
 import LoginForm from './LoginForm'
@@ -126,7 +125,7 @@ class Nav extends Component {
             to="/"
           >
             <img
-              src={logo}
+              src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/logo2_edit.png'}
               className="d-inline-block align-top "
               width="100"
               height="50"
