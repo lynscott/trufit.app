@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import pic from '../img/fat_loss.jpg';
+// import pic from '../img/fat_loss.jpg';
 import StripeCheckout from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
@@ -28,7 +28,7 @@ class ShredPlan extends Component {
           amount={3900}
           token={token => this.props.handleShredToken(token, history, auth._id)}
           stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
-          image={pic}
+          // image={pic}
           zipCode={true}
           bitcoin={true}
         >
@@ -45,7 +45,7 @@ class ShredPlan extends Component {
     return (
       <div className="col-md-4 py-4">
         <figure className="figure">
-          <img
+          {/* <img
             src={pic}
             className="figure-img w-50  d-inline-block d-md-none img-fluid rounded"
             alt=" Plan A"
@@ -54,7 +54,7 @@ class ShredPlan extends Component {
             src={pic}
             className="figure-img d-none d-md-block img-fluid rounded"
             alt=" Plan A"
-          />
+          /> */}
           <figcaption className="figure-caption">
             Includes:
             <ul className="list-unstyled">

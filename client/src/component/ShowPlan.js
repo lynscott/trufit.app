@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import pic from '../img/logo.png'
+// import pic from '../img/logo.png'
 import PlanHeader from './PlanHeader'
 import { findDOMNode } from 'react-dom'
 // import $ from 'jquery';
@@ -79,12 +79,12 @@ class ShowPlan extends Component {
           <div className="container">
             <div className="row justify-content-center">
               <div className="col-md-12">
-                <img
+                {/* <img
                   src={pic}
                   className="img-fluid w-75 mx-auto d-block"
                   style={{ width: 690 }}
                   alt=" LSF"
-                />
+                /> */}
               </div>
             </div>
             <div className="row justify-content-center">

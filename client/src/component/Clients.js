@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import pic_1 from '../img/clients/adam2.jpg'
-import pic_2 from '../img/clients/david.png'
+
 // import pic_3 from '../img/clients/adam.jpg'
 
 import "react-responsive-carousel/lib/styles/carousel.min.css"
@@ -98,11 +97,11 @@ class ClientRoll extends Component {
             style={{borderRadius:'5px'}}
             >
                 <div>
-                    <img src={pic_1} />
+                    <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/adam2.jpg'} />
                     <p className="legend">Adam F. - Down 70lbs</p>
                 </div>
                 <div>
-                    <img src={pic_2} />
+                    <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/david.png'} />
                     <p className="legend">David S. - Down 80lbs</p>
                 </div>
                 {/* <div>

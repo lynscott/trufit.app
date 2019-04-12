@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import pic from '../img/sav.jpg';
+// import pic from '../img/sav.jpg';
 import StripeCheckout from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
@@ -30,7 +30,7 @@ class StrengthPlan extends Component {
             this.props.handleStrengthToken(token, history, auth._id)
           }
           stripeKey="pk_live_2nhU1EGud3cMUuL7bMoZ3c19"
-          image={pic}
+          // image={pic}
           zipCode={true}
           bitcoin={true}
         >
@@ -47,7 +47,7 @@ class StrengthPlan extends Component {
     return (
       <div className="col-md-4 py-4">
         <figure className="figure">
-          <img
+          {/* <img
             src={pic}
             className="figure-img w-50 align-center d-inline-block d-md-none img-fluid rounded"
             alt=" Plan A"
@@ -56,7 +56,7 @@ class StrengthPlan extends Component {
             src={pic}
             className=" figure-img d-none d-md-block img-fluid rounded"
             alt=" Plan A"
-          />
+          /> */}
           <figcaption className="figure-caption">
             Includes:
             <ul className="list-unstyled">
