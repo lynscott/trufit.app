@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 // import BootstrapTable from 'react-bootstrap-table-next'
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
+// import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import { connect } from 'react-redux'
 import Moment from 'react-moment'
 import * as actions from '../actions'
@@ -84,11 +84,11 @@ class NextMeal extends Component {
         {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
           return (
             <CardText key={i} className="row">
-            <Col md='6'>
-              <h5><Badge color='light'> {item.name}</Badge></h5>
+              <Col md='6'>
+                <h5><Badge color='light' style={{whiteSpace:'normal'}}> {item.name}</Badge></h5>
               </Col>
               <Col md='6'>
-              <h5><Badge color='success'>{item.serving + 'oz'}</Badge></h5>
+                <h5><Badge color='success'>{item.serving + 'oz'}</Badge></h5>
               </Col>
             </CardText>
           )

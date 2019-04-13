@@ -15,7 +15,8 @@ class Nav extends Component {
 
     this.state = {
       modal: false,
-      signup: false
+      signup: false,
+      scroll: window.pageYOffset,
     }
 
     this.toggle = this.toggle.bind(this)
@@ -116,7 +117,7 @@ class Nav extends Component {
   render() {
     // console.log(this.props)
     return (
-      <div className="row" style={{ marginBottom: '65px' }}>
+      <div className="row" >
         <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
           <Link
             className="navbar-brand mx-auto d-none d-md-block"

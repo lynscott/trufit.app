@@ -5,26 +5,46 @@ import '../index.css'
 import App from './App'
 import About from './About'
 import Dashboard from '../DashBoard/Dashboard'
-import OnlineTraining from './OnlineTraining'
 import DashRoutes from '../DashBoard/DashRoutes'
 import DashSideBar from '../DashBoard/DashSideBar'
 import NutritionDash from '../DashBoard/NutritionDash'
-import StartStrengthPlan from '../Strength/StartStrengthPlan'
-import StartShredPlan from '../Shred/StartShredPlan'
-import StartTonePlan from '../Tone/StartTonePlan'
+
 import Nav from './Nav'
 import keys from '../config/keys'
 import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
-import { Container, Row } from 'reactstrap'
+import { Container, Row, Fade } from 'reactstrap'
 
 class AppRoutes extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      scroll: window.pageYOffset,
+    }
+
+   
+  }
   componentDidMount() {
     this.props.fetchPlanTemps()
     this.props.fetchUser()
     this.props.fetchProfile()
+    window.addEventListener('scroll', this.handleScroll)
 
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+
+  handleScroll = (event) => {
+    // let scrollTop = event.srcElement.body.scrollTop,
+    //     itemTranslate = Math.min(0, scrollTop/3 - 60)
+
+    this.setState({
+      scroll: window.pageYOffset
+    })
+}
 
   testENV = () => {
     if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
@@ -90,9 +110,15 @@ class AppRoutes extends Component {
   }
 
   render() {
+    // console.log(this.state)
     return (
       <Container fluid>
-        <Nav className="navbar" />
+        { window.location.pathname.includes('dashboard') === false?
+        <Fade in={this.state.scroll > 50 ? true: false} > 
+          <Nav className="navbar" />
+        </Fade>
+        : null}
+        {/* <Nav className="navbar d-none d-sm-block d-md-none " /> */}
         <Switch>
           <Route exact path="/about" component={About} />
           {/* <Route exact path="/dashboard" render={this.renderDash} /> */}

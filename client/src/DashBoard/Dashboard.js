@@ -36,10 +36,10 @@ import ViewPlan from './ViewPlan'
 
 const Block = ({ content, colSize, content2 = null, configs = null }) => {
   return (
-    <div className="row px-0 justify-content-around">
+    // <div className="row px-0 justify-content-around">
       <div className={`col-md-${colSize} ${configs}`}>{content}</div>
-      <div className={'col-md-6'}>{content2}</div>
-    </div>
+      // {/* <div className={'col-md-6'}>{content2}</div> */}
+    // </div>
   )
 }
 
@@ -141,15 +141,17 @@ class Dashboard extends Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-            <h2>Week Ahead</h2>
+            {/* <h2>Week Ahead</h2> */}
+            <Row>
             <DashCalendar plan={this.props.plans[7]} />
             <hr />
-            <h2>Nutrition</h2>
+            {/* <h2>Nutrition</h2> */}
             <Block
               content={<NutritionTable />}
-              content2={<Pie data={data} />}
-              colSize={5}
+              // content2={<Pie data={data} />}
+              colSize={4}
             />
+            </Row>
             <hr />
           </TabPane>
           <TabPane tabId="2">
@@ -240,7 +242,7 @@ class Dashboard extends Component {
   }
 
   render() {
-    console.log(this.props.user)
+    // console.log(this.props.user)
     return (
       <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
         {this.props.profile? this.renderDashTopStats():null}
