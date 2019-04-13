@@ -864,7 +864,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Create Plan
+              Nutrition Plan
             </NavLink>
           </NavItem>
           <NavItem>
@@ -875,7 +875,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Schedule
+              Nutrition Schedule
             </NavLink>
           </NavItem>
         </Nav>

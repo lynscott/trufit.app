@@ -262,7 +262,7 @@ h1 {
 @media screen and (max-width: 450px) and (min-width: 0px){
 
   #header {
-    /* background-image: url('./img/logo2.png'); */
+    background-image: url('https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/logo2.png');
     background-size: contain;
     background-repeat: no-repeat;
     /* background-attachment: fixed; */

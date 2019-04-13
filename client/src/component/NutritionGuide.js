@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 class Guide extends Component {
   render() {
@@ -36,7 +36,7 @@ class Guide extends Component {
           bodybuilders, gymnasts Recommended macronutrients ratio: 40%
           carbohydrates, 30% protein, 30% fat<br />
           <br />Endomorph<br />
-          Endormorphs are built to be larger and more powerful. They tend to
+          Endomorphs are built to be larger and more powerful. They tend to
           have larger bone structures for strength. Because of their size, they
           do better on a higher fat and a lower carbohydrate intake. They look
           like: powerlifters, Recommended macronutrients ratio: 20%-25%
@@ -215,7 +215,7 @@ class Guide extends Component {
             </tr>
             <tr>
               <th scope="row" />
-              <td>Broccolli</td>
+              <td>Broccoli</td>
               <td />
               <td />
               <td />
@@ -229,4 +229,4 @@ class Guide extends Component {
   }
 }
 
-export default Guide;
+export default Guide

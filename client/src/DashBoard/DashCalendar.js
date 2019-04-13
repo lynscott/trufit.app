@@ -84,8 +84,9 @@ class DashCalendar extends Component {
   render() {
     // console.log()
     return (
-      <Row className='justify-content-around'>
-        <Col md='7'>
+      // <Row className='justify-content-around'>
+      <React.Fragment>
+        <Col md='4'>
           <BigCalendar
             localizer={localizer}
             events={this.props.plan ? this.formatDate(): []}
@@ -97,12 +98,13 @@ class DashCalendar extends Component {
             // date={new Date()}
           />
         </Col>
-        <Col md='5' className='align-self-center'>
+        <Col md='4' className='align-self-center'>
         <Button color='info'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
         </Col>
+        </React.Fragment>
 
-      </Row>
+      // </Row>
     )
   }
 }
