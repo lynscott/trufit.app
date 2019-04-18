@@ -8,6 +8,10 @@ html,body{
     border-bottom: #008ed6 3px solid;
 }
 
+.carousel {
+    border-radius: 20px;
+}
+
 #price-block{
     background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
     url(' https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/gym.jpg');
@@ -23,25 +27,34 @@ html,body{
 }
 
 
+.pricing-section, .sidebar-col{
 
-.card-body{
-    padding:0;
-    color: black;
-}
+    .card-body{
+        padding:0;
+        color: black;
+        border-radius: 10px;
+    }
 
-.card-body, .card-title, .list-group-item, .card{
-    background-color: transparent;
-    // border: 1px white solid;
-    // opacity: 0.6;
-}
+    .card-body, .card-title, .list-group-item, .card{
+        background-color: transparent;
+        border: 1px white solid;
+        
+        // opacity: 0.6;
+    }
 
-.list-group-item{
-    border: 1px solid rgba(245, 239, 239, 0.43);
-}
+    .list-group-item{
+        border: 1px solid rgba(245, 239, 239, 0.43);
+    }
 
-.card-title{
-    border: 3px solid white;
-    opacity: 0.7;
+    .card-title{
+        // border: 3px solid white;
+        opacity: 0.7;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
 }
 
 row, .row{

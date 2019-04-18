@@ -23,11 +23,12 @@ import {
   NavLink,
   CardTitle,
   CardText,
-  FormGroup,
+  Jumbotron,
   Label,
   Input,
   Row,
-  Col, CardGroup, CardDeck, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
+  Col, CardGroup, CardDeck, Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
+  CardColumns, CardImg, CardSubtitle
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
@@ -90,7 +91,9 @@ class Dashboard extends Component {
       activeTab: '1',
       activePage: 'overview',
       dropOpen: false,
-      currentGoal: 'No Goal Selected'
+      currentGoal: 'No Goal Selected',
+      updateMessage: 'Testing',
+      update: false,
     }
   }
 
@@ -110,6 +113,115 @@ class Dashboard extends Component {
     this.setState(prevState => ({
       dropOpen: !prevState.dropOpen
     }))
+  }
+
+  affirmationChange = () => {
+    if (this.state.update === false) {
+      return (
+        <p
+          className="lead"
+          style={{ fontSize: '1.2rem' }}
+          onDoubleClick={() => this.setState({ update: true })}
+          
+        >
+          {this.props.profile ? this.props.profile.affirmation !== '' ? this.props.profile.affirmation : 'Tap to fill out' : ''}
+        </p>
+      )
+    } else {
+      return (
+        <React.Fragment>
+          <Form className='row'>
+            <Input
+              type="text"
+              style={{ marginBottom: '8px', backgroundColor:'lightgrey' }}
+              onChange={e => {
+                this.setState({ updateMessage: e.target.value })
+              }}
+              id="inputAF" placeholder={this.props.profile ? this.props.profile.affirmation : ''}
+            />
+          </Form>
+          <Button className='m-3'
+            color="info"  onClick={async () => {
+              await this.props.updateProfile({keys: ['affirmation'], affirmation: this.state.updateMessage })
+              this.setState({ update: false })
+            }}
+          >
+            Update Affirmation
+          </Button>{' '}
+          <Button className='m-3' color="secondary"
+            onClick={() => {
+              this.setState({ update: false })
+            }}
+          >
+            Cancel
+          </Button>{' '}
+        </React.Fragment>
+      )
+    }
+  }
+
+  renderOverviewWall = () => {
+    return (
+      <CardColumns className='card-wall mt-4'>
+        <Card>
+          {/* <CardImg top width="100%" src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/gym.jpg" alt="Card image cap" /> */}
+          <CardBody>
+            <CardTitle>Next Workout</CardTitle>
+            <CardSubtitle>Stay on track.</CardSubtitle>
+            {/* <CardText>This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</CardText>
+            <Button>Button</Button> */}
+            <DashCalendar plan={this.props.plans[7]} />
+          </CardBody>
+        </Card>
+        
+        <Card>
+          <CardBody>
+            <CardTitle>Next Meal</CardTitle>
+            <CardSubtitle>Card subtitle</CardSubtitle>
+            {/* <CardText>This card has supporting text below as a natural lead-in to additional content.</CardText> */}
+            <NutritionTable />
+            {/* <Button>Button</Button> */}
+          </CardBody>
+        </Card>
+        <Card body inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
+          <CardTitle>Current Goal:</CardTitle>
+          <CardText>{this.props.profile.currentGoal.text}</CardText>
+          {/* <Button>Button</Button> */}
+          <Dropdown isOpen={this.state.dropOpen} direction={'right'} toggle={this.toggleDrop}>
+                <DropdownToggle caret>
+                Change Goal
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Loss', value:-400}})}>Weight Loss</DropdownItem>
+                  {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem> */}
+                  {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
+                  {/* <DropdownItem divider /> */}
+                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Gain', value:400}})}>Weight Gain</DropdownItem>
+                  {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem> */}
+                  {/* <DropdownItem>Quo Action</DropdownItem> */}
+                </DropdownMenu>
+              </Dropdown>
+        </Card>
+        <Card>
+          {/* <CardImg top width="100%" src="https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180" alt="Card image cap" /> */}
+          <CardBody>
+            <CardTitle>Training Plan Progress</CardTitle>
+            <CardSubtitle>Keep it up!</CardSubtitle>
+            <CardText>
+            <Progress color="info" value={30}>
+                  30%
+                </Progress>
+            </CardText>
+            {/* <Button>Button</Button> */}
+          </CardBody>
+        </Card>
+        <Card body inverse color="primary">
+          <CardTitle>Special Title Treatment</CardTitle>
+          <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
+          <Button color="secondary">Button</Button>
+        </Card>
+      </CardColumns>
+    )
   }
 
   renderOverviewTabs = () => {
@@ -142,21 +254,11 @@ class Dashboard extends Component {
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             {/* <h2>Week Ahead</h2> */}
-            <Row>
-            <DashCalendar plan={this.props.plans[7]} />
-            <hr />
-            {/* <h2>Nutrition</h2> */}
-            <Block
-              content={<NutritionTable />}
-              // content2={<Pie data={data} />}
-              colSize={4}
-            />
-            </Row>
-            <hr />
+            {this.renderOverviewWall()}
           </TabPane>
           <TabPane tabId="2">
             <Row>
-              <Col md="12">
+              <Col md="10">
                 <h4>Weight Tracking</h4>
                 <Line data={data2} />
               </Col>
@@ -169,82 +271,37 @@ class Dashboard extends Component {
 
   renderDashTopStats = () => {
     return (
-      <Row style={{ padding: 0, marginBottom: '10px' }}>
-        <CardDeck className='col-md'>
-        {/* <Col md="4" className="py-3"> */}
-          <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
-            <CardHeader>Current Goal:</CardHeader>
-            <CardBody>
-              <CardTitle style={{ border: 'none', color: 'white' }}>
-              {this.props.profile.currentGoal.text}
-              </CardTitle>
-              <CardText>
-              <Dropdown isOpen={this.state.dropOpen} direction={'right'} toggle={this.toggleDrop}>
-                <DropdownToggle caret>
-                Change Goal
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Loss', value:-400}})}>Weight Loss</DropdownItem>
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem>
-                  {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
-                  <DropdownItem divider />
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Gain', value:400}})}>Weight Gain</DropdownItem>
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem>
-                  {/* <DropdownItem>Quo Action</DropdownItem> */}
-                </DropdownMenu>
-              </Dropdown>
-              </CardText>
-              {/* <Button>Go somewhere</Button> */}
-            </CardBody>
-            {/* <CardFooter>Footer</CardFooter> */}
-          </Card>
-        {/* </Col> */}
-        {/* <Col md="4" className="py-3"> */}
-          <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
-            <CardHeader>Upload New Progress Picture</CardHeader>
-            <CardBody>
-              {/* <CardTitle style={{border:'none', color:'white'}}>Weight Lost</CardTitle> */}
-              <CardText style={{ padding: '10px' }}>
-                <FormGroup style={{ marginBottom: 0 }}>
-                  {/* <Label for="exampleFile">Upload</Label> */}
-                  <Input type="file" name="file" id="exampleFile" />
-                  {/* <FormText color="muted">
-                      This is some placeholder block-level help text for the above input.
-                      It's a bit lighter and easily wraps to a new line.
-                    </FormText> */}
-                </FormGroup>
-              </CardText>
-              {/* <Button>Go somewhere</Button> */}
-            </CardBody>
-            {/* <CardFooter>Footer</CardFooter> */}
-          </Card>
-        {/* </Col> */}
-        {/* <Col md="4" className="py-3"> */}
-          <Card body inverse color="secondary" style={{ borderColor: '#333' }}>
-            <CardHeader>Plan Completion</CardHeader>
-            <CardBody>
-              <CardTitle style={{ border: 'none', color: 'white' }}>
-                Lets Get To Work
-              </CardTitle>
-              <CardText>
-                <Progress color="warning" value={30}>
-                  30%
-                </Progress>
-              </CardText>
-              {/* <Button>Go somewhere</Button> */}
-            </CardBody>
-            {/* <CardFooter>Footer</CardFooter> */}
-          </Card>
-        {/* </Col> */}
-        </CardDeck>
-      </Row>
+      // <Row style={{ padding: 0, marginBottom: '10px' }}>
+      // {/* {this.affirmationChange()} */}
+      <Jumbotron className='text-left' style={{width:'100%'}} >
+        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
+        {/* <h1 className="display-3">Hello, world!</h1> */}
+        {this.affirmationChange()}
+        <hr className="my-2" />
+        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
+        {/* <p className="lead">
+          <Button color="primary">Learn More</Button>
+        </p> */}
+        <Row>
+          <Col>
+            Most recent check-in weight: None
+          </Col>
+          <Col>
+            Meals tracked: 0
+          </Col>
+          <Col>
+            Calories over today: 0
+          </Col>
+        </Row>
+      </Jumbotron>
+      // </Row>
     )
   }
 
   render() {
-    // console.log(this.props.user)
+    // console.log(this.props)
     return (
-      <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
+      <Col className="bg-dark" style={{ paddingTop: '10px' }} md="10">
         {this.props.profile? this.renderDashTopStats():null}
         {this.renderOverviewTabs()}
       </Col>

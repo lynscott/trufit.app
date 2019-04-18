@@ -18,9 +18,24 @@ td, .truncate {
 
 .react-bootstrap-table {
     overflow-x: auto;
+    border-radius: 10px;
     
     
     .table-mobile{
         table-layout: auto !important;
+    }
+}
+
+.schedule-col{
+    .meal-card{
+        border-radius: 10px;
+    }
+}
+
+.btn-group{
+    display: block;
+
+    h4{
+        margin:0;
     }
 }

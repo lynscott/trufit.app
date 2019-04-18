@@ -90,6 +90,7 @@ class ClientRoll extends Component {
           <div className="col-sm-5">
           <Carousel 
             showThumbs={false}
+            className='client-roll'
             // showArrows={false}
             showStatus={false}
             infiniteLoop={true}

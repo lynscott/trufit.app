@@ -25,14 +25,14 @@ class DashRoutes extends React.Component {
 
     renderNutrition = () => {
         return(
-            <div style={{margin: '500px'}}> placeholder nutrition </div>
+            <div className='col-md-10'> placeholder nutrition </div>
         )
     }
 
     renderPlans = () => {
         return(
             // <DeviceOverview/>
-            <div style={{margin: '500px'}}> placeholder plans </div>
+            <div className='col-md-10'> placeholder plans </div>
         )
     }
 

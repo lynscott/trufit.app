@@ -6,6 +6,7 @@ import Moment from 'react-moment'
 import * as actions from '../actions'
 import { Card, CardTitle, CardText, CardGroup, Button, Badge, Col } from 'reactstrap'
 
+
 const products = [
   { meal: 'Meal 1', fats: 20, carb: 50, protein: 100, total: 300 },
   { meal: 'Meal 2', fats: 30, carb: 70, protein: 200, total: 300 },
@@ -70,17 +71,18 @@ class NextMeal extends Component {
     }
 
     return (
-      <Card body key={index} className="m-1" inverse color="dark">
-        <CardTitle
-          style={{
-            fontWeight: 'bold',
-            textAlign: 'center'
-          }}
-        >
+      // <Card body key={index} className="m-1" inverse color="dark">
+      //   <CardTitle
+      //     style={{
+      //       fontWeight: 'bold',
+      //       textAlign: 'center'
+      //     }}
+      //   >
+      <React.Fragment>
           <h5 style={{ margin: 0 }}>
             Next Meal: <Moment format="LT">{clock(times)}</Moment>
           </h5>
-        </CardTitle>
+        {/* // </CardTitle> */}
         {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
           return (
             <CardText key={i} className="row">
@@ -100,7 +102,8 @@ class NextMeal extends Component {
         >
           Mark Complete
         </Button>
-      </Card>
+      {/* // </Card> */}
+      </React.Fragment>
     )
   }
 

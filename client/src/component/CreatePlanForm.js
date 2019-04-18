@@ -577,7 +577,7 @@ class CreatePlanForm extends Component {
   }
 
   render() {
-    console.log(this.props.values.plan)
+    // console.log(this.props.values.plan)
     const { handleSubmit } = this.props
 
     return (
@@ -589,26 +589,26 @@ class CreatePlanForm extends Component {
         {/* <FontAwesomeIcon icon="user-plus" size={'3x'} /> */}
         <h2>Create New Training Plan</h2>
         <div className='row justify-content-center'>
-        <Field
-          placeholder="Title"
-          name="plan.title"
-          type="text"
-          component={this.renderField}
-        />
+          <Field
+            placeholder="Title"
+            name="plan.title"
+            type="text"
+            component={this.renderField}
+          />
 
-        <Field
-          placeholder="Category"
-          name="plan.category"
-          type="text"
-          component={this.renderField}
-        />
+          <Field
+            placeholder="Category"
+            name="plan.category"
+            type="text"
+            component={this.renderField}
+          />
 
-        <Field
-          placeholder="Logo"
-          name="plan.logo"
-          type="text"
-          component={this.renderField}
-        />
+          <Field
+            placeholder="Logo"
+            name="plan.logo"
+            type="text"
+            component={this.renderField}
+          />
         </div>
 
         <FieldArray name="plan.weeks" component={this.renderWeeksFields} />
