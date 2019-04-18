@@ -70,7 +70,7 @@ class LoginForm extends Component {
     return (
       <form className='p-4' onSubmit={handleSubmit(this.onSubmit.bind(this))}
       >
-      <FontAwesomeIcon icon="user-circle" size={'4x'} />
+      <FontAwesomeIcon icon="user-circle" size={'3x'} />
       <h2>Sign In To Your Account</h2>
 
         <Field

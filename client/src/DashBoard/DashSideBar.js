@@ -17,6 +17,8 @@ import {
   ListGroupItem, Nav, NavItem, NavLink
 } from 'reactstrap'
 import './Sidebar.scss'
+import windowSize from 'react-window-size'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 class DashSideBar extends React.Component {
   constructor(props) {
@@ -27,7 +29,7 @@ class DashSideBar extends React.Component {
       updateMessage: '',
       update: false,
       currentTab: 'overview',
-      collapsed: false,
+      collapsed: this.props.windowWidth < 500 ? true:false,
     }
   }
 
@@ -37,73 +39,36 @@ class DashSideBar extends React.Component {
     })
   }
 
-  affirmationChange = () => {
-    if (this.state.update === false) {
-      return (
-        <p
-          className="lead"
-          style={{ fontSize: '1.2rem' }}
-          onClick={() => this.setState({ update: true })}
-        >
-          {this.props.profile ? this.props.profile.affirmation : ''}
-        </p>
-      )
-    } else {
-      return (
-        <React.Fragment>
-          <Form>
-            <Input
-              type="text"
-              style={{ marginBottom: '8px' }}
-              onChange={e => {
-                this.setState({ updateMessage: e.target.value })
-              }}
-              id="inputAF"
-              placeholder={
-                this.props.profile ? this.props.profile.affirmation : ''
-              }
-            />
-          </Form>
-          <Button
-            color="info"
-            style={{ marginBottom: '5px' }}
-            onClick={async () => {
-              await this.props.updateProfile({
-                keys: ['affirmation'],
-                affirmation: this.state.updateMessage
-              })
-              this.setState({ update: false })
-            }}
-          >
-            Update Affirmation
-          </Button>{' '}
-          <Button
-            style={{ marginBottom: '5px' }}
-            color="secondary"
-            onClick={() => {
-              this.setState({ update: false })
-            }}
-          >
-            Cancel
-          </Button>{' '}
-        </React.Fragment>
-      )
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps.windowWidth !== this.props.windowWidth) {
+        // if (this.props.windowWidth < 500) {
+          this.setState(()=>{
+            if( this.props.windowWidth < 500) {
+              this.state.collapsed = false
+            } else {
+              this.state.collapsed = true
+            }
+            
+          })
+        // }
     }
   }
+
+
 
   render() {
     // console.log(this.props)
     return (
       // <div>
         <Nav vertical navbar className="sidebar-col col-md-2" >
-
-          <CardHeader tag="h3">
+          <CardHeader style={{backgroundColor:'transparent'}} tag="h3">
             {this.props.user ? this.props.user.name : ''}
           </CardHeader>
           <CardTitle>{new Date().toLocaleDateString()}</CardTitle>
 
-          {/* <NavbarToggler onClick={this.toggleNavbar} className="mr-2" /> */}
-          <Button className='d-sm-block d-md-none' onClick={this.toggleNavbar} >Nav Button</Button>
+          {/* <Button className='d-sm-block d-md-none' onClick={this.toggleNavbar} > */}
+          <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
+          {/* </Button> */}
           <Collapse isOpen={!this.state.collapsed} navbar>
 
           <NavItem active={this.state.currentTab === 'overview' ? true : false}>
@@ -144,7 +109,7 @@ class DashSideBar extends React.Component {
   }
 }
 
-export default connect(
+export default windowSize(connect(
   null,
   actions
-)(DashSideBar)
+)(DashSideBar))
