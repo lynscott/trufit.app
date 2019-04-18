@@ -71,13 +71,7 @@ class NextMeal extends Component {
     }
 
     return (
-      // <Card body key={index} className="m-1" inverse color="dark">
-      //   <CardTitle
-      //     style={{
-      //       fontWeight: 'bold',
-      //       textAlign: 'center'
-      //     }}
-      //   >
+
       <React.Fragment>
           <h5 style={{ margin: 0 }}>
             Next Meal: <Moment format="LT">{clock(times)}</Moment>
