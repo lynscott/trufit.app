@@ -86,7 +86,7 @@ class AppRoutes extends Component {
 
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div style={{ backgroundColor: 'white' }}> placeholder plans </div>
+        <div className='col-md-10'> placeholder plans </div>
       </Row>
     )
   }
@@ -95,7 +95,7 @@ class AppRoutes extends Component {
     return (
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div style={{ backgroundColor: 'white' }}> placeholder account </div>
+        <div className='col-md-10' style={{ backgroundColor: 'white' }}> placeholder account </div>
       </Row>
     )
   }
@@ -141,7 +141,7 @@ class AppRoutes extends Component {
 
           <Route
             exact
-            path="/dashboard/account-settings"
+            path="/dashboard/settings"
             render={this.renderAccountSettings}
           />
           {/* <Route

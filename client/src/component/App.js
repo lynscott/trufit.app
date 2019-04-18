@@ -125,11 +125,8 @@ class App extends Component {
             </Fade>
             <div className='row pt-3' >
               <Fade top delay={1000}>
-                {/* <div className='col'> */}
-                {/* </div> */}
+
                 <Modal isOpen={this.state.signup} toggle={this.signup}>
-                  {/* <ModalHeader toggle={this.toggle}>Welcome Back!
-                  </ModalHeader> */}
                   <ModalBody>
                     <SignUpForm closeForm={this.signup}/>
                   </ModalBody>
@@ -138,11 +135,7 @@ class App extends Component {
                     <Button color="secondary" onClick={this.signup}>Cancel</Button>
                   </ModalFooter>
                 </Modal>   
-                  {/* <br/> */}
-                  {/* or */}
-                  {/* <br/> */}
-                {/* <div className='col'> */}
-                {/* </div> */}
+  
                 <Modal isOpen={this.state.modal} toggle={this.toggle}>
                   <ModalHeader toggle={this.toggle}>Welcome Back!
                   </ModalHeader>
@@ -154,6 +147,7 @@ class App extends Component {
                     <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
+
               </Fade>
               </div>
           </div>
@@ -270,7 +264,7 @@ class App extends Component {
             </Fade>
           </div>
         </div>
-        <div className="row p-3 justify-content-center align-items-top bg-dark">
+        <div className="row justify-content-center  bg-dark">
           <div className="col">
             <Footer />
           </div>

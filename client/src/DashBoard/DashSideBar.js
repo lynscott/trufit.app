@@ -13,8 +13,8 @@ import {
   Form,
   Input,
   Button,
-  ListGroup,
-  ListGroupItem
+  ListGroup, Collapse, NavbarToggler,
+  ListGroupItem, Nav, NavItem, NavLink
 } from 'reactstrap'
 import './Sidebar.scss'
 
@@ -26,8 +26,15 @@ class DashSideBar extends React.Component {
       page: 'Course-List',
       updateMessage: '',
       update: false,
-      currentTab: 'overview'
+      currentTab: 'overview',
+      collapsed: false,
     }
+  }
+
+  toggleNavbar = () => {
+    this.setState({
+      collapsed: !this.state.collapsed
+    })
   }
 
   affirmationChange = () => {
@@ -85,65 +92,54 @@ class DashSideBar extends React.Component {
   }
 
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
-      <Col className="sidebar-col" md="3">
-        <Card>
+      // <div>
+        <Nav vertical navbar className="sidebar-col col-md-2" >
+
           <CardHeader tag="h3">
             {this.props.user ? this.props.user.name : ''}
           </CardHeader>
-          <CardBody>
-            <CardTitle>{new Date().toLocaleDateString()}</CardTitle>
-            {/* <CardText style={{ padding: '10px' }}> */}
-              {this.affirmationChange()}
-            {/* </CardText> */}
-            <ListGroup flush>
-              <Link to="/dashboard/overview" style={{ textDecoration: 'none' }}>
-                <ListGroupItem
-                  active={this.state.currentTab === 'overview' ? true : false}
-                  onClick={() => this.setState({ currentTab: 'overview' })}
-                  tag="button"
-                >
-                  Overview
-                </ListGroupItem>
-              </Link>
-              <Link
-                to="/dashboard/nutrition"
-                style={{ textDecoration: 'none' }}
-              >
-                <ListGroupItem
-                  active={this.state.currentTab === 'nutrition' ? true : false}
-                  onClick={() => this.setState({ currentTab: 'nutrition' })}
-                  tag="button"
-                >
+          <CardTitle>{new Date().toLocaleDateString()}</CardTitle>
+
+          {/* <NavbarToggler onClick={this.toggleNavbar} className="mr-2" /> */}
+          <Button className='d-sm-block d-md-none' onClick={this.toggleNavbar} >Nav Button</Button>
+          <Collapse isOpen={!this.state.collapsed} navbar>
+
+          <NavItem active={this.state.currentTab === 'overview' ? true : false}>
+            <Link style={{textDecoration:'none'}} to="/dashboard/overview">
+              <NavLink active={this.state.currentTab === 'overview' ? true : false} onClick={() => this.setState({ currentTab: 'overview' })} >
+                    Overview
+              </NavLink>
+            </Link>
+          </NavItem >
+
+          <NavItem active={this.state.currentTab === 'nutrition' ? true : false}>     
+            <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
+              <NavLink  onClick={() => this.setState({ currentTab: 'nutrition' })} >
                   Nutrition
-                </ListGroupItem>
-              </Link>
-              <Link to="/dashboard/plans" style={{ textDecoration: 'none' }}>
-                <ListGroupItem
-                  active={this.state.currentTab === 'plans' ? true : false}
-                  onClick={() => this.setState({ currentTab: 'plans' })}
-                  tag="button"
-                >
+              </NavLink>
+            </Link>
+          </NavItem>
+
+          <NavItem active={this.state.currentTab === 'training' ? true : false}>
+            <Link style={{textDecoration:'none'}} to="/dashboard/plans">
+              <NavLink  onClick={() => this.setState({ currentTab: 'training' })} >
                   Training
-                </ListGroupItem>
-              </Link>
-              <Link
-                to="/dashboard/account-settings"
-                style={{ textDecoration: 'none' }}
-              >
-                <ListGroupItem
-                  active={this.state.currentTab === 'settings' ? true : false}
-                  onClick={() => this.setState({ currentTab: 'settings' })}
-                  tag="button"
-                >
-                  Account Settings
-                </ListGroupItem>
-              </Link>
-            </ListGroup>
-          </CardBody>
-        </Card>
-      </Col>
+              </NavLink>
+            </Link>
+          </NavItem>
+
+          <NavItem active={this.state.currentTab === 'settings' ? true : false}>
+            <Link style={{textDecoration:'none'}} to="/dashboard/settings">
+              <NavLink  onClick={() => this.setState({ currentTab: 'settings' })} >
+                  Settings
+              </NavLink>
+            </Link>
+          </NavItem> 
+          </Collapse>     
+        </Nav>
+        // </div>
     )
   }
 }

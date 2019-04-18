@@ -1,41 +1,20 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 class Footer extends Component {
   render() {
     return (
-      <div>
-          <div className="row" style={{fontSize:'12px'}}>
-            <div className="col-md-8">
-              <ul className="nav mx-0" id="footer">
-                {/* <li className="nav-item">
-                  <Link className="nav-link" to="/about">
-                    About
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/training">
-                    Online Training
-                  </Link>
-                </li> */}
-                <li className="nav-item">
-                  <a
-                    className="nav-link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="http://www.lynscottdev.com/"
-                  >
-                    Development
-                  </a>
-                </li>
-              </ul>
+          <div className="row" style={{fontSize:'12px', padding:'8px'}}>
+            <div className="col-md-8 align-self-center">
+              
+              <p className='align-middle' style={{margin:0, textAlign:'left', color:'white', fontSize:'14px'}}> Copyright &copy; 2017 LS Fitness.</p>
             </div>
             <div className="col-md-4">
               <ul className="nav justify-content-end" id="footer">
                 <li className="nav-item" id="ig">
                   <a
                     className="nav-link"
-                    href="https://www.instagram.com/lsphysique/"
+                    href="https://www.instagram.com/lynscottfitness/"
                   >
                     <i className="fab fa-instagram" />
                   </a>
@@ -56,14 +35,9 @@ class Footer extends Component {
               </ul>
             </div>
           </div>
-          <div className="row justify-content-left pl-3">
-            <div className="col-md-8 text-left">
-              <p style={{margin:0}}> Copyright &copy; 2017 LS Fitness.</p>
-            </div>
-          </div>
-      </div>
-    );
+
+    )
   }
 }
 
-export default Footer;
+export default Footer

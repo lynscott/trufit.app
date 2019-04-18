@@ -40,12 +40,14 @@ class DashCalendar extends Component {
 
   nextWorkoutCard = () => {
     return (
-      <Card body className="text-center">
+      // <Card body className="text-center">
+      <React.Fragment>
         <CardTitle>Upcoming Session: {this.state.nextWorkout.title}</CardTitle>
         <CardText>{new Date(this.state.nextWorkout.start).toDateString()}</CardText>
         <Button color='danger' className='my-3'>Mark Completed</Button>
         <Button color='warning'>Skip</Button>
-      </Card>
+        </React.Fragment>
+      // </Card>
     )
   }
 
@@ -86,7 +88,7 @@ class DashCalendar extends Component {
     return (
       // <Row className='justify-content-around'>
       <React.Fragment>
-        <Col md='4'>
+        {/* <Col md='4'> */}
           <BigCalendar
             localizer={localizer}
             events={this.props.plan ? this.formatDate(): []}
@@ -97,11 +99,11 @@ class DashCalendar extends Component {
             // }}
             // date={new Date()}
           />
-        </Col>
-        <Col md='4' className='align-self-center'>
+        {/* </Col> */}
+        {/* <Col md='4' className='align-self-center'> */}
         <Button color='info'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
-        </Col>
+        {/* </Col> */}
         </React.Fragment>
 
       // </Row>

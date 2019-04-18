@@ -13,7 +13,8 @@ import {
   NavItem,
   NavLink,
   Badge,
-  Container,
+  ButtonGroup,
+  ButtonToolbar,
   ListGroup,
   ListGroupItem,
   Card,
@@ -452,7 +453,7 @@ class NutritionDash extends Component {
 
     return (
       <Row>
-        <Col md="12" className="text-left">
+        <Col md="12" className="text-left schedule-col">
           <Button
             color="info"
             className="my-2"
@@ -468,14 +469,15 @@ class NutritionDash extends Component {
                       <Card
                         body
                         key={index}
-                        className="m-1"
+                        className="m-1 meal-card"
                         inverse
-                        color="dark"
+                        color="light"
                       >
                         <CardTitle
                           style={{
                             fontWeight:'bold',
-                            textAlign:'center'
+                            textAlign:'center',
+                            color:'black'
                           }}
                         >
                           {new Date(sched.time).toLocaleTimeString('en-US', {
@@ -674,37 +676,41 @@ class NutritionDash extends Component {
   displayMacros = () => {
     return (
       <Row className="justify-content-center py-2">
-        <Col md="4" className='align-self-center' position="middle">
+        
+        <Col md="6" className='align-self-center text-white'>
           {/* <Card body inverse color="info" style={{ borderColor: '#333' }}>
             <CardHeader>Recommended Macros:</CardHeader>
             <CardBody>
               <CardText> */}
+          
           <h5>Recommended Macros:</h5>
-          <h4>
-            <Badge color="primary" >
-              Protein: 200g
-            </Badge>
-          </h4>
-          <h4>
-            <Badge color="warning" >
-              Carbs: 100g
-            </Badge>
-          </h4>
-          <h4>
-            <Badge color="danger" >
-              Fats: 70g
-            </Badge>
-          </h4>
-          <h4>
-            <Badge color="info" >
-              Calories: {(Number(this.props.profile.calories) + this.props.profile.currentGoal.value).toFixed()}
-            </Badge>
-          </h4>
-          {/* </CardText>
-            </CardBody>
-          </Card> */}
+          <ButtonToolbar>
+            <ButtonGroup>
+            <Button><h4>
+                <Badge color="primary" >
+                  Protein: 200g
+                </Badge>
+              </h4></Button>
+            <Button><h4>
+                <Badge color="primary" >
+                  Carbs: 100g
+                </Badge>
+              </h4></Button>
+            <Button><h4>
+                <Badge color="primary" >
+                  Fats: 70g
+                </Badge>
+              </h4></Button>
+              <Button><h4>
+                <Badge color="info" >
+                  Calories: {(Number(this.props.profile.calories) + this.props.profile.currentGoal.value).toFixed()}
+                </Badge>
+              </h4></Button>
+          </ButtonGroup>
+          </ButtonToolbar>
+
         </Col>
-        <Col md="6">
+        <Col md="6" className='text-white'>
           <h5>Your Diets Macros:</h5>
           <HorizontalBar
             legend={{ position: 'bottom' }}
@@ -853,7 +859,7 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" style={{ paddingTop: '10px' }} md="9">
+      <Col className="bg-dark" style={{ paddingTop: '10px' }} md="10">
         {this.displayMacros()}
         <Nav tabs>
           <NavItem>

@@ -6,15 +6,8 @@ const planSchema = new Schema({
   category: String,
   logo: String,
   template: Object,
-  workouts: [Schema.Types.Mixed]
-  // dateStarted: Date,
-  // datePurchased: Date,
-  // weight: Number,
-  // height: Number,
-  // age: Number,
-  // body_fat: Number,
-  // activity_mod: Number,
-  // _user: { type: Schema.Types.ObjectId, ref: 'User' }
+  workouts: String,
+  pdf: String
 });
 
 mongoose.model('plans', planSchema);
