@@ -27,8 +27,16 @@ import {
   Label,
   Input,
   Row,
-  Col, CardGroup, CardDeck, Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
-  CardColumns, CardImg, CardSubtitle
+  Col,
+  CardGroup,
+  CardDeck,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  CardColumns,
+  CardImg,
+  CardSubtitle
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
@@ -38,8 +46,8 @@ import ViewPlan from './ViewPlan'
 const Block = ({ content, colSize, content2 = null, configs = null }) => {
   return (
     // <div className="row px-0 justify-content-around">
-      <div className={`col-md-${colSize} ${configs}`}>{content}</div>
-      // {/* <div className={'col-md-6'}>{content2}</div> */}
+    <div className={`col-md-${colSize} ${configs}`}>{content}</div>
+    // {/* <div className={'col-md-6'}>{content2}</div> */}
     // </div>
   )
 }
@@ -62,7 +70,7 @@ export const data2 = {
       label: 'Weight tracking (lbs)',
       fill: false,
       lineTension: 0.1,
-      backgroundColor: 'rgba(75,192,192,0.4)',
+      backgroundColor: 'white', //'rgba(75,192,192,0.4)',
       borderColor: 'rgba(75,192,192,1)',
       borderCapStyle: 'butt',
       borderDash: [],
@@ -93,7 +101,7 @@ class Dashboard extends Component {
       dropOpen: false,
       currentGoal: 'No Goal Selected',
       updateMessage: 'Testing',
-      update: false,
+      update: false
     }
   }
 
@@ -122,33 +130,46 @@ class Dashboard extends Component {
           className="lead"
           style={{ fontSize: '1.2rem' }}
           onDoubleClick={() => this.setState({ update: true })}
-          
         >
-          {this.props.profile ? this.props.profile.affirmation !== '' ? this.props.profile.affirmation : 'Tap to fill out' : ''}
+          {this.props.profile
+            ? this.props.profile.affirmation !== ''
+              ? this.props.profile.affirmation
+              : 'Tap to fill out'
+            : ''}
         </p>
       )
     } else {
       return (
         <React.Fragment>
-          <Form className='row'>
+          <Form className="row">
             <Input
               type="text"
-              style={{ marginBottom: '8px', backgroundColor:'lightgrey' }}
+              style={{ marginBottom: '8px', backgroundColor: 'lightgrey' }}
               onChange={e => {
                 this.setState({ updateMessage: e.target.value })
               }}
-              id="inputAF" placeholder={this.props.profile ? this.props.profile.affirmation : ''}
+              id="inputAF"
+              placeholder={
+                this.props.profile ? this.props.profile.affirmation : ''
+              }
             />
           </Form>
-          <Button className='m-3'
-            color="info"  onClick={async () => {
-              await this.props.updateProfile({keys: ['affirmation'], affirmation: this.state.updateMessage })
+          <Button
+            className="m-3"
+            color="info"
+            onClick={async () => {
+              await this.props.updateProfile({
+                keys: ['affirmation'],
+                affirmation: this.state.updateMessage
+              })
               this.setState({ update: false })
             }}
           >
             Update Affirmation
           </Button>{' '}
-          <Button className='m-3' color="secondary"
+          <Button
+            className="m-3"
+            color="secondary"
             onClick={() => {
               this.setState({ update: false })
             }}
@@ -162,45 +183,67 @@ class Dashboard extends Component {
 
   renderOverviewWall = () => {
     return (
-      <CardColumns className='card-wall mt-4'>
+      <CardColumns className="card-wall mt-4">
         <Card>
           {/* <CardImg top width="100%" src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/gym.jpg" alt="Card image cap" /> */}
           <CardBody>
             <CardTitle>Next Workout</CardTitle>
-            <CardSubtitle>Stay on track.</CardSubtitle>
+            {/* <CardSubtitle>Stay on track.</CardSubtitle> */}
             {/* <CardText>This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</CardText>
             <Button>Button</Button> */}
             <DashCalendar plan={this.props.plans[7]} />
           </CardBody>
         </Card>
-        
+
         <Card>
           <CardBody>
             <CardTitle>Next Meal</CardTitle>
-            <CardSubtitle>Card subtitle</CardSubtitle>
-            {/* <CardText>This card has supporting text below as a natural lead-in to additional content.</CardText> */}
             <NutritionTable />
             {/* <Button>Button</Button> */}
           </CardBody>
         </Card>
-        <Card body inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
+        <Card
+          body
+          inverse
+          style={{ backgroundColor: '#333', borderColor: 'white' }}
+        >
           <CardTitle>Current Goal:</CardTitle>
-          <CardText>{this.props.profile.currentGoal.text}</CardText>
+          <CardText>{this.props.profile ? this.props.profile.currentGoal.text : null}</CardText>
           {/* <Button>Button</Button> */}
-          <Dropdown isOpen={this.state.dropOpen} direction={'right'} toggle={this.toggleDrop}>
-                <DropdownToggle caret>
-                Change Goal
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Loss', value:-400}})}>Weight Loss</DropdownItem>
-                  {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem> */}
-                  {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
-                  {/* <DropdownItem divider /> */}
-                  <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Weight Gain', value:400}})}>Weight Gain</DropdownItem>
-                  {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem> */}
-                  {/* <DropdownItem>Quo Action</DropdownItem> */}
-                </DropdownMenu>
-              </Dropdown>
+          <Dropdown
+            isOpen={this.state.dropOpen}
+            direction={'right'}
+            toggle={this.toggleDrop}
+          >
+            <DropdownToggle caret>Change Goal</DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem
+                onClick={() =>
+                  this.props.updateProfile({
+                    keys: ['currentGoal'],
+                    currentGoal: { text: 'Weight Loss', value: -300 }
+                  })
+                }
+              >
+                Weight Loss
+              </DropdownItem>
+              {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem> */}
+              {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
+              {/* <DropdownItem divider /> */}
+              <DropdownItem
+                onClick={() =>
+                  this.props.updateProfile({
+                    keys: ['currentGoal'],
+                    currentGoal: { text: 'Weight Gain', value: 300 }
+                  })
+                }
+              >
+                Weight Gain
+              </DropdownItem>
+              {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem> */}
+              {/* <DropdownItem>Quo Action</DropdownItem> */}
+            </DropdownMenu>
+          </Dropdown>
         </Card>
         <Card>
           {/* <CardImg top width="100%" src="https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180" alt="Card image cap" /> */}
@@ -208,18 +251,21 @@ class Dashboard extends Component {
             <CardTitle>Training Plan Progress</CardTitle>
             <CardSubtitle>Keep it up!</CardSubtitle>
             <CardText>
-            <Progress color="info" value={30}>
-                  30%
-                </Progress>
+              <Progress color="info" value={30}>
+                0%
+              </Progress>
             </CardText>
             {/* <Button>Button</Button> */}
           </CardBody>
         </Card>
-        <Card body inverse color="primary">
+        {/* <Card body inverse color="primary">
           <CardTitle>Special Title Treatment</CardTitle>
-          <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
+          <CardText>
+            With supporting text below as a natural lead-in to additional
+            content.
+          </CardText>
           <Button color="secondary">Button</Button>
-        </Card>
+        </Card> */}
       </CardColumns>
     )
   }
@@ -273,7 +319,7 @@ class Dashboard extends Component {
     return (
       // <Row style={{ padding: 0, marginBottom: '10px' }}>
       // {/* {this.affirmationChange()} */}
-      <Jumbotron className='text-left' style={{width:'100%'}} >
+      <Jumbotron className="text-left" style={{ width: '100%' }}>
         {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
         {/* <h1 className="display-3">Hello, world!</h1> */}
         {this.affirmationChange()}
@@ -283,15 +329,9 @@ class Dashboard extends Component {
           <Button color="primary">Learn More</Button>
         </p> */}
         <Row>
-          <Col>
-            Most recent check-in weight: None
-          </Col>
-          <Col>
-            Meals tracked: 0
-          </Col>
-          <Col>
-            Calories over today: 0
-          </Col>
+          <Col>Current Calorie Goal: 0</Col>
+          <Col>Meals Tracked: 0</Col>
+          <Col>Excess Calories Today: 0</Col>
         </Row>
       </Jumbotron>
       // </Row>
@@ -302,7 +342,7 @@ class Dashboard extends Component {
     // console.log(this.props)
     return (
       <Col className="bg-dark" style={{ paddingTop: '10px' }} md="10">
-        {this.props.profile? this.renderDashTopStats():null}
+        {this.props.profile ? this.renderDashTopStats() : null}
         {this.renderOverviewTabs()}
       </Col>
     )

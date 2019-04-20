@@ -21,6 +21,15 @@ body.modal-open-noscroll
     margin-right: 0!important;
 }
 
+.dummy{
+  background-image: url('https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/constr.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: -webkit-fill-available;
+  height: -moz-available;
+}
+
 
 @include media-breakpoint-up(sm) {
   html {

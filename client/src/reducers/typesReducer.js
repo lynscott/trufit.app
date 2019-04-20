@@ -1,10 +1,22 @@
 export default function() {
   return [
-    {type : 'Ectomorph',
-    info : 'Lean/thin build, but short on muscle. You struggle to pack on size despite hours in the gym, but can probably eat whatever you want.'},
-    {type : 'Endomorph',
-    info : 'You have trouble losing weight but in general are pretty strong - usually characterized by a relatively high amount of stored fat, a wide waist and a large bone structure.'},
-    {type : 'Mesomorph',
-     info : 'You find it fairly easy to add new muscle and you don’t tend to store much body fat. Likely played lots of sports as a kid.'}
+    {
+      type: 'Ectomorph',
+      info:
+        'Lean/thin build, but slim on muscle. You likely struggle to gain weight, as either body fat or muscle, despite hours in the gym or relatively constant eating. Physical characteristics include long limbs, narrow shoulders, and slim wrist and ankle joint',
+      macro: { carb: 50, protein: 30, fat: 20 }
+    },
+    {
+      type: 'Mesomorph',
+      info:
+        'You have a natural tendency to be fit and relatively muscular. Physical characteristics include wide shoulders, a narrow waist, and relatively thin joints. Natural "V-taper" for men or "hourglass figure" for women.',
+      macro: { carb: 40, protein: 30, fat: 30 }
+    },
+    {
+      type: 'Endomorph',
+      info:
+        'You tend to gain weight and keep it on. May often struggle to gain muscle without significant amounts of accompanying body fat. Physical characteristics include thick rib cage, wide hips, and shorter limbs.',
+      macro: { carb: 25, protein: 35, fat: 40 }
+    }
   ]
 }

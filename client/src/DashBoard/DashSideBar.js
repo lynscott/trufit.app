@@ -41,16 +41,14 @@ class DashSideBar extends React.Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.windowWidth !== this.props.windowWidth) {
-        // if (this.props.windowWidth < 500) {
           this.setState(()=>{
-            if( this.props.windowWidth < 500) {
-              this.state.collapsed = false
-            } else {
-              this.state.collapsed = true
+            if( this.props.windowWidth < 500 && !this.state.collapsed) {
+              this.toggleNavbar()
+            } else if (this.props.windowWidth > 500 && this.state.collapsed) {
+              this.toggleNavbar()
             }
             
           })
-        // }
     }
   }
 
@@ -101,6 +99,18 @@ class DashSideBar extends React.Component {
                   Settings
               </NavLink>
             </Link>
+          </NavItem>
+
+          <NavItem>
+            <a
+              href={'/api/logout'}
+              key="2"
+              id="title"
+              // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
+              className="nav-item nav-link px-2"
+            >
+              Sign-out
+            </a>
           </NavItem> 
           </Collapse>     
         </Nav>
