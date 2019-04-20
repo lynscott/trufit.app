@@ -1,5 +1,6 @@
 import axios from 'axios'
 import ndb from 'nutrient-database'
+import Alert from 'react-s-alert'
 
 export const TYPE_SELECTED = 'type_selected'
 export const PLAN_SELECTED = 'plan_selected'

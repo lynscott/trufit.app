@@ -372,8 +372,9 @@ app.post('/api/signup', async (req, res, next) => {
   let modifier = parseInt(req.body.activity_mod)
 
   //TEMP Access list check
+  // console.log(process.env)
   if (process.env.NODE_ENV) {
-    let preList = keys.accessList.split(' ')
+    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'ronaldwill94@gmail.com', 'nathanielneal21@gmail.com', 'buckhalterkyrie@gmail.com']
     if (!preList.includes(email)) {
       return res.status(401).send({ error: 'Sorry Reg is is only open for Beta testing! Come back soon!' })
     }

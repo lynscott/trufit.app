@@ -4,7 +4,8 @@ const initialState = {
   token: null,
   errorMessage: null,
   user: null,
-  userProfile: null
+  userProfile: null,
+  signUp: false,
 }
 
 export default function(state = initialState, action ) {
@@ -18,7 +19,8 @@ export default function(state = initialState, action ) {
       return {
         ...state,
         user: action.user,
-        token: action.payload
+        token: action.payload,
+        signUp: true
       }
     case AUTH_ERROR:
       return {
