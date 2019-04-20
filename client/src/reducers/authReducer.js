@@ -1,4 +1,4 @@
-import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN, FETCH_PROFILE, UPDATE_PROFILE } from '../actions'
+import { FETCH_USER, AUTH_USER, AUTH_ERROR, MOUNT_TOKEN, FETCH_PROFILE, UPDATE_PROFILE, USER_SIGNUP, RESET_SIGNUP_FAIL } from '../actions'
 
 const initialState = {
   token: null,
@@ -6,6 +6,8 @@ const initialState = {
   user: null,
   userProfile: null,
   signUp: false,
+  signUpFail: false
+
 }
 
 export default function(state = initialState, action ) {
@@ -14,6 +16,11 @@ export default function(state = initialState, action ) {
       return {
         ...state,
         user: action.payload || null,
+      }
+    case USER_SIGNUP:
+      return {
+        ...state,
+        signUp:true,
       }
     case AUTH_USER:
       return {
@@ -25,7 +32,8 @@ export default function(state = initialState, action ) {
     case AUTH_ERROR:
       return {
         ...state,
-        errorMessage: action.payload
+        errorMessage: action.payload,
+        signUpFail:true
       }
     case MOUNT_TOKEN:
       return {
@@ -41,6 +49,11 @@ export default function(state = initialState, action ) {
       return {
         ...state,
         userProfile : action.payload
+      }
+    case RESET_SIGNUP_FAIL:
+      return {
+        ...state,
+        signUpFail: false
       }
     default:
       return state

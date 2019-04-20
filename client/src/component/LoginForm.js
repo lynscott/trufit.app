@@ -1,14 +1,23 @@
 import React, { Component } from 'react'
 import { Field, reset, reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
-import { signInUser } from '../actions'
+import { signInUser, resetSignUpFail } from '../actions'
 import { withRouter } from 'react-router-dom'
-import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Alert } from 'reactstrap'
 
 const afterSubmit = (result, dispatch) => dispatch(reset('LoginForm'))
 
 class LoginForm extends Component {
+  constructor(props) {
+    super(props)
+
+
+    this.state = {
+      visible: false
+    }
+  }
+
   renderField(field) {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
@@ -55,23 +64,36 @@ class LoginForm extends Component {
 
 
   async onSubmit(values) {
-    console.log(values)
+
+    try {
+    // console.log(values)
     await this.props.signInUser(this.props.history ,values)
-    // Alert.success(<h3>Success!</h3>, {
-    //   position: 'bottom',
-    //   effect: 'scale'
-    // })
-    this.props.closeForm()
+    // this.props.closeForm()
+    } catch (error) {
+      console.log(error)
+      // this.setState({visible:true})
+    }
+    
+  }
+
+  //TODO: Create dedicated signup error logic
+  onDismissFail = () => {
+    // this.setState({visible:false})
+    this.props.resetSignUpFail()
   }
 
   render() {
     const { handleSubmit } = this.props
+    console.log(this.props.signUpFail)
 
     return (
       <form className='p-4' onSubmit={handleSubmit(this.onSubmit.bind(this))}
       >
       <FontAwesomeIcon icon="user-circle" size={'3x'} />
       <h2>Sign In To Your Account</h2>
+      <Alert color="danger" isOpen={this.props.signUpFail} toggle={this.onDismissFail}>
+          Incorrect email or password.
+      </Alert>
 
         <Field
           placeholder="Email"
@@ -131,8 +153,18 @@ function validate(values) {
   return errors
 }
 
+const mapStateToProps = state => {
+  return {
+    // activeType: state.activeType,
+    // values: getFormValues('SignUpForm')(state),
+    // signUpSuccess: state.auth.signUp,
+    signUpFail: state.auth.signUpFail,
+    errorMessage: state.auth.errorMessage
+  }
+}
+
 export default reduxForm({
   validate,
   form: 'LoginForm',
   onSubmitSuccess: afterSubmit
-})(withRouter(connect(null, { signInUser })(LoginForm)))
+})(withRouter(connect(mapStateToProps, { signInUser, resetSignUpFail })(LoginForm)))

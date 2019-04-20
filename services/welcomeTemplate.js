@@ -3,18 +3,28 @@ module.exports = req => {
       <html>
         <body>
           <div className="row">
-          <div style="background-image: url(../img/cover_photo.png) cover center"  className="col-md-10 text-center bg-dark text-white">
+          <div style="background-image: url(https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/logo2_edit.png) cover center"  className="col-md-10 text-center bg-dark text-white">
             <h3>Welcome!</h3>
           </div>
           <div classname="jumbotron">
-          <h1>${req.body.name}!</h1>
-            <p>
-              Thanks for signing up, we look forward getting to helping you reach your fitness goals!
-              
+
+            <h4>
+              Hey ${req.body.name}, <br/><br/>
+              Thanks for signing up! We're excited to tag along on your journey to achieving your fitness goals!
+              A few things you can do to get started in your dashboard:
+              - Choose a goal for yourself, weight loss/gain, maintenance.
+              - Fill in your affirmation!
+              - Create a nutrition plan and schedule meal times.
+              - Setup a fitness plan. <br/>
+              <br/>
+              Lets get started!<br/>
+              www.lsfitness.co
+              <br/>
+              <br/>
               For any questions feel free to reach out to lynscott@lsphysique.com
-  
+              <br/>
               LS Fitness 2017
-            </p>
+            </h4>
           </div>
         </div>
         </body>
