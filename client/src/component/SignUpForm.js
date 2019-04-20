@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Field, reset, reduxForm, getFormValues } from 'redux-form'
 import { connect } from 'react-redux'
-import { signUpUser } from '../actions'
+import { signUpUser, resetSignUpFail } from '../actions'
 // import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Tooltip, Input, Button, Media, Alert } from 'reactstrap'
@@ -24,7 +24,7 @@ class SignUpForm extends Component {
       page: 1,
       nextBtn: false,
       activeType: true,
-      visible: true
+      visible: this.props.signUpFail
     }
   }
 
@@ -173,6 +173,11 @@ class SignUpForm extends Component {
     this.props.closeForm()
   }
 
+  onDismissFail = () => {
+    // this.setState({visible:false})
+    this.props.resetSignUpFail()
+  }
+
   render() {
     const { handleSubmit, values } = this.props
     // console.log(this.props)
@@ -186,6 +191,10 @@ class SignUpForm extends Component {
  
         <Alert color="success" isOpen={this.props.signUpSuccess} toggle={this.onDismiss}>
           Success! A welcome email has been sent to your address.
+        </Alert>
+
+        <Alert color="danger" isOpen={this.props.signUpFail} toggle={this.onDismissFail}>
+          {this.props.errorMessage}
         </Alert>
         
         {/* <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2> */}
@@ -396,7 +405,9 @@ const mapStateToProps = state => {
   return {
     activeType: state.activeType,
     values: getFormValues('SignUpForm')(state),
-    signUpSuccess: state.auth.signUp
+    signUpSuccess: state.auth.signUp,
+    signUpFail: state.auth.signUpFail,
+    errorMessage: state.auth.errorMessage
   }
 }
 
@@ -407,6 +418,6 @@ export default reduxForm({
 })(
   connect(
     mapStateToProps,
-    { signUpUser }
+    { signUpUser, resetSignUpFail }
   )(SignUpForm)
 )

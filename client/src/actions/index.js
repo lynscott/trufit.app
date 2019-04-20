@@ -22,6 +22,8 @@ export const FOOD_SEARCH = 'FOOD_SEARCH'
 export const FOOD_SELECTED = 'FOOD_SELECTED'
 export const FETCH_PROFILE = 'FETCH_PROFILE'
 export const UPDATE_PROFILE = 'UPDATE_PROFILE'
+export const USER_SIGNUP = 'USER_SIGNUP'
+export const RESET_SIGNUP_FAIL = 'RESET_SIGNUP_FAIL'
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
@@ -134,7 +136,8 @@ export const signInUser = (history, {email, password}) => async dispatch => {
     dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
     history.push('/dashboard/overview')
   } catch (error) {
-    dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
+    // console.log(error.response)
+    dispatch({type: AUTH_ERROR, payload:'error'})
   }
 }
 
@@ -143,9 +146,9 @@ export const signUpUser = (values) => async dispatch => {
   try {
     const res = await axios.post('/api/signup/', values)
     // localStorage.setItem('token', res.data.token)
-    dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
+    dispatch({type: USER_SIGNUP})
   } catch (error) {
-    dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})
+    dispatch({type: AUTH_ERROR, payload: error.response.data.message})
   }
 }
 
@@ -266,4 +269,10 @@ export const saveMealTime = (values) => async dispatch => {
   let res = await axios.post('/api/update_food_item', values)
 
   dispatch({ type: UPDATE_PROFILE, payload:res.data  })
+}
+
+
+export const resetSignUpFail = () => dispatch => {
+
+  dispatch({ type: RESET_SIGNUP_FAIL  })
 }

@@ -145,7 +145,7 @@ passport.use(
       proxy: true,
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log(profile)
+      // console.log(profile)
       const existingUser = await User.findOne({ facebookID: profile.id })
       if (existingUser) {
         done(null, existingUser)
@@ -288,7 +288,7 @@ app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => 
 
 //Authenticate User locally then supply jwt
 app.post('/api/signin', passport.authenticate('local', { session: true }), async (req, res, next) => {
-  console.log('inside logg')
+  // console.log('inside logg')
   //Remove password before sending user
   req.user.password = ''
   res.send({ token: tokenForUser(req.user), user: req.user })
@@ -376,7 +376,7 @@ app.post('/api/signup', async (req, res, next) => {
   if (process.env.NODE_ENV) {
     let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'ronaldwill94@gmail.com', 'nathanielneal21@gmail.com', 'buckhalterkyrie@gmail.com']
     if (!preList.includes(email)) {
-      return res.status(401).send({ error: 'Sorry Reg is is only open for Beta testing! Come back soon!' })
+      return res.status(401).send({ message: 'Hey There! Registration is only open for Beta testing at the moment, come back soon!' })
     }
   }
 
@@ -400,7 +400,7 @@ app.post('/api/signup', async (req, res, next) => {
     }
 
     if (existingUser) {
-      return res.status(422).send({ error: 'This email address has already been used' })
+      return res.status(422).send({ message:'An account with this email address has already been created.' })
     }
 
 
@@ -428,8 +428,8 @@ app.post('/api/signup', async (req, res, next) => {
     let alert = {
       to: 'lynscott@lsphysique.com',
       from: 'no-reply@LSFitness.com',
-      subject: 'New User Sign Up',
-      text: 'New User',
+      subject: 'A New User Has Signed Up!',
+      text: name,
       html: emailTemplate(req),
     }
 
@@ -437,13 +437,19 @@ app.post('/api/signup', async (req, res, next) => {
       if (err) {
         return next(err)
       }
-      let profile = new UserProfile({
-        email: email,
-        _user: user.id,
-        macros: somatype.macro,
-        calories: userBMR * modifier,
-        baseSomaType: somatype,
-      })
+
+      try {
+        var profile = new UserProfile({
+          email: email,
+          _user: user.id,
+          macros: somatype.macro,
+          calories: userBMR * modifier,
+          baseSomaType: somatype,
+        })
+      } catch (error) {
+        return res.status(422).send({ message: error })
+      }
+      
       await profile.save()
       //Respond with user token
       await sgMail.send(msg)

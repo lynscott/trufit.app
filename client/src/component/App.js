@@ -86,7 +86,7 @@ class App extends Component {
 
   componentDidMount() {
     //TODO: Create refresh token
-    this.props.fetchUser()
+    // this.props.fetchUser()
     // if (localStorage.getItem('token')) {
     //   let token = localStorage.getItem('token')
     //   this.props.mountToken(token)

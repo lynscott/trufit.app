@@ -111,7 +111,8 @@ class Nav extends Component {
     //   this.props.mountToken(token)
     //   this.props.fetchUserLocal(token)
     // }
-    this.props.fetchUser()
+    if (this.props.auth.user !== null)
+          this.props.fetchUser()
   }
 
   render() {
