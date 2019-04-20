@@ -36,7 +36,6 @@ import windowSize from 'react-window-size'
 
 const recommendedMacros = 1800
 
-
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list)
@@ -81,7 +80,7 @@ class NutritionDash extends Component {
             borderWidth: 1,
             hoverBackgroundColor: 'rgba(255,99,132,0.4)',
             hoverBorderColor: 'rgba(255,99,132,1)',
-            label: '(g)',
+            label: '(g)'
           }
         ]
       },
@@ -163,7 +162,7 @@ class NutritionDash extends Component {
     let i = this.state.index
     let newRow = this.props.profile.nutritionItems[i]
 
-    console.log('correct', newValue)
+    // console.log('correct', newValue)
     newRow.fats = (
       this.props.profile.nutritionItems[i].baseFats *
       (Number(newValue) / 3.5)
@@ -186,7 +185,7 @@ class NutritionDash extends Component {
       index: this.state.index,
       replace: newRow
     })
-    this.setState({rowSelected:false})
+    this.setState({ rowSelected: false })
     this.calculateTotals()
   }
 
@@ -344,7 +343,9 @@ class NutritionDash extends Component {
                 }}
                 {...provided.droppableProps}
               >
-                <h5 style={{fontWeight:'lighter'}}>Select Items For Meal:</h5>
+                <h5 style={{ fontWeight: 'lighter' }}>
+                  Select Items For Meal:
+                </h5>
                 {draggableFoodItems()}
                 {provided.placeholder}
               </div>
@@ -372,7 +373,6 @@ class NutritionDash extends Component {
               >
                 <Row className="align-items-center py-2">
                   <Col md="6">
-                    
                     <Button
                       onClick={() => saveMealTime()}
                       disabled={
@@ -386,18 +386,25 @@ class NutritionDash extends Component {
                     >
                       Save Meal
                     </Button>
-                  {/* </Col>
+                    {/* </Col>
                   <Col md="4" position='middle'> */}
-                    
                   </Col>
                   <Col md="6">
-                  <h5 style={{fontWeight:'lighter', color:'white', display:'inline'}}>Set Time:</h5>
+                    <h5
+                      style={{
+                        fontWeight: 'lighter',
+                        color: 'white',
+                        display: 'inline'
+                      }}
+                    >
+                      Set Time:
+                    </h5>
                     <Input
                       onChange={e => {
                         console.log(e.target.value)
                         this.setState({ time: e.target.value })
                       }}
-                      placeholder='Set Time'
+                      placeholder="Set Time"
                       // style={{maxWidth:'fit-content'}}
                       type="time"
                     />
@@ -475,9 +482,9 @@ class NutritionDash extends Component {
                       >
                         <CardTitle
                           style={{
-                            fontWeight:'bold',
-                            textAlign:'center',
-                            color:'black'
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            color: 'black'
                           }}
                         >
                           {new Date(sched.time).toLocaleTimeString('en-US', {
@@ -488,15 +495,23 @@ class NutritionDash extends Component {
                         {sched
                           ? sched.items.map((item, i) => {
                               return (
-                                <CardText key={i} className="row justify-content-center">
-                                  <Col md='6' className='truncate text-center'>
-                                  <Badge color='light'>{item.name}</Badge>
-                                  </Col>
-                                  <Col md='6' className='text-center'>
-                                  <Badge color='warning'>
-                                  {item.serving + 'oz'}
-                                  </Badge>
-                                  </Col>
+                                <CardText
+                                  key={i}
+                                  className="row justify-content-center"
+                                >
+                                  <React.Fragment>
+                                    <Col
+                                      md="6"
+                                      className="truncate text-center"
+                                    >
+                                      <Badge color="light">{item.name}</Badge>
+                                    </Col>
+                                    <Col md="6" className="text-center">
+                                      <Badge color="warning">
+                                        {item.serving + 'oz'}
+                                      </Badge>
+                                    </Col>
+                                  </React.Fragment>
                                 </CardText>
                               )
                             })
@@ -622,12 +637,12 @@ class NutritionDash extends Component {
         }
         cellEdit={cellEditFactory({
           mode: 'dbclick',
-          blurToSave:true,
+          blurToSave: true,
           autoSelectText: true,
           beforeSaveCell: async (oldValue, newValue, row, column) => {
             // console.log(newValue, row, 'before save log')
-            
-            if (!isNaN(newValue) && newValue !== ' '){
+
+            if (!isNaN(newValue) && newValue !== ' ') {
               this.updateMacros(newValue)
             } else {
               // console.log('send to save')
@@ -644,24 +659,28 @@ class NutritionDash extends Component {
   }
 
   rowClasses = (row, rowIndex) => {
-    if (rowIndex === this.state.index && this.state.rowSelected && 
-      rowIndex !== this.props.profile.nutritionItems.length) {
+    if (
+      rowIndex === this.state.index &&
+      this.state.rowSelected &&
+      rowIndex !== this.props.profile.nutritionItems.length
+    ) {
       return 'selected-row'
     }
   }
-
 
   selectRow = {
     mode: 'checkbox',
     clickToSelect: true,
     hideSelectColumn: true,
     clickToEdit: true,
-    nonSelectable: [this.props.profile ? this.props.profile.nutritionItems.length: ''],
+    nonSelectable: [
+      this.props.profile ? this.props.profile.nutritionItems.length : ''
+    ],
     onSelect: (row, isSelect, rowIndex, e) => {
       // console.log(rowIndex)
       if (rowIndex !== this.props.profile.nutritionItems.length) {
-      this.rowClasses(rowIndex)
-      this.setState({ index: rowIndex,rowSelected: true })
+        this.rowClasses(rowIndex)
+        this.setState({ index: rowIndex, rowSelected: true })
       }
     }
   }
@@ -674,43 +693,66 @@ class NutritionDash extends Component {
   }
 
   displayMacros = () => {
+    console.log(this.props.profile)
     return (
       <Row className="justify-content-center py-2">
-        
-        <Col md="6" className='align-self-center text-white'>
+        <Col md="6" className="align-self-center text-white">
           {/* <Card body inverse color="info" style={{ borderColor: '#333' }}>
             <CardHeader>Recommended Macros:</CardHeader>
             <CardBody>
               <CardText> */}
-          
+
           <h5>Recommended Macros:</h5>
           <ButtonToolbar>
             <ButtonGroup>
-            <Button><h4>
-                <Badge color="primary" >
-                  Protein: 200g
-                </Badge>
-              </h4></Button>
-            <Button><h4>
-                <Badge color="primary" >
-                  Carbs: 100g
-                </Badge>
-              </h4></Button>
-            <Button><h4>
-                <Badge color="primary" >
-                  Fats: 70g
-                </Badge>
-              </h4></Button>
-              <Button><h4>
-                <Badge color="info" >
-                  Calories: {(Number(this.props.profile.calories) + this.props.profile.currentGoal.value).toFixed()}
-                </Badge>
-              </h4></Button>
-          </ButtonGroup>
+              <Button>
+                <h4>
+                  <Badge color="primary">
+                    Protein:{' '}
+                    {(this.props.profile.macros.protein / 100) *
+                      (parseInt(this.props.profile.calories) +
+                        this.props.profile.currentGoal.value)}
+                    g
+                  </Badge>
+                </h4>
+              </Button>
+              <Button>
+                <h4>
+                  <Badge color="primary">
+                    Carbs:{' '}
+                    {(this.props.profile.macros.carb / 100) *
+                      (parseInt(this.props.profile.calories) +
+                        this.props.profile.currentGoal.value)}
+                    g
+                  </Badge>
+                </h4>
+              </Button>
+              <Button>
+                <h4>
+                  <Badge color="primary">
+                    Fats:{' '}
+                    {(this.props.profile.macros.fat / 100) *
+                      (parseInt(this.props.profile.calories) +
+                        this.props.profile.currentGoal.value)}
+                    g
+                  </Badge>
+                </h4>
+              </Button>
+              <Button>
+                <h4>
+                  <Badge color="info">
+                    Calories:{' '}
+                    {(
+                      Number(this.props.profile.calories) +
+                      this.props.profile.currentGoal.value
+                    ).toFixed()}
+                  </Badge>
+                </h4>
+              </Button>
+            </ButtonGroup>
           </ButtonToolbar>
-
         </Col>
-        <Col md="6" className='text-white'>
+        <Col md="6" className="text-white">
           <h5>Your Diets Macros:</h5>
           <HorizontalBar
             legend={{ position: 'bottom' }}
@@ -720,7 +762,6 @@ class NutritionDash extends Component {
       </Row>
     )
   }
-
 
   calculateTotals = () => {
     // if (this.props.profile.nutritionItems.length !== 0) {
@@ -751,12 +792,11 @@ class NutritionDash extends Component {
         calories: Math.round(cals),
         carb: carbs.toFixed(2),
         protein: prot.toFixed(2),
-        id:'total'
+        id: 'total'
       })
     })
     this.forceUpdate()
   }
-
 
   addItemButton = () => {
     return (
@@ -798,7 +838,9 @@ class NutritionDash extends Component {
             this.props.foodSearch(value)
           }}
         />
-        <h6>Nutrition Data Provided by USDA Food Database</h6>
+        <h6 className="text-white">
+          Nutrition Data Provided by USDA Food Database
+        </h6>
       </React.Fragment>
     )
   }
@@ -914,7 +956,7 @@ class NutritionDash extends Component {
 
   render() {
     // console.log(this.props)
-    return this.props.profile? this.renderNutritionTabs():null
+    return this.props.profile ? this.renderNutritionTabs() : null
   }
 }
 

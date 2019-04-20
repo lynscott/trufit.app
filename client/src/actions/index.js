@@ -141,7 +141,7 @@ export const signUpUser = (values) => async dispatch => {
 
   try {
     const res = await axios.post('/api/signup/', values)
-    localStorage.setItem('token', res.data.token)
+    // localStorage.setItem('token', res.data.token)
     dispatch({type: AUTH_USER, payload:res.data.token, user:res.data.user})
   } catch (error) {
     dispatch({type: AUTH_ERROR, payload:'Error Occured'+ error})

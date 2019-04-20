@@ -9,7 +9,6 @@ import Fade from 'react-reveal/Fade'
 import TypeList from '../containers/types'
 import TypeDetail from '../containers/type_detail'
 
-
 const afterSubmit = (result, dispatch) => dispatch(reset('SignUpForm'))
 
 class SignUpForm extends Component {
@@ -17,11 +16,34 @@ class SignUpForm extends Component {
     super(props)
 
     this.toggle = this.toggle.bind(this)
+    this.toggle2 = this.toggle2.bind(this)
 
     this.state = {
       tooltipOpen: false,
       tooltip2: false,
-      page: 1
+      page: 1,
+      nextBtn: false,
+      activeType: true
+    }
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    // console.log(prevProps, 'prev props')
+    if (prevProps.activeType !== this.props.activeType) {
+      this.setState({ activeType: true })
+    }
+
+    if (prevProps.values && this.props.values) {
+      if (prevProps.values !== this.props.values) {
+        if (
+          this.props.values.email !== undefined &&
+          this.props.values.name !== undefined &&
+          this.props.values.password2 !== undefined &&
+          this.state.activeType
+        ) {
+          this.setState({ nextBtn: true })
+        }
+      }
     }
   }
 
@@ -45,6 +67,7 @@ class SignUpForm extends Component {
           placeholder={field.placeholder}
           className={className}
           type={field.type}
+          required
           style={{ backgroundColor: '#e7e7e7' }}
           {...field.input}
         />
@@ -68,11 +91,13 @@ class SignUpForm extends Component {
           className={className}
           style={{ backgroundColor: '#e7e7e7' }}
           type={field.type}
+          required
           {...field.input}
         >
+          <option value="none">Select One</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
-          <option value="none">Prefer Not To Say</option>
+          
         </select>
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
@@ -81,27 +106,16 @@ class SignUpForm extends Component {
     )
   }
 
-  renderSomatypeField = (field) => {
+  renderSomatypeField = field => {
+    // console.log(this.props, field.meta.touched)
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
     }`
     return (
       <div className="form-group col">
-        <FontAwesomeIcon id="bodyTypeTooltip" icon="info-circle" />
-        <Tooltip
-                placement="right"
-                isOpen={this.state.tooltip2}
-                target="bodyTypeTooltip"
-                href="#"
-                toggle={this.toggle(2)}
-              >
-                <label>Select a body type that most accuratly represents you! 
-              Note: You may not feel 100% one type and that's okay! Select the one</label>
-        </Tooltip>
-        
-        <TypeList/>
-        <br/>
-        <TypeDetail/>
+        <TypeList />
+        <br />
+        <TypeDetail />
         {field.input.onChange(this.props.activeType.type)}
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
@@ -127,11 +141,10 @@ class SignUpForm extends Component {
         >
           <option value={1.25}>Little or no exercise.</option>
           <option value={1.3}>Exercise/sports 1-3 days/week.</option>
-          <option value={1.55}>Moderate exercise/sports 3-5 days/week.</option>
-          <option value={1.725}>Hard exercise every day.</option>
+          <option value={1.55}>Exercise/aerobic activity 3-5 days/week.</option>
+          <option value={1.725}>Heavy exercise every day.</option>
           <option value={1.9}>
-            Hard exercise 2 or more times per day, or training for marathon, or
-            triathlon.
+            Heavy exercise 2 or more times per day, or training for marathon/triathlon.
           </option>
         </Input>
         <div className="invalid-feedback">
@@ -143,9 +156,9 @@ class SignUpForm extends Component {
 
   async onSubmit(values) {
     console.log(values)
-    this.props.values.somatype = this.props.activeType.type 
+    this.props.values.somatype = this.props.activeType
     try {
-      await this.props.signUpUser(values) 
+      await this.props.signUpUser(values)
       await Alert.success(<h3>Success! A welcome email has been sent.</h3>, {
         position: 'bottom',
         effect: 'scale'
@@ -169,8 +182,8 @@ class SignUpForm extends Component {
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >
-      <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2>
-        <FontAwesomeIcon icon="user-plus" size={'3x'} />
+        {/* <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2> */}
+        <FontAwesomeIcon icon="user-plus" size={'2x'} />
         <h3>Create An Account</h3>
 
         {this.state.page === 1 ? (
@@ -203,6 +216,27 @@ class SignUpForm extends Component {
                 type="password"
                 component={this.renderField}
               />
+              <FontAwesomeIcon id="bodyTypeTooltip" icon="info-circle" />
+              <Tooltip
+                placement="right"
+                isOpen={this.state.tooltip2}
+                target="bodyTypeTooltip"
+                href="#"
+                toggle={this.toggle2}
+              >
+                <p
+                style={{
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  paddingLeft: '10px',
+                  paddingRight: '10px'
+                }}
+                >
+                  Select a body type that most accurately represents you! Note:
+                  You may not feel 100% one type and that's okay! Select the one
+                  that best represents your current physique.
+                </p>
+              </Tooltip>
 
               <Field
                 placeholder="Body Type"
@@ -297,11 +331,15 @@ class SignUpForm extends Component {
           </Button>
         ) : null}
         {this.state.page === 1 ? (
-          <Button color="success" onClick={() => this.setState({ page: 2 })}>
+          <Button
+            color="success"
+            disabled={!this.state.nextBtn}
+            onClick={() => this.setState({ page: 2, tooltip2: false })}
+          >
             Next
           </Button>
         ) : (
-          <button type="submit" disabled className="btn btn-outline-danger">
+          <button type="submit" className="btn btn-outline-danger">
             Submit
           </button>
         )}
@@ -321,7 +359,7 @@ function validate(values) {
   if (values.password1 !== values.password2) {
     errors.password1 = 'Passwords must match.'
   }
-  if (values.password) {
+  if (values.password1) {
     if (values.password1.length < 8) {
       errors.password1 = 'Password must be at least 8 characters long.'
     }
@@ -348,8 +386,8 @@ function validate(values) {
   return errors
 }
 
-const mapStateToProps = (state) => {
-  return{
+const mapStateToProps = state => {
+  return {
     activeType: state.activeType,
     values: getFormValues('SignUpForm')(state)
   }

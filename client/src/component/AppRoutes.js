@@ -75,7 +75,6 @@ class AppRoutes extends Component {
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <NutritionDash/>
-        {/* <div style={{ backgroundColor: 'white' }}> placeholder nutrition </div> */}
       </Row>
     )
   }
@@ -86,7 +85,7 @@ class AppRoutes extends Component {
 
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div className='col-md-10'> placeholder plans </div>
+        <div className='col-md-10 dummy'> </div>
       </Row>
     )
   }
@@ -95,7 +94,7 @@ class AppRoutes extends Component {
     return (
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div className='col-md-10' style={{ backgroundColor: 'white' }}> placeholder account </div>
+        <div className='col-md-10 dummy' style={{ backgroundColor: 'white' }}> </div>
       </Row>
     )
   }

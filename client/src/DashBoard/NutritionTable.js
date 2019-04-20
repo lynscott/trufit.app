@@ -4,8 +4,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Moment from 'react-moment'
 import * as actions from '../actions'
-import { Card, CardTitle, CardText, CardGroup, Button, Badge, Col } from 'reactstrap'
-
+import {
+  Card,
+  CardTitle,
+  CardText,
+  CardGroup,
+  Button,
+  Badge,
+  Col
+} from 'reactstrap'
 
 const products = [
   { meal: 'Meal 1', fats: 20, carb: 50, protein: 100, total: 300 },
@@ -44,64 +51,93 @@ class NextMeal extends Component {
   renderNextMeal = () => {
     let times = this.props.profile.nutritionSchedule
     let index = 0
-    for (let i = 0; i < times.length; i++) {
-      let oldTime = new Date(times[i].time)
-      let todayTime = new Date()
-      todayTime.setHours(oldTime.getHours(), oldTime.getMinutes())
-      times[i].time = todayTime
-      // console.log(this.props.profile.nutritionSchedule[i].time)
-    }
-    times.sort((a, b) =>
-      Math.abs(a.time - new Date()) > Math.abs(b.time - new Date())
-        ? 1
-        : Math.abs(b.time - new Date()) > Math.abs(a.time - new Date())
-        ? -1
-        : 0
-    )
-    // console.log(times)
 
-    let clock = timeArray => {
-      if (timeArray[0].time > new Date()) {
-        index = 0
-        return timeArray[0].time
-      } else {
-        index = timeArray.length - 1
-        return timeArray[timeArray.length - 1].time
+    if (this.props.profile.nutritionSchedule.length > 0) {
+      for (let i = 0; i < times.length; i++) {
+        let oldTime = new Date(times[i].time)
+        let todayTime = new Date()
+        todayTime.setHours(oldTime.getHours(), oldTime.getMinutes())
+        times[i].time = todayTime
+        // console.log(this.props.profile.nutritionSchedule[i].time)
       }
-    }
+      times.sort((a, b) =>
+        Math.abs(a.time - new Date()) > Math.abs(b.time - new Date())
+          ? 1
+          : Math.abs(b.time - new Date()) > Math.abs(a.time - new Date())
+          ? -1
+          : 0
+      )
+      // console.log(times)
 
-    return (
-
-      <React.Fragment>
+      let clock = timeArray => {
+        if (timeArray[0].time > new Date()) {
+          index = 0
+          return timeArray[0].time
+        } else {
+          index = timeArray.length - 1
+          return timeArray[timeArray.length - 1].time
+        }
+      }
+      return (
+        <React.Fragment>
           <h5 style={{ margin: 0 }}>
             Next Meal: <Moment format="LT">{clock(times)}</Moment>
           </h5>
-        {/* // </CardTitle> */}
-        {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
-          return (
-            <CardText key={i} className="row">
-              <Col md='6'>
-                <h5><Badge color='light' style={{whiteSpace:'normal'}}> {item.name}</Badge></h5>
-              </Col>
-              <Col md='6'>
-                <h5><Badge color='success'>{item.serving + 'oz'}</Badge></h5>
-              </Col>
-            </CardText>
-          )
-        })}
-        <Button
-          color="primary"
-          // onClick={() => removeMeal(index)}
-          className="m-2"
-        >
-          Mark Complete
-        </Button>
-      {/* // </Card> */}
-      </React.Fragment>
-    )
+          {/* // </CardTitle> */}
+          {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
+            return (
+              <CardText key={i} className="row">
+                <Col md="6">
+                  <h5>
+                    <Badge color="dark" style={{ whiteSpace: 'normal' }}>
+                      {' '}
+                      {item.name}
+                    </Badge>
+                  </h5>
+                </Col>
+                <Col md="6">
+                  <h5>
+                    <Badge color="success">{item.serving + 'oz'}</Badge>
+                  </h5>
+                </Col>
+              </CardText>
+            )
+          })}
+          <Button
+            color="primary"
+            // onClick={() => removeMeal(index)}
+            className="m-2"
+          >
+            Mark Complete
+          </Button>
+          {/* // </Card> */}
+        </React.Fragment>
+      )
+    } else {
+      return (
+        <CardText className="row">
+          <Col md="6">
+            <h5>
+              <Badge color="dark" style={{ whiteSpace: 'normal' }}>
+                {' '}
+                No Meals Scheduled Yet!
+              </Badge>
+            </h5>
+          </Col>
+          <Col md="6">
+            <h5>
+              <Badge color="info" style={{ whiteSpace: 'normal' }}>
+                Have you created a nutrition plan?
+              </Badge>
+            </h5>
+          </Col>
+        </CardText>
+      )
+    }
   }
 
   render() {
+    console.log(this.props.profile)
     return this.props.profile ? this.renderNextMeal() : null
   }
 }
