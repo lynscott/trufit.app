@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { Field, reset, reduxForm, getFormValues } from 'redux-form'
 import { connect } from 'react-redux'
 import { signUpUser } from '../actions'
-import Alert from 'react-s-alert'
+// import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Tooltip, Input, Button, Media } from 'reactstrap'
+import { Tooltip, Input, Button, Media, Alert } from 'reactstrap'
 import Fade from 'react-reveal/Fade'
 import TypeList from '../containers/types'
 import TypeDetail from '../containers/type_detail'
@@ -23,7 +23,8 @@ class SignUpForm extends Component {
       tooltip2: false,
       page: 1,
       nextBtn: false,
-      activeType: true
+      activeType: true,
+      visible: true
     }
   }
 
@@ -46,6 +47,8 @@ class SignUpForm extends Component {
       }
     }
   }
+
+
 
   toggle = () => {
     console.log('tooltip hover')
@@ -155,21 +158,19 @@ class SignUpForm extends Component {
   }
 
   async onSubmit(values) {
-    console.log(values)
     this.props.values.somatype = this.props.activeType
     try {
       await this.props.signUpUser(values)
-      await Alert.success(<h3>Success! A welcome email has been sent.</h3>, {
-        position: 'bottom',
-        effect: 'scale'
-      })
-      this.props.closeForm()
+      
+      // this.props.closeForm()
     } catch (error) {
-      Alert.error(<h3>{error}</h3>, {
-        position: 'bottom',
-        effect: 'scale'
-      })
+      console.log(error)
     }
+  }
+
+  onDismiss = () => {
+    this.setState({visible:false})
+    this.props.closeForm()
   }
 
   render() {
@@ -182,6 +183,11 @@ class SignUpForm extends Component {
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >
+ 
+        <Alert color="success" isOpen={this.props.signUpSuccess} toggle={this.onDismiss}>
+          Success! A welcome email has been sent to your address.
+        </Alert>
+        
         {/* <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2> */}
         <FontAwesomeIcon icon="user-plus" size={'2x'} />
         <h3>Create An Account</h3>
@@ -389,7 +395,8 @@ function validate(values) {
 const mapStateToProps = state => {
   return {
     activeType: state.activeType,
-    values: getFormValues('SignUpForm')(state)
+    values: getFormValues('SignUpForm')(state),
+    signUpSuccess: state.auth.signUp
   }
 }
 
