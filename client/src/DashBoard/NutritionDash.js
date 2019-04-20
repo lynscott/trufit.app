@@ -696,22 +696,22 @@ class NutritionDash extends Component {
     console.log(this.props.profile)
     return (
       <Row className="justify-content-center py-2">
-        <Col md="6" className="align-self-center text-white">
+        <Col md="6" className="align-self-center text-white my-2">
           {/* <Card body inverse color="info" style={{ borderColor: '#333' }}>
             <CardHeader>Recommended Macros:</CardHeader>
             <CardBody>
               <CardText> */}
 
-          <h5>Recommended Macros:</h5>
+          <h5>Recommended Daily Intake:</h5>
           <ButtonToolbar>
             <ButtonGroup>
               <Button>
                 <h4>
                   <Badge color="primary">
                     Protein:{' '}
-                    {(this.props.profile.macros.protein / 100) *
+                    {(((this.props.profile.macros.protein / 100) *
                       (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value)}
+                        this.props.profile.currentGoal.value))/4).toFixed(2)}
                     g
                   </Badge>
                 </h4>
@@ -720,9 +720,9 @@ class NutritionDash extends Component {
                 <h4>
                   <Badge color="primary">
                     Carbs:{' '}
-                    {(this.props.profile.macros.carb / 100) *
+                    {(((this.props.profile.macros.carb / 100) *
                       (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value)}
+                        this.props.profile.currentGoal.value))/4).toFixed(2) }
                     g
                   </Badge>
                 </h4>
@@ -731,9 +731,9 @@ class NutritionDash extends Component {
                 <h4>
                   <Badge color="primary">
                     Fats:{' '}
-                    {(this.props.profile.macros.fat / 100) *
+                    {(((this.props.profile.macros.fat / 100) *
                       (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value)}
+                        this.props.profile.currentGoal.value))/9).toFixed(2)}
                     g
                   </Badge>
                 </h4>
@@ -752,8 +752,8 @@ class NutritionDash extends Component {
             </ButtonGroup>
           </ButtonToolbar>
         </Col>
-        <Col md="6" className="text-white">
-          <h5>Your Diets Macros:</h5>
+        <Col md="6" className=" my-2 text-white">
+          <h5>Your Planned Daily Intake:</h5>
           <HorizontalBar
             legend={{ position: 'bottom' }}
             data={this.state.horizontalBarData}
