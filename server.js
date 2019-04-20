@@ -380,7 +380,7 @@ app.post('/api/signup', async (req, res, next) => {
     }
   }
 
-  let findBMR = () => {
+  const findBMR = () => {
     let inToCm = height * 2.54 //190.54
     let lbsToKg = currentWeight / 2.2 //104.54
     if (gender === 'male') {
@@ -392,8 +392,7 @@ app.post('/api/signup', async (req, res, next) => {
     }
   }
 
-  // Instantiate user's BMR
-  const userBMR = findBMR()
+  
 
   await User.findOne({ email: email }, (err, existingUser) => {
     if (err) {
@@ -403,6 +402,10 @@ app.post('/api/signup', async (req, res, next) => {
     if (existingUser) {
       return res.status(422).send({ error: 'This email address has already been used' })
     }
+
+
+    // Instantiate user's BMR
+    const userBMR = findBMR()
 
    
     const user = new User({
