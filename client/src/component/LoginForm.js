@@ -155,9 +155,7 @@ function validate(values) {
 
 const mapStateToProps = state => {
   return {
-    // activeType: state.activeType,
-    // values: getFormValues('SignUpForm')(state),
-    // signUpSuccess: state.auth.signUp,
+
     signUpFail: state.auth.signUpFail,
     errorMessage: state.auth.errorMessage
   }

@@ -32,10 +32,14 @@ td, .truncate {
     }
 }
 
-.btn-group{
+.btn-toolbar {
     display: block;
+    
+    .btn-group{
+        display: inherit;
 
-    h4{
-        margin:0;
+        h5{
+            margin:0;
+        }
     }
 }

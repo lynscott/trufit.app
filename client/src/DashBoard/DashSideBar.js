@@ -30,6 +30,7 @@ class DashSideBar extends React.Component {
       update: false,
       currentTab: 'overview',
       collapsed: this.props.windowWidth < 500 ? true:false,
+      expanded: true
     }
   }
 

@@ -22,6 +22,10 @@ import { connectRouter } from 'connected-react-router'
 import { ConnectedRouter } from 'connected-react-router'
  
 export const history = createBrowserHistory()
+
+history.listen(_ => {
+  window.scrollTo(0, 0)  
+})
  
 library.add(faUserCircle, faUserPlus, faInfoCircle )
 
