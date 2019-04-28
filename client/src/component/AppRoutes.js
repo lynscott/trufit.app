@@ -117,7 +117,6 @@ class AppRoutes extends Component {
           <Nav className="navbar" />
         </Fade>
         : null}
-        {/* <Nav className="navbar d-none d-sm-block d-md-none " /> */}
         <Switch>
           <Route exact path="/about" component={About} />
           {/* <Route exact path="/dashboard" render={this.renderDash} /> */}

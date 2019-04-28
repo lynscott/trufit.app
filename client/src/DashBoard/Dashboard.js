@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as actions from '../actions'
 import classnames from 'classnames'
-
+import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
 import NutritionTable from './NutritionTable'
 // import CreatePlanForm from './CreatePlanForm'
@@ -40,55 +40,75 @@ import {
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
-import { Pie, Line } from 'react-chartjs-2'
+import { Pie, Bar } from 'react-chartjs-2'
 import ViewPlan from './ViewPlan'
+import windowSize from 'react-window-size'
 
-const Block = ({ content, colSize, content2 = null, configs = null }) => {
+const BarChart = ({ display }) => {
   return (
-    // <div className="row px-0 justify-content-around">
-    <div className={`col-md-${colSize} ${configs}`}>{content}</div>
-    // {/* <div className={'col-md-6'}>{content2}</div> */}
-    // </div>
+    <Col md="12" className="p-2">
+      <Bar
+        data={{
+          labels: ['Recommended', 'Actual', 'Deficit/Excess'],
+          datasets: [
+            {
+              label: 'Intake',
+              backgroundColor: 'rgba(255,255,255,0.6)',
+              borderColor: 'rgba(130, 128, 128,1)',
+              borderWidth: 1,
+              hoverBackgroundColor: 'rgba(130, 128, 128,0.4)',
+              hoverBorderColor: 'rgba(255,99,132,1)',
+              data: [645, 592, -800]
+            }
+          ]
+        }}
+        options={{
+          legend: {
+            display: false
+          },
+
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  fontColor: '#ffffff',
+                  fontSize: 12,
+                  display: display
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Calories',
+                  fontColor: 'white'
+                }
+              }
+            ],
+            xAxes: [
+              {
+                ticks: {
+                  fontColor: '#ffffff',
+                  fontSize: 12,
+                  display: display
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Average Intake',
+                  fontColor: 'white'
+                }
+              }
+            ]
+          }
+        }}
+      />
+    </Col>
   )
 }
 
-const data = {
-  labels: ['Carbs', 'Protein', 'Fats'],
-  datasets: [
-    {
-      data: [100, 250, 75],
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-      hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-    }
-  ]
-}
-
-export const data2 = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'Weight tracking (lbs)',
-      fill: false,
-      lineTension: 0.1,
-      backgroundColor: 'white', //'rgba(75,192,192,0.4)',
-      borderColor: 'rgba(75,192,192,1)',
-      borderCapStyle: 'butt',
-      borderDash: [],
-      borderDashOffset: 0.0,
-      borderJoinStyle: 'miter',
-      pointBorderColor: 'rgba(75,192,192,1)',
-      pointBackgroundColor: '#fff',
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-      pointHoverBorderColor: 'rgba(220,220,220,1)',
-      pointHoverBorderWidth: 2,
-      pointRadius: 1,
-      pointHitRadius: 10,
-      data: [200, 180, 150, 130, 200, 190, 140]
-    }
-  ]
-}
+const WL =
+  'Focus primarily on weight loss, which will reduce muscle as well as fat.'
+const WG =
+  'Focus on gaining lean muscle mass. Body fat increases may be accumulated in the process but we will work to keep them minimal.'
+const BR =
+  'Body recomposition focuses on decreasing body fat while simultaneously increasing muscle mass.'
 
 class Dashboard extends Component {
   constructor(props) {
@@ -181,139 +201,194 @@ class Dashboard extends Component {
     }
   }
 
+  dropDownToggle = () => {
+    return (
+      <Dropdown
+        isOpen={this.state.dropOpen}
+        direction={'right'}
+        toggle={this.toggleDrop}
+      >
+        <DropdownToggle caret>Change Goal</DropdownToggle>
+        <DropdownMenu>
+          <DropdownItem
+            onClick={() =>
+              this.props.updateProfile({
+                keys: ['currentGoal'],
+                currentGoal: { text: 'Weight Loss', value: -300 }
+              })
+            }
+          >
+            Weight Loss
+          </DropdownItem>
+          <DropdownItem
+            onClick={() =>
+              this.props.updateProfile({
+                keys: ['currentGoal'],
+                currentGoal: { text: 'Weight Gain', value: 300 }
+              })
+            }
+          >
+            Weight Gain
+          </DropdownItem>
+          <DropdownItem
+            onClick={() =>
+              this.props.updateProfile({
+                keys: ['currentGoal'],
+                currentGoal: { text: 'Recomposition', value: 200 }
+              })
+            }
+          >
+            Body Recomposition
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+  }
+
   renderOverviewWall = () => {
+    let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
         <Card>
-          {/* <CardImg top width="100%" src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/gym.jpg" alt="Card image cap" /> */}
-          <CardBody>
-            <CardTitle>Next Workout</CardTitle>
-            {/* <CardSubtitle>Stay on track.</CardSubtitle> */}
-            {/* <CardText>This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</CardText>
-            <Button>Button</Button> */}
-            <DashCalendar plan={this.props.plans[7]} />
+          <CardHeader>Recommended Macros</CardHeader>
+          <CardSubtitle className="pt-2">
+            {this.props.profile.calories}cal
+          </CardSubtitle>
+          <CardBody className="p-1">
+            <Pie
+              data={{
+                labels: ['Carbs', 'Protein', 'Fat'],
+                datasets: [
+                  {
+                    data: [carb, protein, fat],
+                    backgroundColor: ['#3acbe8', '#3ae89c', '#FFCE56'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#e89c3a']
+                  }
+                ]
+              }}
+            />
           </CardBody>
         </Card>
 
+        <Card inverse color="primary">
+          <CardHeader>Weight Check-ins</CardHeader>
+          {/* <CardTitle>Weight Tracking</CardTitle> */}
+          <Stats />
+          {/* <CardText>
+            Status: Good
+          </CardText> */}
+          <Button color="secondary" className="m-2">
+            Check In
+          </Button>
+        </Card>
+
+        <Card inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
+          <CardHeader style={{ margin: 0 }}>
+            Current Goal & Training Plan
+          </CardHeader>
+          {/* <CardTitle>Current Goal & Workout Plan</CardTitle> */}
+          <CardText style={{ margin: 0 }}>
+            {this.props.profile ? this.props.profile.currentGoal.text : null}
+          </CardText>
+          <CardText style={{ padding: '15px' }}>
+            {this.props.profile.currentGoal.text === 'Weight Loss'
+              ? WL
+              : this.props.profile.currentGoal.text === 'Weight Gain'
+              ? WG
+              : this.props.profile.currentGoal.text === 'Recomposition'
+              ? BR
+              : null}
+          </CardText>
+          {this.dropDownToggle()}
+          <CardSubtitle
+            style={{
+              textAlign: 'left',
+              paddingLeft: '15px',
+              marginTop: '10px'
+            }}
+          >
+            Completion
+          </CardSubtitle>
+          <Progress color="info" className="mx-3 mb-3" value={30}>
+            0%
+          </Progress>
+        </Card>
+
+        <Card inverse color="danger">
+          <CardHeader>Caloric Intake Tracking</CardHeader>
+          {/* <CardBody> */}
+          {/* <CardSubtitle style={{fontSize:'12px'}}>Average Daily: Week/Month</CardSubtitle> */}
+          {/* <CardTitle>Recommended Intake: {this.props.profile.calories}</CardTitle> */}
+          <BarChart display={this.props.windowWidth < 500 ? false : true} />
+          {/* <CardSubtitle>Excess vs Deficit graph week/month/year</CardSubtitle>
+            <CardText>
+              
+            </CardText> */}
+          {/* </CardBody> */}
+        </Card>
+
         <Card>
+          <CardHeader>Nutrition Schedule</CardHeader>
           <CardBody>
-            <CardTitle>Next Meal</CardTitle>
+            {/* <CardTitle>Nutrition Schedule</CardTitle> */}
             <NutritionTable />
             {/* <Button>Button</Button> */}
           </CardBody>
         </Card>
-        <Card
-          body
-          inverse
-          style={{ backgroundColor: '#333', borderColor: 'white' }}
-        >
-          <CardTitle>Current Goal:</CardTitle>
-          <CardText>{this.props.profile ? this.props.profile.currentGoal.text : null}</CardText>
-          {/* <Button>Button</Button> */}
-          <Dropdown
-            isOpen={this.state.dropOpen}
-            direction={'right'}
-            toggle={this.toggleDrop}
-          >
-            <DropdownToggle caret>Change Goal</DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem
-                onClick={() =>
-                  this.props.updateProfile({
-                    keys: ['currentGoal'],
-                    currentGoal: { text: 'Weight Loss', value: -300 }
-                  })
-                }
-              >
-                Weight Loss
-              </DropdownItem>
-              {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Strength & Mass', value:600}})} >Strength Gain</DropdownItem> */}
-              {/* <DropdownItem disabled>Action (disabled)</DropdownItem> */}
-              {/* <DropdownItem divider /> */}
-              <DropdownItem
-                onClick={() =>
-                  this.props.updateProfile({
-                    keys: ['currentGoal'],
-                    currentGoal: { text: 'Weight Gain', value: 300 }
-                  })
-                }
-              >
-                Weight Gain
-              </DropdownItem>
-              {/* <DropdownItem onClick={()=>this.props.updateProfile({keys: ['currentGoal'], currentGoal:{text:'Tone Up', value:-400}})}>Tone Up</DropdownItem> */}
-              {/* <DropdownItem>Quo Action</DropdownItem> */}
-            </DropdownMenu>
-          </Dropdown>
-        </Card>
+
         <Card>
-          {/* <CardImg top width="100%" src="https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97180&w=256&h=180" alt="Card image cap" /> */}
+          <CardHeader>Training Schedule</CardHeader>
           <CardBody>
-            <CardTitle>Training Plan Progress</CardTitle>
-            <CardSubtitle>Keep it up!</CardSubtitle>
-            <CardText>
-              <Progress color="info" value={30}>
-                0%
-              </Progress>
-            </CardText>
-            {/* <Button>Button</Button> */}
+            {/* <CardTitle>Training Schedule</CardTitle> */}
+            <DashCalendar />
+            <CardText>Next Workout</CardText>
+            <Button>Start</Button>
+            <Button>Skip</Button>
           </CardBody>
         </Card>
-        {/* <Card body inverse color="primary">
-          <CardTitle>Special Title Treatment</CardTitle>
-          <CardText>
-            With supporting text below as a natural lead-in to additional
-            content.
-          </CardText>
-          <Button color="secondary">Button</Button>
-        </Card> */}
       </CardColumns>
     )
   }
 
-  renderOverviewTabs = () => {
-    return (
-      <React.Fragment>
-        <Nav tabs>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: this.state.activeTab === '1' })}
-              onClick={() => {
-                this.toggle('1')
-              }}
-              style={{ textTransform: 'none' }}
-            >
-              Overview
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: this.state.activeTab === '2' })}
-              onClick={() => {
-                this.toggle('2')
-              }}
-              style={{ textTransform: 'none' }}
-            >
-              Stats
-            </NavLink>
-          </NavItem>
-        </Nav>
-        <TabContent activeTab={this.state.activeTab}>
-          <TabPane tabId="1">
-            {/* <h2>Week Ahead</h2> */}
-            {this.renderOverviewWall()}
-          </TabPane>
-          <TabPane tabId="2">
-            <Row>
-              <Col md="10">
-                <h4>Weight Tracking</h4>
-                <Line data={data2} />
-              </Col>
-            </Row>
-          </TabPane>
-        </TabContent>
-      </React.Fragment>
-    )
-  }
+  // DEPRECATED:
+  // renderOverviewTabs = () => {
+  //   return (
+  //     <React.Fragment>
+  //       <Nav tabs>
+  //         <NavItem>
+  //           <NavLink
+  //             className={classnames({ active: this.state.activeTab === '1' })}
+  //             onClick={() => {
+  //               this.toggle('1')
+  //             }}
+  //             style={{ textTransform: 'none' }}
+  //           >
+  //             Overview
+  //           </NavLink>
+  //         </NavItem>
+  //         <NavItem>
+  //           <NavLink
+  //             className={classnames({ active: this.state.activeTab === '2' })}
+  //             onClick={() => {
+  //               this.toggle('2')
+  //             }}
+  //             style={{ textTransform: 'none' }}
+  //           >
+  //             Stats
+  //           </NavLink>
+  //         </NavItem>
+  //       </Nav>
+  //       <TabContent activeTab={this.state.activeTab}>
+  //         <TabPane tabId="1">{this.renderOverviewWall()}</TabPane>
+  //         <TabPane tabId="2">
+  //           <Row>
+  //             <Stats />
+  //           </Row>
+  //         </TabPane>
+  //       </TabContent>
+  //     </React.Fragment>
+  //   )
+  // }
 
   renderDashTopStats = () => {
     return (
@@ -329,9 +404,9 @@ class Dashboard extends Component {
           <Button color="primary">Learn More</Button>
         </p> */}
         <Row>
-          <Col>Current Calorie Goal: 0</Col>
-          <Col>Meals Tracked: 0</Col>
-          <Col>Excess Calories Today: 0</Col>
+          {/* <Col>Current Calorie Goal: {this.props.profile.calories}</Col> */}
+          {/* <Col>Meals Tracked: 0</Col>
+          <Col>Excess Calories Today: 0</Col> */}
         </Row>
       </Jumbotron>
       // </Row>
@@ -339,11 +414,23 @@ class Dashboard extends Component {
   }
 
   render() {
-    // console.log(this.props)
+    // console.log(this.props.profile)
     return (
-      <Col className="bg-dark" style={{ paddingTop: '10px' }} md="10">
-        {this.props.profile ? this.renderDashTopStats() : null}
-        {this.renderOverviewTabs()}
+      <Col
+        className="bg-dark"
+        style={{
+          paddingTop: '10px',
+          maxHeight: this.props.windowWidth < 500 ? '80vh' : null,
+          overflowY: this.props.windowWidth < 500 ? 'scroll' : null
+        }}
+        md="10"
+      >
+        {this.props.profile ? (
+          <>
+            {this.renderDashTopStats()}
+            {this.renderOverviewWall()}
+          </>
+        ) : null}
       </Col>
     )
   }
@@ -357,7 +444,9 @@ function mapStateToProps(state, { auth }) {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  actions
-)(withRouter(Dashboard))
+export default windowSize(
+  connect(
+    mapStateToProps,
+    actions
+  )(withRouter(Dashboard))
+)

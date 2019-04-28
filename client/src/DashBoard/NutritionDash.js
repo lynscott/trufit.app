@@ -34,8 +34,6 @@ import { Pie, Doughnut, HorizontalBar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 
-const recommendedMacros = 1800
-
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list)
@@ -75,14 +73,45 @@ class NutritionDash extends Component {
         datasets: [
           {
             data: [100, 250, 75],
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
+            backgroundColor: 'rgb(122, 212, 234, 0.4)', //'rgba(255,99,132,0.2)',
+            borderColor: 'rgba(255,255,255,1)',
             borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+            hoverBackgroundColor: 'rgba(255,99,132,0.2)',
             hoverBorderColor: 'rgba(255,99,132,1)',
             label: '(g)'
           }
         ]
+      },
+      options: {
+        // legend:{labels: {fontColor: 'orange'}},
+        //  title: {
+        //        display: true,
+        //        fontColor: 'blue',
+        //        text: 'Custom Chart Title'
+        //    },
+
+        scales: {
+          gridLines: {
+            color: 'rgb(255, 255, 255, 0.7)'
+          },
+          yAxes: [
+            {
+              ticks: {
+                //  beginAtZero:true,
+                fontColor: 'white',
+                fontSize: 15
+              }
+            }
+          ],
+          xAxes: [
+            {
+              ticks: {
+                fontColor: 'white',
+                fontSize: 15
+              }
+            }
+          ]
+        }
       },
       doughnutData: {
         labels: ['Carbs', 'Protein', 'Fats'],
@@ -107,7 +136,7 @@ class NutritionDash extends Component {
         }
       ],
       items: [],
-      openMeals: true,
+      openMeals: false,
       selected: [],
       time: null
     }
@@ -616,46 +645,54 @@ class NutritionDash extends Component {
       }
     ]
 
-    return (
-      <BootstrapTable
-        keyField="name"
-        bordered={true}
-        hover={true}
-        condensed={false}
-        bootstrap4={true}
-        data={
-          this.props.profile
-            ? this.props.profile.nutritionItems.concat(this.state.products)
-            : []
-        }
-        columns={columns}
-        rowClasses={this.rowClasses}
-        classes={
-          this.props.windowWidth < 500 === true
-            ? 'table-mobile bg-light'
-            : 'bg-light'
-        }
-        cellEdit={cellEditFactory({
-          mode: 'dbclick',
-          blurToSave: true,
-          autoSelectText: true,
-          beforeSaveCell: async (oldValue, newValue, row, column) => {
-            // console.log(newValue, row, 'before save log')
-
-            if (!isNaN(newValue) && newValue !== ' ') {
-              this.updateMacros(newValue)
-            } else {
-              // console.log('send to save')
-              await this.props.updateFoodItem({
-                index: this.state.index,
-                replace: row
-              })
-            }
+    if (this.props.profile.nutritionItems.length === 1) {
+      return (
+        <div>
+          <h2 className="text-white"> Add a food item to start your plan!</h2>
+        </div>
+      )
+    } else {
+      return (
+        <BootstrapTable
+          keyField="name"
+          bordered={true}
+          hover={true}
+          condensed={false}
+          bootstrap4={true}
+          data={
+            this.props.profile
+              ? this.props.profile.nutritionItems.concat(this.state.products)
+              : []
           }
-        })}
-        selectRow={this.selectRow}
-      />
-    )
+          columns={columns}
+          rowClasses={this.rowClasses}
+          classes={
+            this.props.windowWidth < 500 === true
+              ? 'table-mobile bg-light'
+              : 'bg-light'
+          }
+          cellEdit={cellEditFactory({
+            mode: 'dbclick',
+            blurToSave: true,
+            autoSelectText: true,
+            beforeSaveCell: async (oldValue, newValue, row, column) => {
+              // console.log(newValue, row, 'before save log')
+
+              if (!isNaN(newValue) && newValue !== ' ') {
+                this.updateMacros(newValue)
+              } else {
+                // console.log('send to save')
+                await this.props.updateFoodItem({
+                  index: this.state.index,
+                  replace: row
+                })
+              }
+            }
+          })}
+          selectRow={this.selectRow}
+        />
+      )
+    }
   }
 
   rowClasses = (row, rowIndex) => {
@@ -693,7 +730,7 @@ class NutritionDash extends Component {
   }
 
   displayMacros = () => {
-    console.log(this.props.profile)
+    // console.log(this.props.profile)
     return (
       <Row className="justify-content-center py-2">
         <Col md="6" className="align-self-center text-white my-2">
@@ -702,52 +739,56 @@ class NutritionDash extends Component {
             <CardBody>
               <CardText> */}
 
-          <h5>Recommended Daily Intake:</h5>
-          <ButtonToolbar>
-            <ButtonGroup>
-              <Button>
-                <h4>
-                  <Badge color="primary">
-                    Protein:{' '}
-                    {(((this.props.profile.macros.protein / 100) *
-                      (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value))/4).toFixed(2)}
-                    g
-                  </Badge>
-                </h4>
-              </Button>
-              <Button>
-                <h4>
-                  <Badge color="primary">
-                    Carbs:{' '}
-                    {(((this.props.profile.macros.carb / 100) *
-                      (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value))/4).toFixed(2) }
-                    g
-                  </Badge>
-                </h4>
-              </Button>
-              <Button>
-                <h4>
-                  <Badge color="primary">
-                    Fats:{' '}
-                    {(((this.props.profile.macros.fat / 100) *
-                      (parseInt(this.props.profile.calories) +
-                        this.props.profile.currentGoal.value))/9).toFixed(2)}
-                    g
-                  </Badge>
-                </h4>
-              </Button>
-              <Button>
-                <h4>
-                  <Badge color="info">
-                    Calories:{' '}
+          <h5>Recommended Daily Intake:{' '}
                     {(
                       Number(this.props.profile.calories) +
                       this.props.profile.currentGoal.value
-                    ).toFixed()}
+                    ).toFixed()+'cal'}
+                  {/* </Badge> */}
+                </h5>
+          <ButtonToolbar>
+            <ButtonGroup>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Protein:{' '}
+                    {(
+                      ((this.props.profile.macros.protein / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      4
+                    ).toFixed(2)}
+                    g
                   </Badge>
-                </h4>
+                </h5>
+              </Button>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Carbs:{' '}
+                    {(
+                      ((this.props.profile.macros.carb / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      4
+                    ).toFixed(2)}
+                    g
+                  </Badge>
+                </h5>
+              </Button>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Fats:{' '}
+                    {(
+                      ((this.props.profile.macros.fat / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      9
+                    ).toFixed(2)}
+                    g
+                  </Badge>
+                </h5>
               </Button>
             </ButtonGroup>
           </ButtonToolbar>
@@ -757,6 +798,7 @@ class NutritionDash extends Component {
           <HorizontalBar
             legend={{ position: 'bottom' }}
             data={this.state.horizontalBarData}
+            options={this.state.options}
           />
         </Col>
       </Row>
@@ -839,7 +881,7 @@ class NutritionDash extends Component {
           }}
         />
         <h6 className="text-white">
-          Nutrition Data Provided by USDA Food Database
+          Nutrition Data Provided by the USDA Food Database
         </h6>
       </React.Fragment>
     )
@@ -942,12 +984,26 @@ class NutritionDash extends Component {
             {this.renderTable()}
           </TabPane>
           <TabPane tabId="2">
-            <Row className="my-3">
-              <Col md="12">{this.renderMealSchedule()}</Col>
-            </Row>
-            <Row>
-              <Col md="12">{this.makeSchedule()}</Col>
-            </Row>
+            {this.props.profile.nutritionItems.length > 1 ? (
+              <React.Fragment>
+                <Row className="my-3">
+                  <Col md="12">{this.renderMealSchedule()}</Col>
+                </Row>
+                <Row>
+                  <Col md="12">{this.makeSchedule()}</Col>
+                </Row>
+              </React.Fragment>
+            ) : (
+              <Row className="my-3">
+                <Col md="12">
+                  <h1>
+                    <Badge color="info">
+                      Create a nutrition plan to schedule some meals!
+                    </Badge>
+                  </h1>
+                </Col>
+              </Row>
+            )}
           </TabPane>
         </TabContent>
       </Col>

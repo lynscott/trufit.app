@@ -94,6 +94,7 @@ class DashCalendar extends Component {
             events={this.props.plan ? this.formatDate(): []}
             startAccessor="start"
             endAccessor="end"
+            style={{display:'none'}}
             // components={{
             //   event: this.eventCard,
             // }}
