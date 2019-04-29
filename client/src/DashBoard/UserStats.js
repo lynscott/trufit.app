@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Pie, Line } from 'react-chartjs-2'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import {Col} from 'reactstrap'
+import {Col, Modal, ModalHeader, ModalBody, ModalFooter, Input, Button } from 'reactstrap'
 
 const wieghtData = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -42,15 +42,85 @@ class Stats extends Component {
         dropOpen: false,
         currentGoal: 'No Goal Selected',
         updateMessage: 'Testing',
-        update: false
+        update: false,
+        checkInModal: false,
+        checkInWeight: null
       }
+    }
+
+    toggle = () => {
+      this.setState(prevState => ({
+        checkInModal: !prevState.checkInModal
+      }))
+    }
+
+    renderCheckInModal = () => {
+      return (  
+          <Modal isOpen={this.state.checkInModal} toggle={this.toggle} className={this.props.className}>
+            <ModalHeader toggle={this.toggle}>Weekly Check-in</ModalHeader>
+            <ModalBody>
+              Enter your current weight in lbs
+            <Input className='mx-auto' 
+            onChange={(event)=>{
+              // console.log(event.target.value)
+              this.setState({checkInWeight:event.target.value})
+            }}
+            style={{maxWidth:'fit-content', backgroundColor:'lightgrey'}} type="number" name="weight"/>
+              <p style={{marginTop:'20px'}}>Upload an accompanying progress picture (coming soon)</p>
+            <Input className='mx-auto' type="file" name="file" />
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={()=> {
+                if (this.state.checkInWeight) {
+                  this.props.updateProfile({keys:['weighIns'], weighIns:{weight:this.state.checkInWeight, date:new Date()}})
+                  this.toggle()
+                }
+                else {
+                  return 'error'
+                }
+                
+                }}>Submit</Button>{' '}
+              <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
+      )
     }
 
 
     renderWeightTrackGraph = () => {
+      let mostRecentWeighIn = new Date(this.props.profile.weighIns[this.props.profile.weighIns.length-1].date)
+
       return (
               <Col md="12" className='p-2'>
-                <Line data={wieghtData}
+              {this.renderCheckInModal()}
+                <Line data={{
+                          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                          datasets: [
+                            {
+                              label: 'Weight tracking (lbs)',
+                              fill: false,
+                              lineTension: 0.1,
+                              backgroundColor: 'rgba(255,255,255,0.8)', //'rgba(75,192,192,0.4)',
+                              borderColor: 'rgba(75,192,192,1)',
+                              borderCapStyle: 'butt',
+                              borderDash: [],
+                              borderDashOffset: 0.0,
+                              borderJoinStyle: 'miter',
+                              pointBorderColor: 'rgba(75,192,192,1)',
+                              pointBackgroundColor: '#fff',
+                              pointBorderWidth: 1,
+                              pointHoverRadius: 5,
+                              pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                              pointHoverBorderColor: 'rgba(220,220,220,1)',
+                              pointHoverBorderWidth: 2,
+                              pointRadius: 1,
+                              pointHitRadius: 10,
+                              data: this.props.profile.weighIns.map((data)=>{
+                                return {y:data.weight, x:new Date(data.date)}
+                              })
+                            }
+                          ],
+                        }}
                       options={{
                         legend: {
                           display: false,
@@ -80,20 +150,34 @@ class Stats extends Component {
                             {
                               ticks: {
                                 fontColor: 'white',
-                                fontSize: 12
+                                fontSize: 12,
+                                source: 'auto'
+                              },
+                              type: "time",
+                              time: {
+                                unit:'month',
+                                min: new Date('1/1/2019'),
+                                unitStepSize: 1,
+                                displayFormats: {
+                                  quarter: 'MMM YYYY'
+                                }
+
                               }
                             }
                           ]
                         }
                       }}
                  />
+                 {mostRecentWeighIn.setDate(mostRecentWeighIn.getDate() + 7) > new Date() ? 
+                  'Check back in a week for your next check in!': null}
+                 <Button color="secondary" disabled={mostRecentWeighIn.setDate(mostRecentWeighIn.getDate() + 7) > new Date() ? true: false} onClick={this.toggle}>Check-In</Button>
               </Col>
       )
     }
 
     render(){
         return(
-            this.renderWeightTrackGraph()
+            this.props.profile ? this.renderWeightTrackGraph() : null
         )
     }
 }

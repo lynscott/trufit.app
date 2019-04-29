@@ -44,12 +44,12 @@ import { Pie, Bar } from 'react-chartjs-2'
 import ViewPlan from './ViewPlan'
 import windowSize from 'react-window-size'
 
-const BarChart = ({ display }) => {
+const BarChart = ({ display, calories, planned }) => {
   return (
     <Col md="12" className="p-2">
       <Bar
         data={{
-          labels: ['Recommended', 'Actual', 'Deficit/Excess'],
+          labels: ['Planned','Actual', 'Deficit/Excess'],
           datasets: [
             {
               label: 'Intake',
@@ -58,7 +58,7 @@ const BarChart = ({ display }) => {
               borderWidth: 1,
               hoverBackgroundColor: 'rgba(130, 128, 128,0.4)',
               hoverBorderColor: 'rgba(255,99,132,1)',
-              data: [645, 592, -800]
+              data: [ planned, 592, -800]
             }
           ]
         }}
@@ -109,6 +109,8 @@ const WG =
   'Focus on gaining lean muscle mass. Body fat increases may be accumulated in the process but we will work to keep them minimal.'
 const BR =
   'Body recomposition focuses on decreasing body fat while simultaneously increasing muscle mass.'
+const MA =
+  'Maintenance'
 
 class Dashboard extends Component {
   constructor(props) {
@@ -274,12 +276,6 @@ class Dashboard extends Component {
           <CardHeader>Weight Check-ins</CardHeader>
           {/* <CardTitle>Weight Tracking</CardTitle> */}
           <Stats />
-          {/* <CardText>
-            Status: Good
-          </CardText> */}
-          <Button color="secondary" className="m-2">
-            Check In
-          </Button>
         </Card>
 
         <Card inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
@@ -319,7 +315,11 @@ class Dashboard extends Component {
           {/* <CardBody> */}
           {/* <CardSubtitle style={{fontSize:'12px'}}>Average Daily: Week/Month</CardSubtitle> */}
           {/* <CardTitle>Recommended Intake: {this.props.profile.calories}</CardTitle> */}
-          <BarChart display={this.props.windowWidth < 500 ? false : true} />
+          <BarChart 
+            display={this.props.windowWidth < 500 ? false : true} 
+            calories={this.props.profile.calories}
+            planned={this.props.profile.nutritionCalories}
+            />
           {/* <CardSubtitle>Excess vs Deficit graph week/month/year</CardSubtitle>
             <CardText>
               
@@ -330,9 +330,7 @@ class Dashboard extends Component {
         <Card>
           <CardHeader>Nutrition Schedule</CardHeader>
           <CardBody>
-            {/* <CardTitle>Nutrition Schedule</CardTitle> */}
             <NutritionTable />
-            {/* <Button>Button</Button> */}
           </CardBody>
         </Card>
 
@@ -340,55 +338,15 @@ class Dashboard extends Component {
           <CardHeader>Training Schedule</CardHeader>
           <CardBody>
             {/* <CardTitle>Training Schedule</CardTitle> */}
-            <DashCalendar />
-            <CardText>Next Workout</CardText>
-            <Button>Start</Button>
-            <Button>Skip</Button>
+            {/* <DashCalendar /> */}
+            <CardText>No workouts scheduled! Select a plan and create a schedule.</CardText>
+
           </CardBody>
         </Card>
       </CardColumns>
     )
   }
 
-  // DEPRECATED:
-  // renderOverviewTabs = () => {
-  //   return (
-  //     <React.Fragment>
-  //       <Nav tabs>
-  //         <NavItem>
-  //           <NavLink
-  //             className={classnames({ active: this.state.activeTab === '1' })}
-  //             onClick={() => {
-  //               this.toggle('1')
-  //             }}
-  //             style={{ textTransform: 'none' }}
-  //           >
-  //             Overview
-  //           </NavLink>
-  //         </NavItem>
-  //         <NavItem>
-  //           <NavLink
-  //             className={classnames({ active: this.state.activeTab === '2' })}
-  //             onClick={() => {
-  //               this.toggle('2')
-  //             }}
-  //             style={{ textTransform: 'none' }}
-  //           >
-  //             Stats
-  //           </NavLink>
-  //         </NavItem>
-  //       </Nav>
-  //       <TabContent activeTab={this.state.activeTab}>
-  //         <TabPane tabId="1">{this.renderOverviewWall()}</TabPane>
-  //         <TabPane tabId="2">
-  //           <Row>
-  //             <Stats />
-  //           </Row>
-  //         </TabPane>
-  //       </TabContent>
-  //     </React.Fragment>
-  //   )
-  // }
 
   renderDashTopStats = () => {
     return (

@@ -319,7 +319,7 @@ app.post('/api/update_profile', async (req, res, next) => {
   await UserProfile.findOne({ _user: req.user.id }, (err, prof) => {
     if (err) return res.send(500, { error: err })
     for (let i = 0; i < keys.length; i++) {
-      if (keys[i] === 'nutritionItems') {
+      if (keys[i] === 'nutritionItems' || keys[i] === 'weighIns') {
         prof[keys[i]].push(req.body[keys[i]])
       } else {
         prof[keys[i]] = req.body[keys[i]]
@@ -415,6 +415,7 @@ app.post('/api/signup', async (req, res, next) => {
       height,
       currentWeight,
       name,
+      startDate: new Date()
     })
 
     let msg = {

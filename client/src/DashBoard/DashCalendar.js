@@ -86,7 +86,6 @@ class DashCalendar extends Component {
   render() {
     // console.log()
     return (
-      // <Row className='justify-content-around'>
       <React.Fragment>
         {/* <Col md='4'> */}
           <BigCalendar
@@ -105,9 +104,8 @@ class DashCalendar extends Component {
         <Button className='m-3' color='info'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
         {/* </Col> */}
-        </React.Fragment>
+      </React.Fragment>
 
-      // </Row>
     )
   }
 }

@@ -68,6 +68,7 @@ class NutritionDash extends Component {
       serving: 1,
       rowSelected: false,
       index: 0,
+      nutritionCals: 0,
       horizontalBarData: {
         labels: ['Carbs', 'Protein', 'Fats'],
         datasets: [
@@ -147,6 +148,12 @@ class NutritionDash extends Component {
     this.calculateTotals()
   }
 
+  componentWillUnmount = () => {
+    if (this.state.nutritionCals !== 0 && this.state.nutritionCals !== this.props.profile.nutritionCals) {
+      this.props.updateProfile({keys:['nutritionCalories'], nutritionCalories:this.state.nutritionCals})
+    }
+  }
+
   componentDidUpdate = (prevProps, prevState) => {
     //TODO: replace this with new nutrition list props
     let names = this.props.profile
@@ -181,6 +188,11 @@ class NutritionDash extends Component {
       // this.forceUpdate()
       this.calculateTotals()
     }
+
+    // if (this.state.nutritionCals !== this.props.profile.nutritionCals) {
+    //   // console.log(this.props.profile.nutritionCals)
+      
+    // }
 
     if (prevProps.windowWidth !== this.props.windowWidth) {
       this.forceUpdate()
@@ -430,7 +442,7 @@ class NutritionDash extends Component {
                     </h5>
                     <Input
                       onChange={e => {
-                        console.log(e.target.value)
+                        // console.log(e.target.value)
                         this.setState({ time: e.target.value })
                       }}
                       placeholder="Set Time"
@@ -724,13 +736,12 @@ class NutritionDash extends Component {
 
   rowEvents = {
     onClick: (e, row, rowIndex) => {
-      console.log(rowIndex, 'selected')
+      // console.log(rowIndex, 'selected')
       this.setState({ index: rowIndex, rowSelected: true })
     }
   }
 
   displayMacros = () => {
-    // console.log(this.props.profile)
     return (
       <Row className="justify-content-center py-2">
         <Col md="6" className="align-self-center text-white my-2">
@@ -738,6 +749,12 @@ class NutritionDash extends Component {
             <CardHeader>Recommended Macros:</CardHeader>
             <CardBody>
               <CardText> */}
+          <CardText style={{margin:0}}>
+          Body-Type you identified as: {this.props.profile.baseSomaType.type}
+          </CardText>
+          <p style={{padding:'10px', fontSize:'15px'}}>
+            {this.props.profile.baseSomaType.info}
+          </p>
 
           <h5>Recommended Daily Intake:{' '}
                     {(
@@ -823,11 +840,13 @@ class NutritionDash extends Component {
     }
 
     this.setState(() => {
+
       this.state.horizontalBarData.datasets[0].data = [
         Math.round(carbs),
         Math.round(prot),
         Math.round(fats)
       ]
+
       this.state.products.push({
         name: 'Totals(g)',
         fats: fats.toFixed(2),
@@ -836,6 +855,8 @@ class NutritionDash extends Component {
         protein: prot.toFixed(2),
         id: 'total'
       })
+
+      this.state.nutritionCals = Math.round(cals)
     })
     this.forceUpdate()
   }
@@ -943,7 +964,8 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-dark" style={{ paddingTop: '10px' }} md="10">
+      <Col className="bg-dark" style={{ paddingTop: '10px', maxHeight: this.props.windowWidth < 500 ? '80vh' : '100vh',
+      overflowY: 'scroll' }} md="10">
         {this.displayMacros()}
         <Nav tabs>
           <NavItem>

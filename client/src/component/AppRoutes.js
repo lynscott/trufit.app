@@ -8,6 +8,7 @@ import Dashboard from '../DashBoard/Dashboard'
 import DashRoutes from '../DashBoard/DashRoutes'
 import DashSideBar from '../DashBoard/DashSideBar'
 import NutritionDash from '../DashBoard/NutritionDash'
+import TrainingDash from '../DashBoard/TrainingDash'
 
 import Nav from './Nav'
 import keys from '../config/keys'
@@ -85,6 +86,7 @@ class AppRoutes extends Component {
 
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        {/* <TrainingDash/> TODO:Finish Component */}
         <div className='col-md-10 dummy'> </div>
       </Row>
     )
