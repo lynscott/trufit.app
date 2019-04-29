@@ -14,7 +14,7 @@ const userSchema = new Schema ({
   height: Number,
   email: {type:String, unique:true, lowercase:true},
   password: String,
-  date: Date,
+  startDate: Date,
   plans: [String],
   provider: String,
   isAdmin: Boolean,

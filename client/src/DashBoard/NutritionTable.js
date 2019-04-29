@@ -80,29 +80,19 @@ class NextMeal extends Component {
       }
       return (
         <React.Fragment>
-          <h5 style={{ margin: 0 }}>
-            Next Meal: <Moment format="LT">{clock(times)}</Moment>
-          </h5>
+          <h6 style={{ margin: 0 }}>
+            Next Meal Time: <Moment format="LT">{clock(times)}</Moment>
+          </h6>
           {/* // </CardTitle> */}
+          <Col md="12">
           {this.props.profile.nutritionSchedule[index].items.map((item, i) => {
             return (
-              <CardText key={i} className="row">
-                <Col md="6">
-                  <h5>
-                    <Badge color="dark" style={{ whiteSpace: 'normal' }}>
-                      {' '}
-                      {item.name}
-                    </Badge>
-                  </h5>
-                </Col>
-                <Col md="6">
-                  <h5>
-                    <Badge color="success">{item.serving + 'oz'}</Badge>
-                  </h5>
-                </Col>
+              <CardText key={i} style={{fontSize:'15px', padding:'10px', marginBottom:0}}>
+                  {item.serving}oz of {item.name}
               </CardText>
             )
           })}
+          </Col>
           <Button
             color="primary"
             // onClick={() => removeMeal(index)}
@@ -110,7 +100,6 @@ class NextMeal extends Component {
           >
             Mark Complete
           </Button>
-          {/* // </Card> */}
         </React.Fragment>
       )
     } else {
@@ -137,7 +126,7 @@ class NextMeal extends Component {
   }
 
   render() {
-    console.log(this.props.profile)
+    // console.log(this.props.profile)
     return this.props.profile ? this.renderNextMeal() : null
   }
 }
