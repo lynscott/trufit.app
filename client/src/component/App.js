@@ -114,7 +114,7 @@ class App extends Component {
           <div className="col d-none d-md-block">
             <Fade top>
               <h1
-                className="section-header p-2"
+                className="main-header p-2"
                 id="title-line"
                 style={{ marginTop: '50vh', textDecoration: 'none' }}
               >

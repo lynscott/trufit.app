@@ -84,12 +84,9 @@ class NutritionDash extends Component {
         ]
       },
       options: {
-        // legend:{labels: {fontColor: 'orange'}},
-        //  title: {
-        //        display: true,
-        //        fontColor: 'blue',
-        //        text: 'Custom Chart Title'
-        //    },
+        legend: {
+          display: false
+        },
 
         scales: {
           gridLines: {
@@ -113,16 +110,6 @@ class NutritionDash extends Component {
             }
           ]
         }
-      },
-      doughnutData: {
-        labels: ['Carbs', 'Protein', 'Fats'],
-        datasets: [
-          {
-            data: [100, 250, 75],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-          }
-        ]
       },
       activeTab: '1',
       products: [
@@ -756,7 +743,7 @@ class NutritionDash extends Component {
             {this.props.profile.baseSomaType.info}
           </p>
 
-          <h5>Recommended Daily Intake:{' '}
+          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>Recommended Daily Intake:{' '}
                     {(
                       Number(this.props.profile.calories) +
                       this.props.profile.currentGoal.value
@@ -811,7 +798,7 @@ class NutritionDash extends Component {
           </ButtonToolbar>
         </Col>
         <Col md="6" className=" my-2 text-white">
-          <h5>Your Planned Daily Intake:</h5>
+          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>Your Planned Daily Intake: {this.state.nutritionCals}cal</h5>
           <HorizontalBar
             legend={{ position: 'bottom' }}
             data={this.state.horizontalBarData}
@@ -1018,7 +1005,7 @@ class NutritionDash extends Component {
             ) : (
               <Row className="my-3">
                 <Col md="12">
-                  <h1>
+                  <h1 className='no-meals-badge'>
                     <Badge color="info">
                       Create a nutrition plan to schedule some meals!
                     </Badge>

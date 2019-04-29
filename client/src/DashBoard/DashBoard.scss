@@ -20,6 +20,12 @@
     // margin: 10px;
 }
 
+.affirmation {
+    font-family: 'Fira Sans', sans-serif;
+    touch-action: manipulation;
+}
+
+
 .sidebar-col{
     background-image: linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
     color: white;
@@ -48,5 +54,9 @@
         border: 2px lightgrey solid;
         // border-color: lightgray;
         background-color: #eff0f2;
+
+        .card-header{
+            font-family: 'Fira Sans', sans-serif;
+        }
     }
 }

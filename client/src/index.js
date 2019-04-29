@@ -15,7 +15,7 @@ import { routerMiddleware } from 'connected-react-router'
 import createRootReducer from './reducers'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faUserPlus, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { faUserCircle, faUserPlus, faInfoCircle, faTools } from '@fortawesome/free-solid-svg-icons'
 
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
@@ -27,7 +27,7 @@ history.listen(_ => {
   window.scrollTo(0, 0)  
 })
  
-library.add(faUserCircle, faUserPlus, faInfoCircle )
+library.add(faUserCircle, faUserPlus, faInfoCircle, faTools )
 
 const composeEnhancers = composeWithDevTools({
   // options like actionSanitizer, stateSanitizer

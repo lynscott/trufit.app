@@ -80,7 +80,7 @@ class NextMeal extends Component {
       }
       return (
         <React.Fragment>
-          <h6 style={{ margin: 0 }}>
+          <h6 style={{ margin: 0, fontSize:'15px' }}>
             Next Meal Time: <Moment format="LT">{clock(times)}</Moment>
           </h6>
           {/* // </CardTitle> */}
