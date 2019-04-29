@@ -16,12 +16,6 @@ import {
   CardBody,
   Container,
   Progress,
-  TabContent,
-  TabPane,
-  Nav,
-  NavItem,
-  NavLink,
-  CardTitle,
   CardText,
   Jumbotron,
   Label,
@@ -149,7 +143,7 @@ class Dashboard extends Component {
     if (this.state.update === false) {
       return (
         <p
-          className="lead"
+          className="lead affirmation"
           style={{ fontSize: '1.2rem' }}
           onDoubleClick={() => this.setState({ update: true })}
         >
@@ -274,7 +268,6 @@ class Dashboard extends Component {
 
         <Card inverse color="primary">
           <CardHeader>Weight Check-ins</CardHeader>
-          {/* <CardTitle>Weight Tracking</CardTitle> */}
           <Stats />
         </Card>
 
@@ -282,11 +275,10 @@ class Dashboard extends Component {
           <CardHeader style={{ margin: 0 }}>
             Current Goal & Training Plan
           </CardHeader>
-          {/* <CardTitle>Current Goal & Workout Plan</CardTitle> */}
           <CardText style={{ margin: 0 }}>
             {this.props.profile ? this.props.profile.currentGoal.text : null}
           </CardText>
-          <CardText style={{ padding: '15px' }}>
+          <CardText style={{ padding: '15px', fontSize:'15px' }}>
             {this.props.profile.currentGoal.text === 'Weight Loss'
               ? WL
               : this.props.profile.currentGoal.text === 'Weight Gain'
@@ -312,19 +304,12 @@ class Dashboard extends Component {
 
         <Card inverse color="danger">
           <CardHeader>Caloric Intake Tracking</CardHeader>
-          {/* <CardBody> */}
-          {/* <CardSubtitle style={{fontSize:'12px'}}>Average Daily: Week/Month</CardSubtitle> */}
-          {/* <CardTitle>Recommended Intake: {this.props.profile.calories}</CardTitle> */}
+
           <BarChart 
             display={this.props.windowWidth < 500 ? false : true} 
             calories={this.props.profile.calories}
             planned={this.props.profile.nutritionCalories}
             />
-          {/* <CardSubtitle>Excess vs Deficit graph week/month/year</CardSubtitle>
-            <CardText>
-              
-            </CardText> */}
-          {/* </CardBody> */}
         </Card>
 
         <Card>

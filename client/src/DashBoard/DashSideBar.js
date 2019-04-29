@@ -58,21 +58,23 @@ class DashSideBar extends React.Component {
   render() {
     // console.log(this.props)
     return (
-      // <div>
         <Nav vertical navbar className="sidebar-col col-md-2" >
-          <CardHeader style={{backgroundColor:'transparent'}} tag="h3">
+          <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h3">
             {this.props.user ? this.props.user.name : ''}
           </CardHeader>
-          <CardTitle>{new Date().toLocaleDateString()}</CardTitle>
+          <CardTitle style={{fontFamily:'Fira Sans, sans-serif'}}>{new Date().toLocaleDateString()}</CardTitle>
 
-          {/* <Button className='d-sm-block d-md-none' onClick={this.toggleNavbar} > */}
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
-          {/* </Button> */}
           <Collapse isOpen={!this.state.collapsed} navbar>
 
           <NavItem active={this.state.currentTab === 'overview' ? true : false}>
             <Link style={{textDecoration:'none'}} to="/dashboard/overview">
-              <NavLink active={this.state.currentTab === 'overview' ? true : false} onClick={() => this.setState({ currentTab: 'overview' })} >
+              <NavLink active={this.state.currentTab === 'overview' ? true : false} 
+                      onClick={() => this.setState({ currentTab: 'overview' },()=>{
+                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                            this.toggleNavbar()
+                        }
+                      })} >
                     Overview
               </NavLink>
             </Link>
@@ -80,7 +82,11 @@ class DashSideBar extends React.Component {
 
           <NavItem active={this.state.currentTab === 'nutrition' ? true : false}>     
             <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
-              <NavLink  onClick={() => this.setState({ currentTab: 'nutrition' })} >
+              <NavLink onClick={() => this.setState({ currentTab: 'nutrition' },()=>{
+                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                            this.toggleNavbar()
+                        }
+                      })} >
                   Nutrition
               </NavLink>
             </Link>
@@ -88,7 +94,11 @@ class DashSideBar extends React.Component {
 
           <NavItem active={this.state.currentTab === 'training' ? true : false}>
             <Link style={{textDecoration:'none'}} to="/dashboard/plans">
-              <NavLink  onClick={() => this.setState({ currentTab: 'training' })} >
+              <NavLink  onClick={() => this.setState({ currentTab: 'training' },()=>{
+                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                            this.toggleNavbar()
+                        }
+                      })} >
                   Training
               </NavLink>
             </Link>
@@ -96,7 +106,11 @@ class DashSideBar extends React.Component {
 
           <NavItem active={this.state.currentTab === 'settings' ? true : false}>
             <Link style={{textDecoration:'none'}} to="/dashboard/settings">
-              <NavLink  onClick={() => this.setState({ currentTab: 'settings' })} >
+              <NavLink  onClick={() => this.setState({ currentTab: 'settings' },()=>{
+                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                            this.toggleNavbar()
+                        }
+                      })} >
                   Settings
               </NavLink>
             </Link>
@@ -115,7 +129,6 @@ class DashSideBar extends React.Component {
           </NavItem> 
           </Collapse>     
         </Nav>
-        // </div>
     )
   }
 }

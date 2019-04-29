@@ -24,11 +24,29 @@ td, .truncate {
     .table-mobile{
         table-layout: auto !important;
     }
+
+    td{
+        touch-action: manipulation;
+    }
 }
 
 .schedule-col{
     .meal-card{
         border-radius: 10px;
+    }
+}
+
+.no-meals-badge{
+    .badge{
+        display: inline-block;
+        padding: .25em .4em;
+        font-size: 50%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: normal;
+        vertical-align: baseline;
+        border-radius: .25rem;
     }
 }
 

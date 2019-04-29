@@ -15,6 +15,7 @@ import keys from '../config/keys'
 import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
 import { Container, Row, Fade } from 'reactstrap'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 class AppRoutes extends Component {
   constructor(props) {
@@ -87,7 +88,10 @@ class AppRoutes extends Component {
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
         {/* <TrainingDash/> TODO:Finish Component */}
-        <div className='col-md-10 dummy'> </div>
+        <div className='col-md-10 bg-light'>
+        <h3 className='my-5'>This area is under construction, come back soon!</h3>
+          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+        </div>
       </Row>
     )
   }
@@ -96,7 +100,10 @@ class AppRoutes extends Component {
     return (
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div className='col-md-10 dummy' style={{ backgroundColor: 'white' }}> </div>
+        <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
+          <h3 className='my-5'>This area is under construction, come back soon!</h3>
+          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+        </div>
       </Row>
     )
   }

@@ -4,32 +4,6 @@ import { connect } from 'react-redux'
 import * as actions from '../actions'
 import {Col, Modal, ModalHeader, ModalBody, ModalFooter, Input, Button } from 'reactstrap'
 
-const wieghtData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'Weight tracking (lbs)',
-      fill: false,
-      lineTension: 0.1,
-      backgroundColor: 'rgba(255,255,255,0.8)', //'rgba(75,192,192,0.4)',
-      borderColor: 'rgba(75,192,192,1)',
-      borderCapStyle: 'butt',
-      borderDash: [],
-      borderDashOffset: 0.0,
-      borderJoinStyle: 'miter',
-      pointBorderColor: 'rgba(75,192,192,1)',
-      pointBackgroundColor: '#fff',
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-      pointHoverBorderColor: 'rgba(220,220,220,1)',
-      pointHoverBorderWidth: 2,
-      pointRadius: 1,
-      pointHitRadius: 10,
-      data: [200, 180, 150, 130, 200, 190, 140]
-    }
-  ],
-}
 
 class Stats extends Component {
     constructor(props) {
@@ -96,7 +70,7 @@ class Stats extends Component {
         return (
           <>
             {this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) > new Date() ? 
-              'Check back in a week for your next check in!': null}
+              <p style={{fontSize:'15px'}}>Check back in a week for your next check in!</p>: null}
             <Button color="secondary" disabled={this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) >
               new Date() ? true: false} onClick={this.toggle}>
               Check-In
@@ -180,7 +154,7 @@ class Stats extends Component {
                               type: "time",
                               time: {
                                 unit:'month',
-                                min: new Date('1/1/2019'),
+                                min: new Date('4/1/2019'),
                                 unitStepSize: 1,
                                 displayFormats: {
                                   quarter: 'MMM YYYY'
