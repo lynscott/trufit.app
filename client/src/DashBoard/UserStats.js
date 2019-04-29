@@ -39,12 +39,16 @@ class Stats extends Component {
         // eslint-disable-next-line quotes
         activeTab: '1',
         activePage: 'overview',
-        dropOpen: false,
-        currentGoal: 'No Goal Selected',
-        updateMessage: 'Testing',
         update: false,
         checkInModal: false,
-        checkInWeight: null
+        checkInWeight: null,
+        mostRecentWeighIn: null
+      }
+    }
+
+    componentDidMount = () => {
+      if (this.props.profile.weighIns.length > 0) {
+        this.setState({mostRecentWeighIn:new Date(this.props.profile.weighIns[this.props.profile.weighIns.length-1].date)})
       }
     }
 
@@ -86,9 +90,29 @@ class Stats extends Component {
       )
     }
 
+    renderButton = () => {
+      if (this.state.mostRecentWeighIn) {
+        
+        return (
+          <>
+            {this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) > new Date() ? 
+              'Check back in a week for your next check in!': null}
+            <Button color="secondary" disabled={this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) >
+              new Date() ? true: false} onClick={this.toggle}>
+              Check-In
+            </Button>
+          </>
+        )
+      } else {
+        return (
+          <Button color="secondary" onClick={this.toggle}>Check-In</Button>
+        )
+      }
+    }
+
 
     renderWeightTrackGraph = () => {
-      let mostRecentWeighIn = new Date(this.props.profile.weighIns[this.props.profile.weighIns.length-1].date)
+      // let mostRecentWeighIn = this.props.profile.weighIns.length > 0 ?  : []
 
       return (
               <Col md="12" className='p-2'>
@@ -116,7 +140,7 @@ class Stats extends Component {
                               pointRadius: 1,
                               pointHitRadius: 10,
                               data: this.props.profile.weighIns.map((data)=>{
-                                return {y:data.weight, x:new Date(data.date)}
+                                return data ? {y:data.weight, x:new Date(data.date)} : []
                               })
                             }
                           ],
@@ -168,9 +192,8 @@ class Stats extends Component {
                         }
                       }}
                  />
-                 {mostRecentWeighIn.setDate(mostRecentWeighIn.getDate() + 7) > new Date() ? 
-                  'Check back in a week for your next check in!': null}
-                 <Button color="secondary" disabled={mostRecentWeighIn.setDate(mostRecentWeighIn.getDate() + 7) > new Date() ? true: false} onClick={this.toggle}>Check-In</Button>
+                 
+                {this.renderButton()} 
               </Col>
       )
     }
