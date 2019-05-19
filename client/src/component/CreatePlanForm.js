@@ -582,7 +582,7 @@ class CreatePlanForm extends Component {
 
     return (
       <form
-        className="p-4"
+        className="p-4 bg-light"
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >

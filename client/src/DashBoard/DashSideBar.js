@@ -54,9 +54,32 @@ class DashSideBar extends React.Component {
   }
 
 
+  renderAdminLink = () => {
+    
+    if (this.props.profile.isAdmin)
+      return(
+          <>
+            <hr/>
+            <NavItem active={this.state.currentTab === 'admin' ? true : false}>
+            <Link style={{textDecoration:'none'}} to="/dashboard/admin">
+              <NavLink  onClick={() => this.setState({ currentTab: 'admin' },()=>{
+                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                            this.toggleNavbar()
+                        }
+                      })} >
+                  Admin 
+              </NavLink>
+            </Link>
+            </NavItem>
+          </>
+      )
+    else return null
+  }
+
+
 
   render() {
-    // console.log(this.props)
+    console.log(this.props)
     return (
         <Nav vertical navbar className="sidebar-col col-md-2" >
           <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h3">
@@ -127,6 +150,10 @@ class DashSideBar extends React.Component {
               Sign-out
             </a>
           </NavItem> 
+
+          {this.props.profile ?
+            this.renderAdminLink()
+           : null}
           </Collapse>     
         </Nav>
     )

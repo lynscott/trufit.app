@@ -66,13 +66,16 @@ class Stats extends Component {
 
     renderButton = () => {
       if (this.state.mostRecentWeighIn) {
-        
+        // console.log(this.state.mostRecentWeighIn.getDate(),  'ORIG')
+        let tempDate = new Date(this.props.profile.weighIns[this.props.profile.weighIns.length-1].date)
+        // console.log(tempDate.getDate(), 'COPY')
+        tempDate.setDate(tempDate.getDate() + 7)
+        // console.log(tempDate, new Date(), 'LEG')
         return (
           <>
-            {this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) > new Date() ? 
+            {tempDate > new Date() ? 
               <p style={{fontSize:'15px'}}>Check back in a week for your next check in!</p>: null}
-            <Button color="secondary" disabled={this.state.mostRecentWeighIn.setDate(this.state.mostRecentWeighIn.getDate() + 7) >
-              new Date() ? true: false} onClick={this.toggle}>
+            <Button color="secondary" disabled={ new Date(tempDate) > new Date() ? true: false} onClick={this.toggle}>
               Check-In
             </Button>
           </>
