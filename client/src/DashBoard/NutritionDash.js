@@ -30,34 +30,52 @@ import './NutritionDash.scss'
 import { Type } from 'react-bootstrap-table2-editor'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import classnames from 'classnames'
-import { Pie, Doughnut, HorizontalBar } from 'react-chartjs-2'
+import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 
-// a little function to help us with reordering the result
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list)
-  const [removed] = result.splice(startIndex, 1)
-  result.splice(endIndex, 0, removed)
+const barOptions = {
+  legend: {
+    display: false
+  },
 
-  return result
+  scales: {
+    gridLines: {
+      color: 'rgb(255, 255, 255, 0.7)'
+    },
+    yAxes: [
+      {
+        ticks: {
+          //  beginAtZero:true,
+          fontColor: 'white',
+          fontSize: 15,
+          min: 0
+        }
+      }
+    ],
+    xAxes: [
+      {
+        ticks: {
+          fontColor: 'white',
+          fontSize: 15
+        }
+      }
+    ]
+  }
 }
 
-/**
- * Moves an item from one list to another list.
- */
-const move = (source, destination, droppableSource, droppableDestination) => {
-  const sourceClone = Array.from(source)
-  const destClone = Array.from(destination)
-  const [removed] = sourceClone.splice(droppableSource.index, 1)
+export const formatMealTime = (mealTime) => {
+  let hr = parseInt(mealTime.split(':')[0])
+  let min = parseInt(mealTime.split(':')[1])
+  let now = new Date()
+  now.setHours(hr, min)
+  if (hr > 12) {
+    hr = hr - 1
+  }
 
-  destClone.splice(droppableDestination.index, 0, removed)
+  return now
 
-  const result = {}
-  result[droppableSource.droppableId] = sourceClone
-  result[droppableDestination.droppableId] = destClone
 
-  return result
 }
 
 class NutritionDash extends Component {
@@ -69,48 +87,7 @@ class NutritionDash extends Component {
       rowSelected: false,
       index: 0,
       nutritionCals: 0,
-      horizontalBarData: {
-        labels: ['Carbs', 'Protein', 'Fats'],
-        datasets: [
-          {
-            data: [100, 250, 75],
-            backgroundColor: 'rgb(122, 212, 234, 0.4)', //'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,255,255,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.2)',
-            hoverBorderColor: 'rgba(255,99,132,1)',
-            label: '(g)'
-          }
-        ]
-      },
-      options: {
-        legend: {
-          display: false
-        },
-
-        scales: {
-          gridLines: {
-            color: 'rgb(255, 255, 255, 0.7)'
-          },
-          yAxes: [
-            {
-              ticks: {
-                //  beginAtZero:true,
-                fontColor: 'white',
-                fontSize: 15
-              }
-            }
-          ],
-          xAxes: [
-            {
-              ticks: {
-                fontColor: 'white',
-                fontSize: 15
-              }
-            }
-          ]
-        }
-      },
+      
       activeTab: '1',
       products: [
         {
@@ -123,10 +100,25 @@ class NutritionDash extends Component {
           carb: 0
         }
       ],
+      resetProducts: [
+        {
+          name: 'Total',
+          serving: '',
+          serving_label: '',
+          calories: 0,
+          fats: 0,
+          protein: 0,
+          carb: 0
+        }
+      ],
+      planProtein:0,
+      planCarb:0,
+      planFats:0,
       items: [],
-      openMeals: false,
+      openMeals: true,
       selected: [],
-      time: null
+      time: null,
+      barData: [0,0,0]
     }
   }
 
@@ -142,710 +134,65 @@ class NutritionDash extends Component {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    //TODO: replace this with new nutrition list props
-    let names = this.props.profile
-      ? this.props.profile.nutritionSchedule.map(item => {
-          return item.items
-        })
-      : null
-    if (prevProps.profile !== this.props.profile) {
-      this.setState(() => {
-        this.state.items = this.props.profile.nutritionItems.filter(
-          (item, index) => {
-            let isMatch = false
-            if (names.length > 0) {
-              for (let i = 0; i < names.length; i++) {
-                for (let j = 0; j < names[i].length; j++) {
-                  if (names[i][j].id === item.id) {
-                    isMatch = true // skip
-                    continue
-                  }
-                }
-              }
-              if (isMatch) {
-                return false
-              }
-              return true
-            } else {
-              return true
-            }
-          }
-        )
-      })
-      // this.forceUpdate()
-      this.calculateTotals()
+    if (prevState.nutritionCals !== this.state.nutritionCals) {
+      this.forceUpdate()
     }
-
-    // if (this.state.nutritionCals !== this.props.profile.nutritionCals) {
-    //   // console.log(this.props.profile.nutritionCals)
-      
-    // }
 
     if (prevProps.windowWidth !== this.props.windowWidth) {
       this.forceUpdate()
     }
   }
 
-  updateMacros = async newValue => {
-    let i = this.state.index
-    let newRow = this.props.profile.nutritionItems[i]
-
-    // console.log('correct', newValue)
-    newRow.fats = (
-      this.props.profile.nutritionItems[i].baseFats *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.carb = (
-      this.props.profile.nutritionItems[i].baseCarb *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.protein = (
-      this.props.profile.nutritionItems[i].baseProtein *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.calories = (
-      this.props.profile.nutritionItems[i].baseCal *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.serving = newValue
-
-    await this.props.updateFoodItem({
-      index: this.state.index,
-      replace: newRow
-    })
-    this.setState({ rowSelected: false })
-    this.calculateTotals()
-  }
-
-  id2List = {
-    foodlist: 'items',
-    schedule_1: 'selected'
-  }
-
-  getList = id => this.state[this.id2List[id]]
-
-  onDragEnd = result => {
-    const { source, destination } = result
-    // console.log(source.index, source)
-
-    // dropped outside the list
-    if (!destination) {
-      return
-    }
-
-    if (source.droppableId === destination.droppableId) {
-      const items = reorder(
-        this.getList(source.droppableId),
-        source.index,
-        destination.index
-      )
-
-      let state = { [this.id2List[source.droppableId]]: items }
-
-      this.setState(state)
-    } else {
-      const result = move(
-        this.getList(source.droppableId),
-        this.getList(destination.droppableId),
-        source,
-        destination
-      )
-      // console.log(result)
-
-      this.setState({
-        [this.id2List[source.droppableId]]: result[source.droppableId],
-        [this.id2List[destination.droppableId]]: result[destination.droppableId]
-      })
-    }
-  }
-
-  makeSchedule = () => {
-    // console.log(this.state)
-
-    let getItemStyle = (isDragging, draggableStyle) => ({
-      // some basic styles to make the items look a bit nicer
-      userSelect: 'none',
-      padding: 5,
-      margin: `0 0 ${8}px 0`,
-      color: 'white',
-      borderRadius: '5px',
-      boxShadow: 'grey 3px 5px 2px 3px',
-      border: '2px solid white',
-
-      // change background colour if dragging
-      background: isDragging
-        ? 'lightgreen'
-        : 'linear-gradient(135deg, grey, #008ed6 70%)',
-      // backgroundImage: 'linear-gradient(to top, rgba(0, 0, 0, 0, 1), #008ed6)',
-
-      // styles we need to apply on draggables
-      ...draggableStyle
-    })
-
-    let draggableFoodItems = () => {
-      let names = this.props.profile
-        ? this.props.profile.nutritionSchedule.map(item => {
-            return item.items
-          })
-        : null
-      return this.props.profile
-        ? this.state.items
-            .filter((item, index) => {
-              let isMatch = false
-              if (names.length > 0) {
-                for (let i = 0; i < names.length; i++) {
-                  for (let j = 0; j < names[i].length; j++) {
-                    if (names[i][j].id === item.id) {
-                      isMatch = true // skip
-                      continue
-                    }
-                  }
-                }
-                if (isMatch) {
-                  return false
-                }
-                return true
-              } else {
-                return true
-              }
-            })
-            .map((item, index) => (
-              <Draggable key={index} draggableId={item.name} index={index}>
-                {(provided, snapshot) => (
-                  // <Row>
-                  // <ListGroupItem color='dark' tag="button" action>
-                  <div
-                    className="col-md-12 p-2 my-2"
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
-                  >
-                    <p>{item.name}</p>
-                    <p style={{ display: 'inline' }}>
-                      {'Serving: ' + item.serving + 'oz'}
-                    </p>
-                  </div>
-                  // </ListGroupItem>
-                  // </Row>
-                )}
-              </Draggable>
-            ))
-        : null
-    }
-
-    let saveMealTime = async time => {
-      let makeTime = timeString => {
-        let date = new Date()
-        date.setHours(timeString.split(':')[0])
-        date.setMinutes(timeString.split(':')[1])
-        return date
-      }
-
-      await this.props.updateFoodItem({
-        schedule: {
-          time: makeTime(this.state.time),
-          items: this.state.selected
-        }
-      })
-      this.setState({ selected: [], meal: null })
-    }
-
-    let foodList = () => {
-      return (
-        // <Col md="6" className='py-2'>
-        <Droppable droppableId="foodlist">
-          {(provided, snapshot) => (
-            // <Row>
-            <Col md="6" className="py-2">
-              <div //className='col-md-6 py-2'
-                ref={provided.innerRef}
-                style={{
-                  backgroundColor: snapshot.isDraggingOver
-                    ? 'blue'
-                    : 'lightgrey',
-                  borderRadius: '8px'
-                }}
-                {...provided.droppableProps}
-              >
-                <h5 style={{ fontWeight: 'lighter' }}>
-                  Select Items For Meal:
-                </h5>
-                {draggableFoodItems()}
-                {provided.placeholder}
-              </div>
-            </Col>
-          )}
-        </Droppable>
-        // </Col>
-      )
-    }
-
-    let schedule = () => {
-      return (
-        <Col md="6" className="py-2">
-          <Droppable droppableId="schedule_1">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={{
-                  backgroundColor: snapshot.isDraggingOver
-                    ? 'lightblue'
-                    : 'grey',
-                  borderRadius: '8px'
-                }}
-                {...provided.droppableProps}
-              >
-                <Row className="align-items-center py-2">
-                  <Col md="6">
-                    <Button
-                      onClick={() => saveMealTime()}
-                      disabled={
-                        this.state.selected.length === 0 ||
-                        this.state.time === null
-                          ? true
-                          : false
-                      }
-                      className="my-2"
-                      color="success"
-                    >
-                      Save Meal
-                    </Button>
-                    {/* </Col>
-                  <Col md="4" position='middle'> */}
-                  </Col>
-                  <Col md="6">
-                    <h5
-                      style={{
-                        fontWeight: 'lighter',
-                        color: 'white',
-                        display: 'inline'
-                      }}
-                    >
-                      Set Time:
-                    </h5>
-                    <Input
-                      onChange={e => {
-                        // console.log(e.target.value)
-                        this.setState({ time: e.target.value })
-                      }}
-                      placeholder="Set Time"
-                      // style={{maxWidth:'fit-content'}}
-                      type="time"
-                    />
-                  </Col>
-                </Row>
-                {this.state.selected.map((item, index) => (
-                  <Draggable key={index} draggableId={item.name} index={index}>
-                    {(provided, snapshot) => (
-                      // <ListGroupItem tag="button" action>
-                      <div
-                        className="p-2 bg-dark"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        )}
-                      >
-                        {item.name}
-                        <br />
-                        <br />
-                        {'Serving: ' + item.serving + 'oz'}
-                      </div>
-                      // </ListGroupItem>
-                    )}
-                  </Draggable>
-                ))}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </Col>
-      )
-    }
-
-    //Groups of food items as meals with times, could be a form element
-    return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
-        <Row className="my-4">
-          {schedule()}
-          {foodList()}
-        </Row>
-      </DragDropContext>
-    )
-  }
-
-  renderMealSchedule = () => {
-    let removeMeal = async i => {
-      await this.props.updateFoodItem({ removeSchedule: i })
-    }
-
-    return (
-      <Row>
-        <Col md="12" className="text-left schedule-col">
-          <Button
-            color="info"
-            className="my-2"
-            onClick={() => this.setState({ openMeals: !this.state.openMeals })}
-          >
-            {this.state.openMeals ? 'Hide Meals' : 'Show Meals'}
-          </Button>
-          <Collapse isOpen={this.state.openMeals}>
-            <CardGroup>
-              {this.props.profile
-                ? this.props.profile.nutritionSchedule.map((sched, index) => {
-                    return (
-                      <Card
-                        body
-                        key={index}
-                        className="m-1 meal-card"
-                        inverse
-                        color="light"
-                      >
-                        <CardTitle
-                          style={{
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            color: 'black'
-                          }}
-                        >
-                          {new Date(sched.time).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </CardTitle>
-                        {sched
-                          ? sched.items.map((item, i) => {
-                              return (
-                                <CardText
-                                  key={i}
-                                  className="row justify-content-center"
-                                >
-                                  <React.Fragment>
-                                    <Col
-                                      md="6"
-                                      className="truncate text-center"
-                                    >
-                                      <Badge color="light">{item.name}</Badge>
-                                    </Col>
-                                    <Col md="6" className="text-center">
-                                      <Badge color="warning">
-                                        {item.serving + 'oz'}
-                                      </Badge>
-                                    </Col>
-                                  </React.Fragment>
-                                </CardText>
-                              )
-                            })
-                          : null}
-                        <Button
-                          color="primary"
-                          onClick={() => removeMeal(index)}
-                          className="m-2"
-                        >
-                          Remove Meal
-                        </Button>
-                      </Card>
-                    )
-                  })
-                : null}
-            </CardGroup>
-          </Collapse>
-        </Col>
-      </Row>
-    )
-  }
-
-  renderTable = () => {
-    let makeArray = () => {
-      let list = [...Array(12).keys()].map(value => {
-        // console.log(value, 'here')
-        return {
-          value: value + 1,
-          label: value + 1
-        }
-      })
-      return list
-    }
-
-    let columns = [
-      {
-        dataField: 'name',
-        text: 'Food Item',
-        editable: (cell, row, rowIndex, colIndex) => {
-          // console.log(cell, colIndex)
-          if (rowIndex === this.props.profile.nutritionItems.length) {
-            return false
-          }
-          return true
-        }
-      },
-      // {
-      //   dataField: 'serving_label',
-      //   text: 'Serving',
-      //   editable: (cell, row, rowIndex, colIndex) => {
-      //     if (rowIndex === this.props.profile.nutritionItems.length) {
-      //       return false
-      //     }
-      //     return true
-      //   }
-      // },
-      {
-        dataField: 'serving',
-        text: 'Amount(oz)',
-        editor: {
-          type: Type.SELECT,
-          options: makeArray()
-        },
-        editable: (cell, row, rowIndex, colIndex) => {
-          if (rowIndex === this.props.profile.nutritionItems.length) {
-            return false
-          }
-          return true
-        }
-      },
-      {
-        dataField: 'calories',
-        text: 'Calories',
-        editable: (cell, row, rowIndex, colIndex) => {
-          // console.log(cell, row)
-          if (row.id === 'manual') {
-            return true
-          }
-          return false
-        }
-      },
-      {
-        dataField: 'fats',
-        text: 'Fats (g)',
-        editable: (cell, row, rowIndex, colIndex) => {
-          return false
-        }
-      },
-      {
-        dataField: 'carb',
-        text: 'Carbs (g)',
-        editable: (cell, row, rowIndex, colIndex) => {
-          return false
-        }
-      },
-      {
-        dataField: 'protein',
-        text: 'Protein (g)',
-        editable: (cell, row, rowIndex, colIndex) => {
-          return false
-        }
-      }
-    ]
-
-    if (this.props.profile.nutritionItems.length === 1) {
-      return (
-        <div>
-          <h2 className="text-white"> Add a food item to start your plan!</h2>
-        </div>
-      )
-    } else {
-      return (
-        <BootstrapTable
-          keyField="name"
-          bordered={true}
-          hover={true}
-          condensed={false}
-          bootstrap4={true}
-          data={
-            this.props.profile
-              ? this.props.profile.nutritionItems.concat(this.state.products)
-              : []
-          }
-          columns={columns}
-          rowClasses={this.rowClasses}
-          classes={
-            this.props.windowWidth < 500 === true
-              ? 'table-mobile bg-light'
-              : 'bg-light'
-          }
-          cellEdit={cellEditFactory({
-            mode: 'dbclick',
-            blurToSave: true,
-            autoSelectText: true,
-            beforeSaveCell: async (oldValue, newValue, row, column) => {
-              // console.log(newValue, row, 'before save log')
-
-              if (!isNaN(newValue) && newValue !== ' ') {
-                this.updateMacros(newValue)
-              } else {
-                // console.log('send to save')
-                await this.props.updateFoodItem({
-                  index: this.state.index,
-                  replace: row
-                })
-              }
-            }
-          })}
-          selectRow={this.selectRow}
-        />
-      )
-    }
-  }
-
-  rowClasses = (row, rowIndex) => {
-    if (
-      rowIndex === this.state.index &&
-      this.state.rowSelected &&
-      rowIndex !== this.props.profile.nutritionItems.length
-    ) {
-      return 'selected-row'
-    }
-  }
-
-  selectRow = {
-    mode: 'checkbox',
-    clickToSelect: true,
-    hideSelectColumn: true,
-    clickToEdit: true,
-    nonSelectable: [
-      this.props.profile ? this.props.profile.nutritionItems.length : ''
-    ],
-    onSelect: (row, isSelect, rowIndex, e) => {
-      // console.log(rowIndex)
-      if (rowIndex !== this.props.profile.nutritionItems.length) {
-        this.rowClasses(rowIndex)
-        this.setState({ index: rowIndex, rowSelected: true })
-      }
-    }
-  }
-
-  rowEvents = {
-    onClick: (e, row, rowIndex) => {
-      // console.log(rowIndex, 'selected')
-      this.setState({ index: rowIndex, rowSelected: true })
-    }
-  }
-
-  displayMacros = () => {
-    return (
-      <Row className="justify-content-center py-2">
-        <Col md="6" className="align-self-center text-white my-2">
-          {/* <Card body inverse color="info" style={{ borderColor: '#333' }}>
-            <CardHeader>Recommended Macros:</CardHeader>
-            <CardBody>
-              <CardText> */}
-          <CardText style={{margin:0}}>
-          Body-Type you identified as: {this.props.profile.baseSomaType.type}
-          </CardText>
-          <p style={{padding:'10px', fontSize:'15px'}}>
-            {this.props.profile.baseSomaType.info}
-          </p>
-
-          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>Recommended Daily Intake:{' '}
-                    {(
-                      Number(this.props.profile.calories) +
-                      this.props.profile.currentGoal.value
-                    ).toFixed()+'cal'}
-                  {/* </Badge> */}
-                </h5>
-          <ButtonToolbar>
-            <ButtonGroup>
-              <Button>
-                <h5>
-                  <Badge color="primary">
-                    Protein:{' '}
-                    {(
-                      ((this.props.profile.macros.protein / 100) *
-                        (parseInt(this.props.profile.calories) +
-                          this.props.profile.currentGoal.value)) /
-                      4
-                    ).toFixed(2)}
-                    g
-                  </Badge>
-                </h5>
-              </Button>
-              <Button>
-                <h5>
-                  <Badge color="primary">
-                    Carbs:{' '}
-                    {(
-                      ((this.props.profile.macros.carb / 100) *
-                        (parseInt(this.props.profile.calories) +
-                          this.props.profile.currentGoal.value)) /
-                      4
-                    ).toFixed(2)}
-                    g
-                  </Badge>
-                </h5>
-              </Button>
-              <Button>
-                <h5>
-                  <Badge color="primary">
-                    Fats:{' '}
-                    {(
-                      ((this.props.profile.macros.fat / 100) *
-                        (parseInt(this.props.profile.calories) +
-                          this.props.profile.currentGoal.value)) /
-                      9
-                    ).toFixed(2)}
-                    g
-                  </Badge>
-                </h5>
-              </Button>
-            </ButtonGroup>
-          </ButtonToolbar>
-        </Col>
-        <Col md="6" className=" my-2 text-white">
-          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>Your Planned Daily Intake: {this.state.nutritionCals}cal</h5>
-          <HorizontalBar
-            legend={{ position: 'bottom' }}
-            data={this.state.horizontalBarData}
-            options={this.state.options}
-          />
-        </Col>
-      </Row>
-    )
-  }
-
+  /****************************************
+   * HELPER FUNCTIONS *********************
+   ****************************************/
   calculateTotals = () => {
-    // if (this.props.profile.nutritionItems.length !== 0) {
+ 
     this.state.products.splice(-1)
-    // }
-
     let carbs = 0
     let prot = 0
     let fats = 0
     let cals = 0
-    for (let i = 0; i < this.props.profile.nutritionItems.length; i++) {
-      fats = Number(this.props.profile.nutritionItems[i].fats) + Number(fats)
-      carbs = Number(this.props.profile.nutritionItems[i].carb) + Number(carbs)
-      prot = Number(this.props.profile.nutritionItems[i].protein) + Number(prot)
-      cals =
-        Number(this.props.profile.nutritionItems[i].calories) + Number(cals)
+    let nutritionCals = 0
+    for (let i = 0; i < this.props.profile.nutritionSchedule.length; i++) {
+      this.props.profile.nutritionSchedule[i].items.map(item=>{
+        // fats = Number(item.fats) + Number(fats)
+        // carbs = Number(item.carb) + Number(carbs)
+        // prot = Number(item.protein) + Number(prot)
+        nutritionCals = Number(item.calories) + Number(nutritionCals)
+      })
     }
 
-    this.setState(() => {
+    for (let i = 0; i < this.state.products.length; i++) {
+      // console.log(this.state.products[i])
+      fats = Number(this.state.products[i].fats) + Number(fats)
+      carbs = Number(this.state.products[i].carb) + Number(carbs)
+      prot = Number(this.state.products[i].protein) + Number(prot)
+      cals =
+        Number(this.state.products[i].calories) + Number(cals)
+      
+    }
 
-      this.state.horizontalBarData.datasets[0].data = [
-        Math.round(carbs),
-        Math.round(prot),
-        Math.round(fats)
-      ]
+    //TODO: Add recommended macros to user macros
+    // (((this.props.profile.macros.protein / 100) *
+    //                     (parseInt(this.props.profile.calories) +
+    //                       this.props.profile.currentGoal.value)) /
+    //                   4
+    //                 ).toFixed(2)
 
-      this.state.products.push({
-        name: 'Totals(g)',
-        fats: fats.toFixed(2),
-        calories: Math.round(cals),
-        carb: carbs.toFixed(2),
-        protein: prot.toFixed(2),
-        id: 'total'
-      })
-
-      this.state.nutritionCals = Math.round(cals)
+    // console.log('ACTIVE', fats, carbs, prot, cals, this.state.products)
+    
+    this.state.products.push({
+      name: 'Total',
+      serving: '',
+      serving_label: '',
+      calories: Math.round(cals),
+      fats: Math.round(fats),
+      protein: Math.round(prot),
+      carb: Math.round(carbs)
     })
-    this.forceUpdate()
+    this.setState({nutritionCals:Math.round(nutritionCals)})
+    // this.forceUpdate()
   }
 
   addItemButton = () => {
@@ -855,14 +202,15 @@ class NutritionDash extends Component {
         color={'primary'}
         disabled={this.props.foodSelected ? false : true}
         onClick={async () => {
-          await this.props.updateProfile({
-            keys: ['nutritionItems'],
-            nutritionItems: this.props.foodSelected
-          })
+          // await this.props.updateProfile({
+          //   keys: ['nutritionItems'],
+          //   nutritionItems: this.props.foodSelected
+          // })
           this.setState(() => {
-            // this.state.products.unshift(this.props.foodSelected)
+            this.state.products.unshift(this.props.foodSelected)
             this.calculateTotals()
           })
+          console.log(this.state.products)
           // this.forceUpdate()
         }}
       >
@@ -941,6 +289,29 @@ class NutritionDash extends Component {
     )
   }
 
+  addMealButton = () => {
+    return (
+      <Button
+        className="my-2"
+        color="success"
+        size="lg" block
+        disabled={this.state.time && this.state.products.length > 1? false: true}
+        onClick={async () => {
+          this.state.products.splice(-1)
+          await this.props.updateProfile({
+            keys: ['nutritionSchedule'],
+            nutritionSchedule: {items:this.state.products, time:this.state.time}
+          })
+          // await this.props.updateFoodItem({ index: this.state.index })
+          // this.calculateTotals()
+          this.setState({ products: this.state.resetProducts, time:null })
+        }}
+      >
+        Add Meal
+      </Button>
+    )
+  }
+
   toggle(tab) {
     if (this.state.activeTab !== tab) {
       this.setState({
@@ -948,6 +319,355 @@ class NutritionDash extends Component {
       })
     }
   }
+
+
+  /******************
+   * UPDATE MACROS  *
+   ******************/
+
+  updateMacros = async newValue => {
+    let i = this.state.index
+    let newRow = this.state.products[i]
+
+    console.log('correct', newValue)
+    newRow.fats = (
+      this.state.products[i].baseFats *
+      (Number(newValue) / 3.5)
+    ).toFixed(2)
+    newRow.carb = (
+      this.state.products[i].baseCarb *
+      (Number(newValue) / 3.5)
+    ).toFixed(2)
+    newRow.protein = (
+      this.state.products[i].baseProtein *
+      (Number(newValue) / 3.5)
+    ).toFixed(2)
+    newRow.calories = (
+      this.state.products[i].baseCal *
+      (Number(newValue) / 3.5)
+    ).toFixed(2)
+    newRow.serving = newValue
+
+    // await this.props.updateFoodItem({
+    //   index: this.state.index,
+    //   replace: newRow
+    // })
+    this.setState({ rowSelected: false })
+    this.calculateTotals()
+  }
+
+
+  updateBar = (fats, carb, protein) => {
+    this.setState({},() => {
+      this.state.planProtein = this.state.planProtein + protein
+      this.state.planCarb = this.state.planCarb + carb
+      this.state.planFats = this.state.planFats + fats
+      // console.log(this.state.planProtein, this.state.planCarb)
+    })
+  }
+
+  getMealMacros = () => {
+    let cals = 0
+    let protein = 0
+    let carb = 0
+    let fats = 0
+
+    this.props.profile.nutritionSchedule.map(meal=>{ 
+      meal.items.map(item=>{
+        //Count up macros through each iter
+        cals = cals+parseInt(item.calories)
+        protein = protein + parseInt(item.protein)
+        carb = carb + parseInt(item.carb)
+        fats = fats + parseInt(item.fats)
+      })
+    })
+    
+    return (
+      [
+        Math.round(carb),
+        Math.round(protein),
+        Math.round(fats),
+      ]
+    )
+  }
+
+
+  renderMealSchedule = () => {
+
+    let removeMeal = async i => {
+      await this.props.updateFoodItem({ removeSchedule: i })
+    }
+
+
+    let parseMeals = (meal) => {
+      let meals = []
+      let cals = 0
+      let protein = 0
+      let carb = 0
+      let fats = 0
+
+      //Parse macro info from meals
+      meal.items.forEach((item, i) => {
+        meals.push(
+          <CardText key={i} className="row justify-content-center">
+            <React.Fragment>
+              <Col md="6"className="truncate text-center">
+                <Badge color="light">{item.name}</Badge>
+              </Col>
+              <Col md="6" className="text-center">
+                <Badge color="warning">
+                  {item.serving + 'oz'}
+                </Badge>
+              </Col>
+            </React.Fragment>
+          </CardText>
+        )
+
+        //Count up macros through each iter
+        cals = cals+parseInt(item.calories)
+        protein = protein + parseInt(item.protein)
+        carb = carb + parseInt(item.carb)
+        fats = fats + parseInt(item.fats)
+      })
+
+      // //Update state
+      // // this.updateBar(fats, carb, protein)
+      // this.setState((prevState, props) => {
+      //   // console.log(props, 'WTF IS PROPS?')
+      //   if (prevState.planProtein !== this.state.planProtein) {
+      //     return {
+      //       planProtein: prevState.planProtein + protein,
+      //       planCarb: prevState.planCarb + carb,
+      //       planFats: prevState.planFats + fats
+      //     }
+      //   }
+      // })
+
+      //Add calories to meal card
+      meals.push(
+          <CardText className="row justify-content-center" >
+            <Col md='6' className="truncate text-center text-dark">Total Calories:</Col>
+            <Col md='6' className="truncate text-center text-dark">{cals}</Col>
+          </CardText>
+        )
+      
+      return meals
+    }
+
+    return (
+      <Row>
+        <Col md="12" className="text-left schedule-col">         
+          <Collapse isOpen={this.state.openMeals}>
+            <CardGroup>
+             { this.props.profile.nutritionSchedule.map((meal , index) => {
+              //  console.log(meal, 'TWO')
+                    return (
+                      <Card
+                        body
+                        key={index}
+                        className="m-1 meal-card"
+                        inverse
+                        color="light"
+                      >
+                        <CardTitle
+                          style={{
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            color: 'black'
+                          }}  
+                        >
+                        
+                        {/* Needs times */}
+                          {formatMealTime(meal.time).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                          {/* {meal.time} */}
+                        </CardTitle>
+                        {parseMeals(meal)}
+
+                        <Button
+                          color="primary"
+                          onClick={() => removeMeal(index)}
+                          className="m-2"
+                        >
+                          Remove Meal
+                        </Button>
+                      </Card>
+                    )
+                  })
+                }
+            </CardGroup>
+          </Collapse>
+        </Col>
+      </Row>
+    )
+  }
+
+  renderTable = () => {
+    let makeArray = () => {
+      let list = [...Array(12).keys()].map(value => {
+        // console.log(value, 'here')
+        return {
+          value: value + 1,
+          label: value + 1
+        }
+      })
+      return list
+    }
+
+    let columns = [
+      {
+        dataField: 'name',
+        text: 'Food Item',
+        editable: (cell, row, rowIndex, colIndex) => {
+          // console.log(cell, colIndex)
+          if (row.name === 'Total') {
+            return false
+          }
+          return true
+        }
+      },
+      // {
+      //   dataField: 'serving_label',
+      //   text: 'Serving',
+      //   editable: (cell, row, rowIndex, colIndex) => {
+      //     if (rowIndex === this.row.name === 'Total'.length) {
+      //       return false
+      //     }
+      //     return true
+      //   }
+      // },
+      {
+        dataField: 'serving',
+        text: 'Amount(oz)',
+        editor: {
+          type: Type.SELECT,
+          options: makeArray()
+        },
+        editable: (cell, row, rowIndex, colIndex) => {
+          // console.log(row)
+          if (row.name === 'Total') {
+            return false
+          }
+          return true
+        }
+      },
+      {
+        dataField: 'calories',
+        text: 'Calories',
+        editable: (cell, row, rowIndex, colIndex) => {
+          // console.log(cell, row)
+          if (row.id === 'manual') {
+            return true
+          }
+          return false
+        }
+      },
+      {
+        dataField: 'fats',
+        text: 'Fats (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
+      },
+      {
+        dataField: 'carb',
+        text: 'Carbs (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
+      },
+      {
+        dataField: 'protein',
+        text: 'Protein (g)',
+        editable: (cell, row, rowIndex, colIndex) => {
+          return false
+        }
+      }
+    ]
+
+      return (
+        <BootstrapTable
+          keyField="name"
+          bordered={true}
+          hover={true}
+          condensed={false}
+          bootstrap4={true}
+          data={this.state.products}
+          columns={columns}
+          rowClasses={this.rowClasses}
+          classes={
+            this.props.windowWidth < 500 === true
+              ? 'table-mobile bg-light'
+              : 'bg-light'
+          }
+          cellEdit={cellEditFactory({
+            mode: 'dbclick',
+            blurToSave: true,
+            autoSelectText: true,
+            beforeSaveCell: async (oldValue, newValue, row, column) => {
+              // console.log(newValue, row, 'before save log')
+
+
+              if (!isNaN(newValue) && newValue !== ' ') {
+                this.updateMacros(newValue)
+              } else {
+                // console.log('send to save')
+                await this.props.updateFoodItem({
+                  index: this.state.index,
+                  replace: row
+                })
+              }
+            },
+            onStartEdit: (row, column, rowIndex, columnIndex) => { 
+              if (rowIndex !== this.state.index) {
+                this.setState({index:rowIndex})
+              }
+             }
+          })}
+          selectRow={this.selectRow}
+        />
+      )
+  }
+
+  rowClasses = (row, rowIndex) => {
+    if (
+      rowIndex === this.state.index &&
+      this.state.rowSelected &&
+      row.name !== 'Total'
+    ) {
+      return 'selected-row'
+    }
+  }
+
+  selectRow = {
+    mode: 'checkbox',
+    clickToSelect: true,
+    hideSelectColumn: true,
+    clickToEdit: true,
+    nonSelectable: [
+      // this.props.profile ? this.row.name === 'Total'.length : ''
+    ],
+    onSelect: (row, isSelect, rowIndex, e) => {
+      console.log(rowIndex, 'INDEX')
+      if (row.name !== 'Total') {
+        this.rowClasses(rowIndex)
+        this.setState({ index: rowIndex, rowSelected: true })
+      }
+    }
+  }
+
+  rowEvents = {
+    onClick: (e, row, rowIndex) => {
+      // console.log(rowIndex, 'selected')
+      if (row.name !== 'Total')
+        this.setState({ index: rowIndex, rowSelected: true })
+    }
+  }
+
+
+
 
   renderNutritionTabs = () => {
     return (
@@ -963,7 +683,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Plan
+              Nutrition Schedule
             </NavLink>
           </NavItem>
           <NavItem>
@@ -974,12 +694,12 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Schedule
+              Nutrition Plan
             </NavLink>
           </NavItem>
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
-          <TabPane className="mt-4" tabId="1">
+          <TabPane className="mt-4" tabId="2">
             <Col md="12">
               <Row className="justify-content-center">
                 <Col md="6">{this.selectFoodItem()}</Col>
@@ -988,18 +708,24 @@ class NutritionDash extends Component {
                 <Col md="3">{this.addItemButton()}</Col>
                 <Col md="3">{this.manualEntryButton()}</Col>
                 <Col md="3">{this.removeItemButton()}</Col>
+                <Col md='3'><h6 className='text-white mb-0'>Set a meal time</h6>
+                  <Input style={{marginBottom:'15px'}} onChange={e => {
+                  this.setState({ time: e.target.value })
+                  }} placeholder="Set Time" type="time"/>
+                </Col>
               </Row>
             </Col>
             {this.renderTable()}
+            {this.addMealButton()}
           </TabPane>
-          <TabPane tabId="2">
-            {this.props.profile.nutritionItems.length > 1 ? (
+          <TabPane tabId="1">
+            {this.props.profile.nutritionSchedule.length > 0 ? (
               <React.Fragment>
                 <Row className="my-3">
                   <Col md="12">{this.renderMealSchedule()}</Col>
                 </Row>
                 <Row>
-                  <Col md="12">{this.makeSchedule()}</Col>
+                  {/* <Col md="12">{this.makeSchedule()}</Col> */}
                 </Row>
               </React.Fragment>
             ) : (
@@ -1019,8 +745,103 @@ class NutritionDash extends Component {
     )
   }
 
+  displayMacros = () => {
+    return (
+      <Row className="justify-content-center py-2">
+        {/* <Col md="6" className="align-self-center text-white my-2">
+  
+          <CardText style={{margin:0}}>
+          Body-Type you identified as: {this.props.profile.baseSomaType.type}
+          </CardText>
+  
+
+          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>Recommended Daily Intake:{' '}
+                    {(
+                      Number(this.props.profile.calories) +
+                      this.props.profile.currentGoal.value
+                    ).toFixed()+'cal'}
+                </h5>
+          <ButtonToolbar>
+            <ButtonGroup>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Protein:{' '}
+                    {(
+                      ((this.props.profile.macros.protein / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      4
+                    ).toFixed(2)}
+                    g
+                  </Badge>
+                </h5>
+              </Button>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Carbs:{' '}
+                    {(
+                      ((this.props.profile.macros.carb / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      4
+                    ).toFixed(2)}
+                    g
+                  </Badge>
+                </h5>
+              </Button>
+              <Button>
+                <h5>
+                  <Badge color="primary">
+                    Fats:{' '}
+                    {(
+                      ((this.props.profile.macros.fat / 100) *
+                        (parseInt(this.props.profile.calories) +
+                          this.props.profile.currentGoal.value)) /
+                      9
+                    ).toFixed(2)}
+                    g
+                  </Badge>
+                </h5>
+              </Button>
+            </ButtonGroup>
+          </ButtonToolbar>
+        </Col> */}
+        <Col md="8" className=" my-2 text-white">
+          <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>
+          Recommended Daily Intake:{' '}
+                    {(
+                      Number(this.props.profile.calories) +
+                      this.props.profile.currentGoal.value
+                    ).toFixed()+'cal'} // 
+          Your Planned Daily Intake: {this.state.nutritionCals}cal</h5>
+          <Bar
+            legend={{ position: 'bottom' }}
+            data={{
+                labels: ['Carbs', 'Protein', 'Fats'],
+                datasets: [
+                  {
+                    data: this.getMealMacros(),
+                    backgroundColor: 'rgb(122, 212, 234, 0.4)', //'rgba(255,99,132,0.2)',
+                    borderColor: 'rgba(255,255,255,1)',
+                    borderWidth: 1,
+                    hoverBackgroundColor: 'rgba(255,99,132,0.2)',
+                    hoverBorderColor: 'rgba(255,99,132,1)',
+                    label: '(g)'
+                  }
+                ]
+            }}
+            options={barOptions}
+          />
+        </Col>
+      </Row>
+    )
+  }
+
+
   render() {
-    // console.log(this.props)
+    console.log(this.props.profile)
     return this.props.profile ? this.renderNutritionTabs() : null
   }
 }

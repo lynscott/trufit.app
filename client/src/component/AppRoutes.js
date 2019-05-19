@@ -9,6 +9,7 @@ import DashRoutes from '../DashBoard/DashRoutes'
 import DashSideBar from '../DashBoard/DashSideBar'
 import NutritionDash from '../DashBoard/NutritionDash'
 import TrainingDash from '../DashBoard/TrainingDash'
+import CreatePlanForm from './CreatePlanForm'
 
 import Nav from './Nav'
 import keys from '../config/keys'
@@ -28,11 +29,19 @@ class AppRoutes extends Component {
    
   }
   componentDidMount() {
-    this.props.fetchPlanTemps()
     this.props.fetchUser()
-    this.props.fetchProfile()
+    
+    
     window.addEventListener('scroll', this.handleScroll)
 
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.currentUser !== null &&
+        prevProps.currentUser !== this.props.currentUser) {
+          this.props.fetchPlanTemps()
+          this.props.fetchProfile()
+    }
   }
 
   componentWillUnmount() {
@@ -117,8 +126,39 @@ class AppRoutes extends Component {
     )
   }
 
+  renderAdmin = () => {
+    if ( this.props.userProfile.isAdmin)
+      return (
+        <Row>
+          <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+          <CreatePlanForm />
+        </Row>
+      )
+    else return (
+          <Row>
+          <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+          <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
+            <h3 className='my-5'>Forbidden Area. Back Away Slowly.</h3>
+            <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+          </div>
+        </Row>
+        )
+  }
+
+  returnRoute = () => {
+    if (this.props.userProfile.isAdmin)
+      return(
+            <Route
+              exact
+              path="/dashboard/admin"
+              render={this.renderAdmin}
+            />
+        )
+    else return null
+  }
+
   render() {
-    // console.log(this.state)
+    // console.log(this.props)
     return (
       <Container fluid>
         { window.location.pathname.includes('dashboard') === false?
@@ -127,7 +167,7 @@ class AppRoutes extends Component {
         </Fade>
         : null}
         <Switch>
-          <Route exact path="/about" component={About} />
+          {/* <Route exact path="/about" component={About} /> */}
           {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
           {/* <Route path="/training" component={OnlineTraining} /> */}
           <Route
@@ -151,6 +191,10 @@ class AppRoutes extends Component {
             path="/dashboard/settings"
             render={this.renderAccountSettings}
           />
+
+          {this.props.userProfile ?
+           this.returnRoute()
+          : null}
           {/* <Route
                     exact
                     path="/startplan/strength/:userid"

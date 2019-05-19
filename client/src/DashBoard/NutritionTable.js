@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Moment from 'react-moment'
 import * as actions from '../actions'
+import { formatMealTime} from './NutritionDash'
 import {
   Card,
   CardTitle,
@@ -49,39 +50,53 @@ class NextMeal extends Component {
   }
 
   renderNextMeal = () => {
-    let times = this.props.profile.nutritionSchedule
+    let meals = this.props.profile.nutritionSchedule
     let index = 0
 
     if (this.props.profile.nutritionSchedule.length > 0) {
-      for (let i = 0; i < times.length; i++) {
-        let oldTime = new Date(times[i].time)
-        let todayTime = new Date()
-        todayTime.setHours(oldTime.getHours(), oldTime.getMinutes())
-        times[i].time = todayTime
-        // console.log(this.props.profile.nutritionSchedule[i].time)
-      }
-      times.sort((a, b) =>
-        Math.abs(a.time - new Date()) > Math.abs(b.time - new Date())
+
+      meals.sort((a, b) =>
+        Math.abs(formatMealTime(a.time) - new Date()) > Math.abs(formatMealTime(b.time) - new Date())
           ? 1
-          : Math.abs(b.time - new Date()) > Math.abs(a.time - new Date())
+          : Math.abs(formatMealTime(b.time )- new Date()) > Math.abs(formatMealTime(a.time) - new Date())
           ? -1
           : 0
       )
-      // console.log(times)
 
-      let clock = timeArray => {
-        if (timeArray[0].time > new Date()) {
-          index = 0
-          return timeArray[0].time
+      let clock = () => {
+        let list = []
+        // Map the difference between now and meal time for every meal
+        meals.map((meal, i)=>{
+          list.push(
+            Math.abs(formatMealTime(meal.time) - new Date())
+          )
+        })
+        // console.log( list.indexOf(Math.min(...list)), list)
+        // Find the index of the minimum difference, which is the next meal
+        if (formatMealTime(meals[list.indexOf(Math.min(...list))].time) > new Date()) {
+          index = list.indexOf(Math.min(...list))
+          return formatMealTime(meals[index].time)
         } else {
-          index = timeArray.length - 1
-          return timeArray[timeArray.length - 1].time
+          index = list.length -1//list.indexOf(Math.min(...list)) 
+          // console.log(index, 'CHOSEN INDEX')
+          return formatMealTime(meals[index].time)
         }
+        
       }
+
+      // let clock = timeArray => {
+      //   if (formatMealTime(timeArray[0].time) > new Date()) {
+      //     index = 0
+      //     return formatMealTime(timeArray[0].time)
+      //   } else {
+      //     index = timeArray.length - 1
+      //     return formatMealTime(timeArray[timeArray.length - 1].time)
+      //   }
+      // }
       return (
         <React.Fragment>
           <h6 style={{ margin: 0, fontSize:'15px' }}>
-            Next Meal Time: <Moment format="LT">{clock(times)}</Moment>
+            Next Meal Time: <Moment format="LT">{clock()}</Moment>
           </h6>
           {/* // </CardTitle> */}
           <Col md="12">

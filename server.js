@@ -27,7 +27,7 @@ const trainingTemplate = require('./services/trainingTemplate')
 const welcomeTemplate = require('./services/welcomeTemplate')
 const app = express()
 mongoose.Promise = require('bluebird')
-
+//'mongodb://localhost:27017'
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
 mongoose.model('exercises', new mongoose.Schema())
 
@@ -234,29 +234,30 @@ app.get(
 
 app.get('/api/logged_user', (req, res) => {
   if (req.user) {
+    req.user.password = ''
     res.send({ user: req.user })
   } else {
     res.send({ user: null })
   }
 })
 
-app.post('/api/logged_user_local', async (req, res) => {
-  // console.log(req.body.token)
-  let decoded = jwt.decode(req.body.token, keys.secret)
-  // console.log(process.env.NODE_ENV, 'ENV')
-  User.findById(decoded.sub, (err, user) => {
-    if (err) {
-      return err
-    }
+// app.post('/api/logged_user_local', async (req, res) => {
+//   // console.log(req.body.token)
+//   let decoded = jwt.decode(req.body.token, keys.secret)
+//   // console.log(process.env.NODE_ENV, 'ENV')
+//   User.findById(decoded.sub, (err, user) => {
+//     if (err) {
+//       return err
+//     }
 
-    if (user) {
-      user.password = ''
-      return res.send({ user: user })
-    } else {
-      return res.send({ user: null })
-    }
-  })
-})
+//     if (user) {
+//       user.password = ''
+//       return res.send({ user: user })
+//     } else {
+//       return res.send({ user: null })
+//     }
+//   })
+// })
 
 app.get('/api/user_profile', async (req, res, next) => {
   requireLogin(req, res, next)
@@ -319,7 +320,8 @@ app.post('/api/update_profile', async (req, res, next) => {
   await UserProfile.findOne({ _user: req.user.id }, (err, prof) => {
     if (err) return res.send(500, { error: err })
     for (let i = 0; i < keys.length; i++) {
-      if (keys[i] === 'nutritionItems' || keys[i] === 'weighIns') {
+      if (keys[i] === 'nutritionSchedule' || keys[i] === 'weighIns') {
+        console.log("fired??")
         prof[keys[i]].push(req.body[keys[i]])
       } else {
         prof[keys[i]] = req.body[keys[i]]

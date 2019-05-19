@@ -248,7 +248,7 @@ class Dashboard extends Component {
         <Card>
           <CardHeader>Recommended Macros</CardHeader>
           <CardSubtitle className="pt-2">
-            {this.props.profile.calories}cal
+            {parseInt(this.props.profile.calories) + this.props.profile.currentGoal.value}cal
           </CardSubtitle>
           <CardBody className="p-1">
             <Pie
@@ -347,9 +347,9 @@ class Dashboard extends Component {
           <Button color="primary">Learn More</Button>
         </p> */}
         <Row>
-          {/* <Col>Current Calorie Goal: {this.props.profile.calories}</Col> */}
-          {/* <Col>Meals Tracked: 0</Col>
-          <Col>Excess Calories Today: 0</Col> */}
+          <Col>
+            {/* <Button>Add Accountability Partner</Button> */}
+          </Col>
         </Row>
       </Jumbotron>
       // </Row>
