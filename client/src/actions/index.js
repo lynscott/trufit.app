@@ -25,6 +25,8 @@ export const UPDATE_PROFILE = 'UPDATE_PROFILE'
 export const USER_SIGNUP = 'USER_SIGNUP'
 export const RESET_SIGNUP_FAIL = 'RESET_SIGNUP_FAIL'
 export const WEEKLY_CHECKIN = 'WEEKLY_CHECKIN'
+export const NEW_WORKOUT_SUCCESS = 'NEW_WORKOUT_SUCCESS'
+export const NEW_WORKOUT_FAILED = 'NEW_WORKOUT_FAILED'
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
@@ -177,6 +179,18 @@ export const createNewPlan = (values) => async dispatch => {
     dispatch({type: CREATE_NEW_PLAN})
   } catch (error) {
     dispatch({type: CREATE_NEW_PLAN_ERROR, payload:'Error Occured'+ error})
+  }
+
+}
+
+
+export const createNewWorkout = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/new_workout', values)
+    dispatch({type: NEW_WORKOUT_SUCCESS})
+  } catch (error) {
+    dispatch({type: NEW_WORKOUT_FAILED, payload:'Error Occured'+ error})
   }
 
 }

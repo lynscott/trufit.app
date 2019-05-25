@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import LoginForm from './LoginForm'
-
+import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 class LoginModal extends Component {
@@ -21,6 +21,7 @@ class LoginModal extends Component {
 
 
   render() {
+    console.log(isMobileSafari, isSafari, isIOS ,'SAF?')
     return (
       <div>
         <div
@@ -44,7 +45,9 @@ class LoginModal extends Component {
                 </button>
               </div>
               <div className="modal-body">
-                <LoginForm/>
+                { !isMobileSafari ? <LoginForm/> :
+                 'Mobile Safari is not fully supported for web apps (like this one) please use' 
+                 + ' Chrome or Firefox instead!'}
               </div>
               <div className="modal-footer">
                 <button
