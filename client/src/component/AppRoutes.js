@@ -10,6 +10,7 @@ import DashSideBar from '../DashBoard/DashSideBar'
 import NutritionDash from '../DashBoard/NutritionDash'
 import TrainingDash from '../DashBoard/TrainingDash'
 import CreatePlanForm from './CreatePlanForm'
+import CreateWorkoutForm from './CreateWorkoutForm'
 
 import Nav from './Nav'
 import keys from '../config/keys'
@@ -17,6 +18,7 @@ import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
 import { Container, Row, Fade } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 
 class AppRoutes extends Component {
   constructor(props) {
@@ -29,6 +31,7 @@ class AppRoutes extends Component {
    
   }
   componentDidMount() {
+    console.log(isMobileSafari, isSafari, isIOS)
     this.props.fetchUser()
     
     
@@ -96,11 +99,12 @@ class AppRoutes extends Component {
 
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        {/* <TrainingDash/> TODO:Finish Component */}
-        <div className='col-md-10 bg-light'>
+        <TrainingDash/> 
+        {/* TODO:Finish Component */}
+        {/* <div className='col-md-10 bg-light'>
         <h3 className='my-5'>This area is under construction, come back soon!</h3>
           <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div>
+        </div> */}
       </Row>
     )
   }
@@ -131,7 +135,7 @@ class AppRoutes extends Component {
       return (
         <Row>
           <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-          <CreatePlanForm />
+          <CreateWorkoutForm />
         </Row>
       )
     else return (

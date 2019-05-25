@@ -154,7 +154,7 @@ class Stats extends Component {
                                 fontSize: 12,
                                 source: 'auto'
                               },
-                              type: "time",
+                              type: 'time',
                               time: {
                                 unit:'month',
                                 min: new Date('4/1/2019'),

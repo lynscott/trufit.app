@@ -13,6 +13,8 @@ const cookieParser = require('cookie-parser')
 require('./models/User')
 require('./models/Plans')
 require('./models/UserProfile')
+require('./models/Workouts')
+require('./models/Exercises')
 const cookieSession = require('cookie-session')
 const requireLogin = require('./middlewares/requireLogin')
 const fs = require('fs')
@@ -29,7 +31,7 @@ const app = express()
 mongoose.Promise = require('bluebird')
 //'mongodb://localhost:27017'
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
-mongoose.model('exercises', new mongoose.Schema())
+// mongoose.model('exercises', new mongoose.Schema())
 
 sgMail.setApiKey(keys.sendGridKey)
 
@@ -37,6 +39,7 @@ const User = mongoose.model('users')
 const Plan = mongoose.model('plans')
 const Exercises = mongoose.model('exercises')
 const UserProfile = mongoose.model('profile')
+const Workout = mongoose.model('workouts')
 
 const localLogin = new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   User.findOne({ email: email }, (err, user) => {
@@ -310,6 +313,23 @@ app.post('/api/new_plan_template', async (req, res) => {
   plan_template = await plan_template.save()
   // req.user.plans.push(plan.id);
   // const user = await req.user.save();
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/new_workout', async (req, res) => {
+  if (!req.user ) {
+    // console.log(req.user)
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { workout } = req.body
+  console.log(workout)
+  let newWorkout = new Workout({
+    type: workout.type,
+    title: workout.title,
+    exercises: workout.list,
+  })
+  await newWorkout.save()
   res.status(200).send('Success')
 })
 
