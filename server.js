@@ -183,6 +183,8 @@ app.use(passport.session())
 
 //START GETS
 
+// fetch_workouts
+
 app.get('/api/plans', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
@@ -199,8 +201,20 @@ app.get('/api/plan_templates', async (req, res, next) => {
 })
 
 app.get('/api/exercises', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
   const exerciseList = await Exercises.find().select('-_id')
   res.send(exerciseList)
+})
+
+app.get('/api/fetch_workouts', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  const workoutList = await Workout.find().select('-_id')
+  // console.log(workoutList, 'Workouts')
+  res.send(workoutList)
 })
 
 app.param('id', async (req, res, next, id) => {
@@ -323,7 +337,7 @@ app.post('/api/new_workout', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   let { workout } = req.body
-  console.log(workout)
+  // console.log(workout)
   let newWorkout = new Workout({
     type: workout.type,
     title: workout.title,
@@ -341,7 +355,7 @@ app.post('/api/update_profile', async (req, res, next) => {
     if (err) return res.send(500, { error: err })
     for (let i = 0; i < keys.length; i++) {
       if (keys[i] === 'nutritionSchedule' || keys[i] === 'weighIns') {
-        console.log("fired??")
+        // console.log("fired??")
         prof[keys[i]].push(req.body[keys[i]])
       } else {
         prof[keys[i]] = req.body[keys[i]]
@@ -396,7 +410,7 @@ app.post('/api/signup', async (req, res, next) => {
   //TEMP Access list check
   // console.log(process.env)
   if (process.env.NODE_ENV) {
-    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com',
+    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'j6quach@gmail.com',
      'ronaldwill94@gmail.com', 'nathanielneal21@gmail.com', 'buckhalterkyrie@gmail.com', 'smithdeidra1@gmail.com']
     if (!preList.includes(email)) {
       return res.status(401).send({ message: 'Hey There! Registration is only open for Beta testing at the moment, come back soon!' })
@@ -521,7 +535,7 @@ app.post('/api/intake/tone', async (req, res) => {
   })
   plan = await plan.save()
   req.user.plans.push(plan.id)
-  const user = await req.user.save()
+  // const user = await req.user.save()
   res.status(200).send(plan)
 })
 

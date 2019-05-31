@@ -11,6 +11,7 @@ import NutritionDash from '../DashBoard/NutritionDash'
 import TrainingDash from '../DashBoard/TrainingDash'
 import CreatePlanForm from './CreatePlanForm'
 import CreateWorkoutForm from './CreateWorkoutForm'
+import AdminPage from './Admin'
 
 import Nav from './Nav'
 import keys from '../config/keys'
@@ -31,7 +32,7 @@ class AppRoutes extends Component {
    
   }
   componentDidMount() {
-    console.log(isMobileSafari, isSafari, isIOS)
+    // console.log(isMobileSafari, isSafari, isIOS)
     this.props.fetchUser()
     
     
@@ -135,7 +136,7 @@ class AppRoutes extends Component {
       return (
         <Row>
           <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-          <CreateWorkoutForm />
+          <AdminPage />
         </Row>
       )
     else return (

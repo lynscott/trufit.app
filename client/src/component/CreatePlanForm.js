@@ -11,15 +11,53 @@ import {
   touch
 } from 'redux-form'
 import { connect } from 'react-redux'
-import { signUpUser, fetchExercises, createNewPlan } from '../actions'
+import { signUpUser, fetchExercises, createNewPlan, fetchWorkouts } from '../actions'
 import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Tooltip, Input, Button, Row, Col, Container } from 'reactstrap'
 import Select from 'react-select'
-import Creatable from 'react-select'
+import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 
 const afterSubmit = (result, dispatch) => dispatch(reset('CreatePlanForm'))
 
+
+// fake data generator
+const getItems = count =>
+  Array.from({ length: count }, (v, k) => k).map(k => ({
+    id: `item-${k}`,
+    content: `item ${k}`,
+  }));
+
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const grid = 8;
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: 'none',
+  padding: grid * 2,
+  margin: `0 ${grid}px 0 0`,
+
+  // change background colour if dragging
+  background: isDragging ? 'lightgreen' : 'grey',
+
+  // styles we need to apply on draggables
+  ...draggableStyle,
+});
+
+const getListStyle = isDraggingOver => ({
+  background: isDraggingOver ? 'lightblue' : 'lightgrey',
+  display: 'flex',
+  padding: grid,
+  overflow: 'auto',
+});
 
 const initialValues = {
     plan:{
@@ -157,12 +195,35 @@ class CreatePlanForm extends Component {
     this.toggle = this.toggle.bind(this)
 
     this.state = {
-      tooltipOpen: false
+      tooltipOpen: false,
+      items: getItems(6),
     }
+
+    this.onDragEnd = this.onDragEnd.bind(this)
+  }
+
+
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      this.state.items,
+      result.source.index,
+      result.destination.index
+    );
+
+    this.setState({
+      items,
+    });
   }
 
   componentDidMount = () => {
     this.props.fetchExercises()
+
+    this.props.fetchWorkouts()
   }
 
   toggle = () => {
@@ -238,65 +299,65 @@ class CreatePlanForm extends Component {
     )
   }
 
-  renderWorkoutArray = ({ fields, meta: { error, submitFailed }, values }) => {
+  // renderWorkoutArray = ({ fields, meta: { error, submitFailed }, values }) => {
 
-    let formatExercises = (exerciseArray) => {
-      let formmated = exerciseArray.map(e => {
-        return {value:e.name, label:e.name.replace(/\b\w/g, l => l.toUpperCase())} 
-      })
+  //   let formatExercises = (exerciseArray) => {
+  //     let formmated = exerciseArray.map(e => {
+  //       return {value:e.name, label:e.name.replace(/\b\w/g, l => l.toUpperCase())} 
+  //     })
 
-      return formmated
-    }
+  //     return formmated
+  //   }
 
-    return (
-      <React.Fragment>
-        {fields.map((workout, index) => (
-          <React.Fragment>
-            <div className="row justify-content-center">
-              <Field
-                placeholder="exercise"
-                name={`${workout}.name`}
-                items ={formatExercises(this.props.exercises)}
-                type="text"
-                component={this.renderWorkoutSelect}
-              />
-              <Field
-                placeholder="reps"
-                name={`${workout}.reps`}
-                type="text"
-                colSize ={'-2'}
-                component={this.renderField}
-              />
-              <Field
-                placeholder="sets"
-                name={`${workout}.sets`}
-                type="text"
-                colSize ={'-2'}
-                component={this.renderField}
-              />
-              <Field
-                placeholder="tempo/note"
-                name={`${workout}.note`}
-                type="text"
-                component={this.renderField}
-              />
-            </div>
-          </React.Fragment>
-        ))}
-        <Row className='justify-content-center'>
-          <Col>
-        <Button
-          className="add-week-button"
-          raised
-          onClick={() => fields.push({})}
-        >
-          Add another exercise
-        </Button>
-        </Col>
-        </Row>
-      </React.Fragment>
-    )
-  };
+  //   return (
+  //     <React.Fragment>
+  //       {fields.map((workout, index) => (
+  //         <React.Fragment>
+  //           <div className="row justify-content-center">
+  //             <Field
+  //               placeholder="exercise"
+  //               name={`${workout}.name`}
+  //               items ={formatExercises(this.props.exercises)}
+  //               type="text"
+  //               component={this.renderWorkoutSelect}
+  //             />
+  //             <Field
+  //               placeholder="reps"
+  //               name={`${workout}.reps`}
+  //               type="text"
+  //               colSize ={'-2'}
+  //               component={this.renderField}
+  //             />
+  //             <Field
+  //               placeholder="sets"
+  //               name={`${workout}.sets`}
+  //               type="text"
+  //               colSize ={'-2'}
+  //               component={this.renderField}
+  //             />
+  //             <Field
+  //               placeholder="tempo/note"
+  //               name={`${workout}.note`}
+  //               type="text"
+  //               component={this.renderField}
+  //             />
+  //           </div>
+  //         </React.Fragment>
+  //       ))}
+  //       <Row className='justify-content-center'>
+  //         <Col>
+  //       <Button
+  //         className="add-week-button"
+  //         raised
+  //         onClick={() => fields.push({})}
+  //       >
+  //         Add another exercise
+  //       </Button>
+  //       </Col>
+  //       </Row>
+  //     </React.Fragment>
+  //   )
+  // }
 
   renderDayType = fields => {
     
@@ -577,7 +638,7 @@ class CreatePlanForm extends Component {
   }
 
   render() {
-    // console.log(this.props.values.plan)
+    console.log(this.props)
     const { handleSubmit } = this.props
 
     return (
@@ -611,7 +672,39 @@ class CreatePlanForm extends Component {
           />
         </div>
 
-        <FieldArray name="plan.weeks" component={this.renderWeeksFields} />
+        <label>Track One:</label>
+        <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId="droppable" direction="horizontal">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+              {...provided.droppableProps}
+            >
+              {this.state.items.map((item, index) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      {item.content}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+        {/* <FieldArray name="plan.weeks" component={this.renderWeeksFields} /> */}
 
         <Button type="submit" className="btn btn-outline-primary mt-4">
           Submit
@@ -644,7 +737,8 @@ function validate(values) {
 const mapStateToProps = state => {
   return {
     values: getFormValues('CreatePlanForm')(state),
-    exercises: state.admin.exercises
+    exercises: state.admin.exercises,
+    workouts: state.admin.workouts
   }
 }
 
@@ -656,6 +750,6 @@ export default reduxForm({
 })(
   connect(
     mapStateToProps,
-    { signUpUser, fetchExercises, createNewPlan }
+    { signUpUser, fetchExercises, createNewPlan, fetchWorkouts }
   )(CreatePlanForm)
 )

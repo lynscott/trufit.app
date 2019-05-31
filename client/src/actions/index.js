@@ -1,6 +1,6 @@
 import axios from 'axios'
 import ndb from 'nutrient-database'
-import Alert from 'react-s-alert'
+// import Alert from 'react-s-alert'
 
 export const TYPE_SELECTED = 'type_selected'
 export const PLAN_SELECTED = 'plan_selected'
@@ -27,6 +27,8 @@ export const RESET_SIGNUP_FAIL = 'RESET_SIGNUP_FAIL'
 export const WEEKLY_CHECKIN = 'WEEKLY_CHECKIN'
 export const NEW_WORKOUT_SUCCESS = 'NEW_WORKOUT_SUCCESS'
 export const NEW_WORKOUT_FAILED = 'NEW_WORKOUT_FAILED'
+export const FETCH_WORKOUTS = 'FETCH_WORKOUTS'
+
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
@@ -255,7 +257,7 @@ export const foodSelect = (foodID) => async dispatch => {
   }
 
   ndb.foodReport(foodID ,API_KEY,(err, response) => {
-    console.log(response)
+    // console.log(response)
     dispatch({type:FOOD_SELECTED, payload:parseFood(response.foods)})
   })
 }
@@ -267,14 +269,12 @@ export const fetchProfile = () => async dispatch => {
 }
 
 export const updateProfile = (values) => async dispatch => {
-  // console.log(values, 'fired')
   let res = await axios.post('/api/update_profile', values)
 
   dispatch({ type: UPDATE_PROFILE, payload:res.data  })
 }
 
 export const updateFoodItem = (values) => async dispatch => {
-  console.log(values)
   let res = await axios.post('/api/update_food_item', values)
 
   dispatch({ type: UPDATE_PROFILE, payload:res.data  })
@@ -290,4 +290,10 @@ export const saveMealTime = (values) => async dispatch => {
 export const resetSignUpFail = () => dispatch => {
 
   dispatch({ type: RESET_SIGNUP_FAIL  })
+}
+
+export const fetchWorkouts = () => async dispatch => {
+  let res = await axios.get('/api/fetch_workouts')
+
+  dispatch({ type: FETCH_WORKOUTS, payload:res.data })
 }
