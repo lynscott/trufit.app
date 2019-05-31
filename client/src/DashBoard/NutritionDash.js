@@ -348,10 +348,6 @@ class NutritionDash extends Component {
     ).toFixed(2)
     newRow.serving = newValue
 
-    // await this.props.updateFoodItem({
-    //   index: this.state.index,
-    //   replace: newRow
-    // })
     this.setState({ rowSelected: false })
     this.calculateTotals()
   }

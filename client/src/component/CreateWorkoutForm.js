@@ -11,7 +11,7 @@ import {
   touch
 } from 'redux-form'
 import { connect } from 'react-redux'
-import { signUpUser, fetchExercises, createNewWorkout } from '../actions'
+import { signUpUser, fetchExercises, createNewWorkout, fetchWorkouts } from '../actions'
 import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Tooltip, Input, Button, Row, Col, Container } from 'reactstrap'
@@ -35,12 +35,21 @@ class CreateWorkoutForm extends Component {
     this.props.fetchExercises()
   }
 
+  
+  // workoutCards = (workouts) => {
+    
+  //   return(
+
+  //   )
+  // }
+
   renderSelectField = field => {
     const className = `form-control ${
       field.meta.touched && field.meta.error ? 'is-invalid' : ''
     }`
     return (
-      <div className="form-group col-md-3">
+      <div className="form-group col-md-4">
+        <label>{'Exercise Category'}</label>
         <select
           width="100%"
           value="lift"
@@ -56,8 +65,8 @@ class CreateWorkoutForm extends Component {
         >
           <option value="lift">Strength Training</option>
           <option value="cardio">Aerobic</option>
-          <option value="none">HIIT</option>
-          <option value="none">Recovery</option>
+          <option value="hitt">HIIT</option>
+          <option value="recovery">Recovery</option>
         </select>
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
@@ -96,15 +105,18 @@ class CreateWorkoutForm extends Component {
 
   renderWorkoutSelect = field => {
     return (
-      <Select
-        options={field.items}
-        className="workout-selector__field form-group col-md-4"
-        classNamePrefix="workout-selector"
-        onChange={value => {
-          console.log(value)
-          field.input.onChange(value.label)
-        }}
-      />
+      <>
+        <label>{'Exercise'}</label>
+        <Select
+          options={field.items}
+          className="workout-selector__field form-group col-md-10"
+          classNamePrefix="workout-selector"
+          onChange={value => {
+            // console.log(value)
+            field.input.onChange(value.label)
+          }}
+        />
+      </>
     )
   }
 
@@ -114,6 +126,7 @@ class CreateWorkoutForm extends Component {
     }`
     return (
       <div className="form-group col ">
+        <label>{field.label}</label>
         <input
           placeholder={field.placeholder}
           className={className}
@@ -129,12 +142,11 @@ class CreateWorkoutForm extends Component {
   }
 
   renderWorkoutList = ({ fields, meta: { error, submitFailed }, values }) => {
-    console.log(this.props.values)
+    // console.log(this.props.values)
     return (
-      <Col md="10">
+      <Col md="12">
         {fields.map((workout, index) => (
-          <React.Fragment>
-            <div className="row justify-content-center">
+            <div className="row justify-content-center my-3">
               <Field
                 placeholder="exercise"
                 name={`${workout}.name`}
@@ -149,25 +161,28 @@ class CreateWorkoutForm extends Component {
                 component={this.renderSelectField}
               />
               <Field
-                placeholder="sets"
+                // placeholder="sets"
                 name={`${workout}.sets`}
                 type="text"
                 component={this.renderField}
+                label={'Sets'}
               />
               <Field
-                placeholder="reps"
+                // placeholder="reps"
                 name={`${workout}.reps`}
                 type="text"
                 component={this.renderField}
+                label={'Reps'}
               />
               <Field
-                placeholder="tempo/note"
+                // placeholder="tempo/note"
                 name={`${workout}.note`}
                 type="text"
                 component={this.renderField}
+                label={'Note'}
               />
+              <hr style={{width:'100%'}}/>
             </div>
-          </React.Fragment>
         ))}
         <Row className="justify-content-center">
           <Col>
@@ -206,23 +221,23 @@ class CreateWorkoutForm extends Component {
 
     return (
       <form
-        className="p-4 bg-light col-md-10"
+        className="p-1 bg-light col-md-12"
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >
         {/* <FontAwesomeIcon icon="user-plus" size={'3x'} /> */}
-        <h2>Create New Workout </h2>
+        {/* <h2>Create New Workout </h2> */}
         <div className="row justify-content-center">
-          <Col md="3">
-            <label>{'Workout Title'}</label>
+          <Col md="5">
             <Field
-              placeholder="Title"
+              // placeholder="Title"
               name="workout.title"
               type="text"
               component={this.renderField}
+              label={'Workout Name'}
             />
           </Col>
-          <Col md="3">
+          <Col md="5">
             <Field
               placeholder="Type"
               name="workout.type"
@@ -249,7 +264,7 @@ class CreateWorkoutForm extends Component {
 const mapStateToProps = state => {
   return {
     values: getFormValues('CreateWorkoutForm')(state),
-    exercises: state.admin.exercises
+    exercises: state.admin.exercises,
   }
 }
 

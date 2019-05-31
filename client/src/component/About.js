@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 // import logo from '../img/about_logo.png';
-import Footer from './Footer';
+import Footer from './Footer'
 
 class About extends Component {
   render() {
@@ -133,8 +133,8 @@ class About extends Component {
 
         <Footer />
       </div>
-    );
+    )
   }
 }
 
-export default About;
+export default About

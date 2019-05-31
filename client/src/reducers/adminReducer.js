@@ -1,7 +1,8 @@
-import {FETCH_EXERCISES} from '../actions'
+import {FETCH_EXERCISES, FETCH_WORKOUTS} from '../actions'
 
 const initialState = {
     exercises: [],
+    workouts:[]
     // errorMessage: null,
     // user: null
   }
@@ -12,6 +13,11 @@ export default function(state = initialState, action) {
     return {
         ...state,
         exercises:action.payload
+    }
+  case FETCH_WORKOUTS:
+    return {
+        ...state,
+        workouts:action.payload
     }
   default:
     return state
