@@ -17,9 +17,8 @@ import createRootReducer from './reducers'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserCircle, faUserPlus, faInfoCircle, faTools } from '@fortawesome/free-solid-svg-icons'
 
-import { combineReducers } from 'redux'
-import { connectRouter } from 'connected-react-router'
 import { ConnectedRouter } from 'connected-react-router'
+import * as registerServiceWorker  from './registerServiceWorker'
  
 export const history = createBrowserHistory()
 
@@ -45,3 +44,4 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 )
+registerServiceWorker.register()
