@@ -410,7 +410,7 @@ app.post('/api/signup', async (req, res, next) => {
   //TEMP Access list check
   // console.log(process.env)
   if (process.env.NODE_ENV) {
-    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'j6quach@gmail.com',
+    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'j6quach@gmail.com', 'terencegfit@gmail.com',
      'ronaldwill94@gmail.com', 'nathanielneal21@gmail.com', 'buckhalterkyrie@gmail.com', 'smithdeidra1@gmail.com']
     if (!preList.includes(email)) {
       return res.status(401).send({ message: 'Hey There! Registration is only open for Beta testing at the moment, come back soon!' })

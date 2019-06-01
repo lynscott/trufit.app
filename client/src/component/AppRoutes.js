@@ -100,12 +100,12 @@ class AppRoutes extends Component {
 
       <Row>
         <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <TrainingDash/> 
+        {/* <TrainingDash/>  */}
         {/* TODO:Finish Component */}
-        {/* <div className='col-md-10 bg-light'>
+        <div className='col-md-10 bg-light'>
         <h3 className='my-5'>This area is under construction, come back soon!</h3>
           <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div> */}
+        </div>
       </Row>
     )
   }
