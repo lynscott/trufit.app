@@ -98,11 +98,13 @@ class ClientRoll extends Component {
             style={{borderRadius:'5px'}}
             >
                 <div>
-                    <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/adam2.jpg'} />
+                    <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/adam2.webp'}
+                      srcSet={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/adam2.webp, https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/adam2.jpg'} />
                     <p className="legend">Adam F. - Down 70lbs</p>
                 </div>
                 <div>
-                    <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/david.png'} />
+                  <img src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/david.webp'} 
+                    srcSet={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/david.webp, https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/david.png'}/>
                     <p className="legend">David S. - Down 80lbs</p>
                 </div>
                 {/* <div>
