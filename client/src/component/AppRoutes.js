@@ -1,13 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component, Suspense, lazy } from 'react'
 import { Route, withRouter, Switch, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import '../index.css'
 import App from './App'
-import About from './About'
+// import About from './About'
 import Dashboard from '../DashBoard/Dashboard'
 import DashRoutes from '../DashBoard/DashRoutes'
 import DashSideBar from '../DashBoard/DashSideBar'
-import NutritionDash from '../DashBoard/NutritionDash'
+// import NutritionDash from '../DashBoard/NutritionDash'
 import TrainingDash from '../DashBoard/TrainingDash'
 import CreatePlanForm from './CreatePlanForm'
 import CreateWorkoutForm from './CreateWorkoutForm'
@@ -17,9 +17,17 @@ import Nav from './Nav'
 import keys from '../config/keys'
 import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
-import { Container, Row, Fade } from 'reactstrap'
+import { Container, Row, Fade, Spinner } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
+
+const Home = lazy(() => import('./App'))
+const About = lazy(() => import('./About'))
+const SideBar = lazy(() => import('../DashBoard/DashSideBar'))
+const Dash = lazy(() => import('../DashBoard/Dashboard'))
+const NutritionDash = lazy(() => import('../DashBoard/NutritionDash'))
+const Admin = lazy(() => import('./Admin'))
+
 
 class AppRoutes extends Component {
   constructor(props) {
@@ -88,7 +96,7 @@ class AppRoutes extends Component {
   renderNutrition = () => {
     return (
       <Row>
-        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <NutritionDash/>
       </Row>
     )
@@ -99,7 +107,7 @@ class AppRoutes extends Component {
       // <DeviceOverview/>
 
       <Row>
-        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         {/* <TrainingDash/>  */}
         {/* TODO:Finish Component */}
         <div className='col-md-10 bg-light'>
@@ -113,7 +121,7 @@ class AppRoutes extends Component {
   renderAccountSettings = () => {
     return (
       <Row>
-        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
           <h3 className='my-5'>This area is under construction, come back soon!</h3>
           <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
@@ -125,8 +133,8 @@ class AppRoutes extends Component {
   renderOverview = () => {
     return (
       <Row>
-        <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <Dashboard />
+        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        <Dash />
       </Row>
     )
   }
@@ -135,13 +143,13 @@ class AppRoutes extends Component {
     if ( this.props.userProfile.isAdmin)
       return (
         <Row>
-          <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
-          <AdminPage />
+          <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+          <Admin />
         </Row>
       )
     else return (
           <Row>
-          <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+          <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
             <h3 className='my-5'>Forbidden Area. Back Away Slowly.</h3>
             <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
@@ -171,6 +179,7 @@ class AppRoutes extends Component {
           <Nav className="navbar" />
         </Fade>
         : null}
+        <Suspense fallback={<Spinner color="primary" />}>
         <Switch>
           {/* <Route exact path="/about" component={About} /> */}
           {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
@@ -215,8 +224,9 @@ class AppRoutes extends Component {
                     path="/startplan/tone/:userid"
                     component={StartTonePlan}
                 /> */}
-          <Route exact path="/" component={App} />
+          <Route exact path="/" component={Home} />
         </Switch>
+        </Suspense>
       </Container>
     )
   }
