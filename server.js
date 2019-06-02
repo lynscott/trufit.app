@@ -28,6 +28,7 @@ const freePlanTemplate = require('./services/freePlanTemplate')
 const trainingTemplate = require('./services/trainingTemplate')
 const welcomeTemplate = require('./services/welcomeTemplate')
 const compression = require('compression')
+const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 mongoose.Promise = require('bluebird')
 //'mongodb://localhost:27017'
@@ -168,6 +169,8 @@ passport.use(
   )
 )
 
+// Don't redirect if the hostname is `localhost:port` or the route is `/insecure`
+app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [/\/insecure/], 301))
 app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
