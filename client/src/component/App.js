@@ -169,8 +169,8 @@ class App extends Component {
               <Fade left>
                 <img
                   className="d-block w-100 img-fluid rounded"
-                  src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/dashboard.gif'}
-                  alt="gif"
+                  src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/dash_prev.webp'}
+                  alt="img of dash"
                 />
               </Fade>
             </div>
