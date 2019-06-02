@@ -20,13 +20,34 @@ import * as actions from '../actions'
 import { Container, Row, Fade, Spinner } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
+import Loadable from 'react-loadable'
 
-const Home = lazy(() => import('./App'))
+// const LoadableComponent = Loadable({
+//   loader: () => import('./my-component'),
+//   loading: Loading,
+//   timeout: 5000
+// })
+const loaderCircle = (props) => {
+  if (props.error) {
+      console.log(props)
+      return <div>Error! <button onClick={props.retry}>Retry</button></div>
+  } else {
+      return <Spinner color="primary" />
+  }
+}
+
+const loadFromPath = (loaderCallBack) => Loadable({
+  loader: loaderCallBack,
+  loading: loaderCircle,
+  timeout: 5000
+})
+
+const Home = loadFromPath(() => import('./App'))
 const About = lazy(() => import('./About'))
-const SideBar = lazy(() => import('../DashBoard/DashSideBar'))
-const Dash = lazy(() => import('../DashBoard/Dashboard'))
-const NutritionDash = lazy(() => import('../DashBoard/NutritionDash'))
-const Admin = lazy(() => import('./Admin'))
+const SideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
+const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
+const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
+const Admin = loadFromPath(() => import('./Admin'))
 
 
 class AppRoutes extends Component {
@@ -179,7 +200,6 @@ class AppRoutes extends Component {
           <Nav className="navbar" />
         </Fade>
         : null}
-        <Suspense fallback={<Spinner color="primary" />}>
         <Switch>
           {/* <Route exact path="/about" component={About} /> */}
           {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
@@ -226,7 +246,6 @@ class AppRoutes extends Component {
                 /> */}
           <Route exact path="/" component={Home} />
         </Switch>
-        </Suspense>
       </Container>
     )
   }
