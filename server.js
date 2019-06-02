@@ -27,6 +27,7 @@ const emailTemplate = require('./services/emailTemplate')
 const freePlanTemplate = require('./services/freePlanTemplate')
 const trainingTemplate = require('./services/trainingTemplate')
 const welcomeTemplate = require('./services/welcomeTemplate')
+const compression = require('compression')
 const app = express()
 mongoose.Promise = require('bluebird')
 //'mongodb://localhost:27017'
@@ -167,6 +168,7 @@ passport.use(
   )
 )
 
+app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
 app.use(bodyParser.json())
