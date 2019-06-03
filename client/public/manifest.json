@@ -1,5 +1,5 @@
 {
-  "short_name": "LS_Fitness",
+  "short_name": "LS Fitness",
   "name": "LS Fitness",
   "icons": [
     {
@@ -13,7 +13,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
