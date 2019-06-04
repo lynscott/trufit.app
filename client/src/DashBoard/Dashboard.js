@@ -5,6 +5,7 @@ import * as actions from '../actions'
 import classnames from 'classnames'
 import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
+import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
 // import CreatePlanForm from './CreatePlanForm'
 import {
@@ -117,7 +118,8 @@ class Dashboard extends Component {
       dropOpen: false,
       currentGoal: 'No Goal Selected',
       updateMessage: 'Testing',
-      update: false
+      update: false,
+      assessment: false
     }
   }
 
@@ -245,6 +247,7 @@ class Dashboard extends Component {
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
+        {this.state.assessment? <PoseNet/> : null}
         <Card>
           <CardHeader>Recommended Macros</CardHeader>
           <CardSubtitle className="pt-2">
@@ -348,7 +351,9 @@ class Dashboard extends Component {
         </p> */}
         <Row>
           <Col>
-            {/* <Button>Add Accountability Partner</Button> */}
+           {this.props.user.isAdmin? 
+           <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button>
+           : null}
           </Col>
         </Row>
       </Jumbotron>
