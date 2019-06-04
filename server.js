@@ -31,8 +31,8 @@ const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 mongoose.Promise = require('bluebird')
-mongoose.connect('mongodb://localhost:27017')
-// mongoose.connect(keys.mongoURI, { useMongoClient: true })
+// mongoose.connect('mongodb://localhost:27017')
+mongoose.connect(keys.mongoURI, { useMongoClient: true })
 // mongoose.model('exercises', new mongoose.Schema())
 
 sgMail.setApiKey(keys.sendGridKey)
