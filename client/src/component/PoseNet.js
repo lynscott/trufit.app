@@ -5,8 +5,8 @@ import './PoseNet.scss'
 
 class PoseNet extends Component {
   static defaultProps = {
-    videoWidth: 900,
-    videoHeight: 700,
+    videoWidth: 400,
+    videoHeight: window.innerHeight/2,
     flipHorizontal: true,
     algorithm: 'single-pose',
     showVideo: true,
@@ -61,7 +61,6 @@ class PoseNet extends Component {
 
   async setupCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        return false
       throw new Error(
         'Browser API navigator.mediaDevices.getUserMedia not available'
       )
@@ -190,7 +189,7 @@ class PoseNet extends Component {
   render() {
     return (
       <div>
-        <div>
+        <div style={{paddingTop:0}} className="embed-responsive embed-responsive-21by9">
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
         </div>
