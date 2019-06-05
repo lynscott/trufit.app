@@ -247,7 +247,14 @@ class Dashboard extends Component {
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
-        {this.state.assessment? <PoseNet/> : null}
+      
+      {this.state.assessment?
+        <Card inverse color="primary">
+          <CardHeader>Assessment</CardHeader>
+           <PoseNet/>
+        </Card>
+        : null}
+        
         <Card>
           <CardHeader>Recommended Macros</CardHeader>
           <CardSubtitle className="pt-2">
@@ -351,9 +358,9 @@ class Dashboard extends Component {
         </p> */}
         <Row>
           <Col>
-           {this.props.user.isAdmin? 
+           {/* {this.props.user.isAdmin?  */}
            <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button>
-           : null}
+           {/* : null} */}
           </Col>
         </Row>
       </Jumbotron>
