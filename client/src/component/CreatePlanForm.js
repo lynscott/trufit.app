@@ -25,19 +25,19 @@ const afterSubmit = (result, dispatch) => dispatch(reset('CreatePlanForm'))
 const getItems = count =>
   Array.from({ length: count }, (v, k) => k).map(k => ({
     id: `item-${k}`,
-    content: `item ${k}`,
-  }));
+    title: `item ${k}`,
+  }))
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
 
-  return result;
-};
+  return result
+}
 
-const grid = 8;
+const grid = 8
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
@@ -50,143 +50,33 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
   // styles we need to apply on draggables
   ...draggableStyle,
-});
+  position:'initial',
+
+})
 
 const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   display: 'flex',
   padding: grid,
-  overflow: 'auto',
-});
+  overflow: 'visible',
+  minHeight: '75px',
+})
 
-const initialValues = {
-    plan:{
-        weeks:[{
-            day:{
-                mon:{
-                  type:null, 
-                  val:false,
-                  
 
-                },
-                tue:{
-                  type:null, 
-                  val:false,
-                  
-                },
-                wed:{
-                  type:null, 
-                  val:false,
-                  
-                },
-                thu:{
-                  type:null, 
-                  val:false,
-                  
-                },
-                fri:{
-                  type:null, 
-                  val:false,
-                  
-                },
-                sat:{
-                  type:null, 
-                  val:false,
-                  
-                },
-                sun:{
-                  type:null, 
-                  val:false,
-                  
-                }
-            }
-        }]
-    }
+const move = (source, destination, droppableSource, droppableDestination) => {
+  const sourceClone = Array.from(source)
+  const destClone = Array.from(destination)
+  const [removed] = sourceClone.splice(droppableSource.index, 1)
+
+  destClone.splice(droppableDestination.index, 0, removed)
+
+  const result = {}
+  result[droppableSource.droppableId] = sourceClone
+  result[droppableDestination.droppableId] = destClone
+  return result
 }
 
-const initWorkout = {
-    workout:{
-      name:null,
-      reps:null,
-      sets:null,
-      note:null
-    }
-}
 
-const initWeek = {
-  day:{
-      mon:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      tue:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      wed:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      thu:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      fri:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      sat:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      },
-      sun:{
-        type:null, 
-        val:false,
-        workout:[{
-          name:null,
-          reps:null,
-          sets:null,
-          note:null
-        }]
-      }
-  }
-}
 
 class CreatePlanForm extends Component {
   constructor(props) {
@@ -196,28 +86,64 @@ class CreatePlanForm extends Component {
 
     this.state = {
       tooltipOpen: false,
-      items: getItems(6),
+      items: this.props.workouts,
+      selected: []
     }
 
     this.onDragEnd = this.onDragEnd.bind(this)
   }
 
 
+  /**
+     * A semi-generic way to handle multiple lists. Matches
+     * the IDs of the droppable container to the names of the
+     * source arrays stored in the state.
+     */
+    id2List = {
+      droppable: 'items',
+      droppable2: 'selected'
+  };
+
+  getList = id => this.state[this.id2List[id]];
+
+
   onDragEnd(result) {
     // dropped outside the list
-    if (!result.destination) {
-      return;
+    const { source, destination } = result
+
+    // dropped outside the list
+    if (!destination) {
+        return
     }
+    console.log(destination)
 
-    const items = reorder(
-      this.state.items,
-      result.source.index,
-      result.destination.index
-    );
+    if (source.droppableId === destination.droppableId) {
+        const items = reorder(
+            this.getList(source.droppableId),
+            source.index,
+            destination.index
+        )
 
-    this.setState({
-      items,
-    });
+        let state = { items }
+
+        if (source.droppableId === 'droppable2') {
+            state = { selected: items }
+        }
+
+        this.setState(state)
+    } else {
+        const result = move(
+            this.getList(source.droppableId),
+            this.getList(destination.droppableId),
+            source,
+            destination
+        )
+
+        this.setState({
+            items: result.droppable,
+            selected: result.droppable2
+        })
+    }
   }
 
   componentDidMount = () => {
@@ -229,7 +155,7 @@ class CreatePlanForm extends Component {
   toggle = () => {
     console.log('tooltip hover')
     this.setState({ tooltipOpen: !this.state.tooltipOpen })
-  };
+  }
 
   renderField(field) {
     const className = `form-control ${
@@ -299,65 +225,6 @@ class CreatePlanForm extends Component {
     )
   }
 
-  // renderWorkoutArray = ({ fields, meta: { error, submitFailed }, values }) => {
-
-  //   let formatExercises = (exerciseArray) => {
-  //     let formmated = exerciseArray.map(e => {
-  //       return {value:e.name, label:e.name.replace(/\b\w/g, l => l.toUpperCase())} 
-  //     })
-
-  //     return formmated
-  //   }
-
-  //   return (
-  //     <React.Fragment>
-  //       {fields.map((workout, index) => (
-  //         <React.Fragment>
-  //           <div className="row justify-content-center">
-  //             <Field
-  //               placeholder="exercise"
-  //               name={`${workout}.name`}
-  //               items ={formatExercises(this.props.exercises)}
-  //               type="text"
-  //               component={this.renderWorkoutSelect}
-  //             />
-  //             <Field
-  //               placeholder="reps"
-  //               name={`${workout}.reps`}
-  //               type="text"
-  //               colSize ={'-2'}
-  //               component={this.renderField}
-  //             />
-  //             <Field
-  //               placeholder="sets"
-  //               name={`${workout}.sets`}
-  //               type="text"
-  //               colSize ={'-2'}
-  //               component={this.renderField}
-  //             />
-  //             <Field
-  //               placeholder="tempo/note"
-  //               name={`${workout}.note`}
-  //               type="text"
-  //               component={this.renderField}
-  //             />
-  //           </div>
-  //         </React.Fragment>
-  //       ))}
-  //       <Row className='justify-content-center'>
-  //         <Col>
-  //       <Button
-  //         className="add-week-button"
-  //         raised
-  //         onClick={() => fields.push({})}
-  //       >
-  //         Add another exercise
-  //       </Button>
-  //       </Col>
-  //       </Row>
-  //     </React.Fragment>
-  //   )
-  // }
 
   renderDayType = fields => {
     
@@ -494,111 +361,7 @@ class CreatePlanForm extends Component {
     )
   };
 
-  renderWeeksFields = ({ fields, meta: { error, submitFailed }, values }) => {
-    // let dayType = this.props.values.plan.weeks[field.index].day[field.label.toLowerCase()].type
-    return (
-      <React.Fragment>
-        {fields.map((week, index) => (
-          <React.Fragment>
-            <h2>Week {index+1}</h2>
-            <Field
-              id={`mon-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.mon.val`}
-              className="weekday-checkbox"
-              index={index}
-              component={this.renderDayCheckbox}
-              labelBefore
-              dayType={this.props.values.plan.weeks[index].day['mon'].type}
-              label={'Mon'}
-            />
-            <Field
-              id={`tue-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.tue.val`}
-              className="weekday-checkbox"
-              index={index}
-              component={this.renderDayCheckbox}
-              labelBefore
-              dayType={this.props.values.plan.weeks[index].day['tue'].type}
-              label={'Tue'}
-            />
-            <Field
-              id={`wed-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.wed.val`}
-              className="weekday-checkbox"
-              index={index}
-              component={this.renderDayCheckbox}
-              labelBefore
-              dayType={this.props.values.plan.weeks[index].day['wed'].type}
-              label={'Wed'}
-            />
-            <Field
-              id={`thu-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.thu.val`}
-              className="weekday-checkbox"
-              index={index}
-              component={this.renderDayCheckbox}
-              labelBefore
-              dayType={this.props.values.plan.weeks[index].day['thu'].type}
-              label={'Thu'}
-            />
-            <Field
-              id={`fri-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.fri.val`}
-              className="weekday-checkbox"
-              index={index}
-              dayType={this.props.values.plan.weeks[index].day['fri'].type}
-              component={this.renderDayCheckbox}
-              labelBefore
-              label={'Fri'}
-            />
-            <Field
-              id={`sat-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.sat.val`}
-              className="weekday-checkbox"
-              index={index}
-              dayType={this.props.values.plan.weeks[index].day['sat'].type}
-              component={this.renderDayCheckbox}
-              labelBefore
-              label={'Sat'}
-            />
-            <Field
-              id={`sun-select-${index}`}
-              placeholder="example"
-              type="checkbox"
-              name={`${week}.day.sun.val`}
-              className="weekday-checkbox"
-              index={index}
-              dayType={this.props.values.plan.weeks[index].day['sun'].type}
-              component={this.renderDayCheckbox}
-              labelBefore
-              label={'Sun'}
-            />
-          </React.Fragment>
-        ))}
-        <Row className='justify-content-center'>
-        <Button
-          className="add-week-button col-3 m-3"
-          raised
-          onClick={() => fields.push(initWeek)}
-        >
-          Add another week
-        </Button>
-        </Row>
-      </React.Fragment>
-    )
-  };
+
 
   async onSubmit(values) {
     // console.log(values)
@@ -638,7 +401,7 @@ class CreatePlanForm extends Component {
   }
 
   render() {
-    console.log(this.props)
+    console.log(this.props, 'PROPS')
     const { handleSubmit } = this.props
 
     return (
@@ -672,9 +435,9 @@ class CreatePlanForm extends Component {
           />
         </div>
 
-        <label>Track One:</label>
         <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="droppable" direction="horizontal">
+        <label>Track One:</label>
+        <Droppable droppableId="droppable" direction="horizontal" >
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -682,7 +445,8 @@ class CreatePlanForm extends Component {
               {...provided.droppableProps}
             >
               {this.state.items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
+                // console.log(item)
+                <Draggable key={item.title} draggableId={index+item.title} index={index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
@@ -693,7 +457,7 @@ class CreatePlanForm extends Component {
                         provided.draggableProps.style
                       )}
                     >
-                      {item.content}
+                      {item.title}
                     </div>
                   )}
                 </Draggable>
@@ -702,9 +466,37 @@ class CreatePlanForm extends Component {
             </div>
           )}
         </Droppable>
+        <label>Track Two:</label>
+        <Droppable droppableId="droppable2" direction="horizontal">
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}>
+                    {this.state.selected.map((item, index) => (
+                        <Draggable
+                            key={item.title}
+                            draggableId={index+item.title}
+                            index={index}>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={getItemStyle(
+                                        snapshot.isDragging,
+                                        provided.draggableProps.style
+                                    )}>
+                                    {item.title}
+                                </div>
+                            )}
+                        </Draggable>
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
       </DragDropContext>
 
-        {/* <FieldArray name="plan.weeks" component={this.renderWeeksFields} /> */}
 
         <Button type="submit" className="btn btn-outline-primary mt-4">
           Submit
@@ -746,7 +538,7 @@ export default reduxForm({
   //   validate,
   form: 'CreatePlanForm',
   // onSubmitSuccess: afterSubmit,
-  initialValues
+  // initialValues
 })(
   connect(
     mapStateToProps,
