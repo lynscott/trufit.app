@@ -315,8 +315,8 @@ class Dashboard extends Component {
         <Card inverse color="danger">
           <CardHeader>Caloric Intake Tracking</CardHeader>
 
-          <BarChart 
-            display={this.props.windowWidth < 500 ? false : true} 
+          <BarChart
+            display={this.props.windowWidth < 500 ? false : true}
             calories={this.props.profile.calories}
             planned={this.props.profile.nutritionCalories}
             />
@@ -362,6 +362,11 @@ class Dashboard extends Component {
            <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button>
            {/* : null} */}
           </Col>
+          <Col>
+           {/* {this.props.user.isAdmin?  */}
+           <Button color='info' onClick={()=> this.setState({assessment:false})}>End Assessment</Button>
+           {/* : null} */}
+          </Col>
         </Row>
       </Jumbotron>
       // </Row>
@@ -376,7 +381,8 @@ class Dashboard extends Component {
         style={{
           paddingTop: '10px',
           maxHeight: this.props.windowWidth < 500 ? '80vh' : null,
-          overflowY: this.props.windowWidth < 500 ? 'scroll' : null
+          overflowY: 'scroll',
+          height: '100vh'
         }}
         md="10"
       >
