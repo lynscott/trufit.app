@@ -116,10 +116,8 @@ class AppRoutes extends Component {
 
   renderNutrition = () => {
     return (
-      <Row>
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+      
         <NutritionDash/>
-      </Row>
     )
   }
 
@@ -127,55 +125,55 @@ class AppRoutes extends Component {
     return (
       // <DeviceOverview/>
 
-      <Row>
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        {/* <TrainingDash/>  */}
-        {/* TODO:Finish Component */}
+      // <Row>
+      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        // {/* <TrainingDash/>  */}
+        // {/* TODO:Finish Component */}
         <div className='col-md-10 bg-light'>
         <h3 className='my-5'>This area is under construction, come back soon!</h3>
           <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
         </div>
-      </Row>
+      // </Row>
     )
   }
 
   renderAccountSettings = () => {
     return (
-      <Row>
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+      // <Row>
+      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
           <h3 className='my-5'>This area is under construction, come back soon!</h3>
           <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
         </div>
-      </Row>
+      // </Row>
     )
   }
 
   renderOverview = () => {
     return (
-      <Row>
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+      // <Row>
+      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         <Dash />
-      </Row>
+     // {/* </Row> */}
     )
   }
 
   renderAdmin = () => {
     if ( this.props.userProfile.isAdmin)
       return (
-        <Row>
-          <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+     //   <Row>
+     //     <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <Admin />
-        </Row>
+      //  </Row>
       )
     else return (
-          <Row>
-          <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+          // <Row>
+          // <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
             <h3 className='my-5'>Forbidden Area. Back Away Slowly.</h3>
             <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
           </div>
-        </Row>
+        // {/* </Row> */}
         )
   }
 
@@ -200,52 +198,44 @@ class AppRoutes extends Component {
           <Nav className="navbar" />
         </Fade>
         : null}
-        <Switch>
-          {/* <Route exact path="/about" component={About} /> */}
-          {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
-          {/* <Route path="/training" component={OnlineTraining} /> */}
-          <Route
-            exact
-            path="/dashboard/:userid/plan/:id"
-            component={ShowPlan}
-          />
+        <Row style={{margin:0}}>
+        { window.location.pathname.includes('dashboard') ? 
+        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+        : null}
+        
+          <Switch>
+            {/* <Route exact path="/about" component={About} /> */}
+            {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
+            {/* <Route path="/training" component={OnlineTraining} /> */}
+            <Route
+              exact
+              path="/dashboard/:userid/plan/:id"
+              component={ShowPlan}
+            />
 
-          <Route exact path="/dashboard/overview" render={this.renderDash} />
-          {/* <Route exact path='/n/admin/dashboard' render={this.renderDashboard} /> */}
-          <Route exact path="/dashboard/plans" render={this.renderPlans} />
+            <Route exact path="/dashboard/overview" render={this.renderDash} />
+            {/* <Route exact path='/n/admin/dashboard' render={this.renderDashboard} /> */}
+            <Route exact path="/dashboard/plans" render={this.renderPlans} />
 
-          <Route
-            exact
-            path="/dashboard/nutrition"
-            render={this.renderNutrition}
-          />
+            <Route
+              exact
+              path="/dashboard/nutrition"
+              render={this.renderNutrition}
+            />
 
-          <Route
-            exact
-            path="/dashboard/settings"
-            render={this.renderAccountSettings}
-          />
+            <Route
+              exact
+              path="/dashboard/settings"
+              render={this.renderAccountSettings}
+            />
 
-          {this.props.userProfile ?
-           this.returnRoute()
-          : null}
-          {/* <Route
-                    exact
-                    path="/startplan/strength/:userid"
-                    component={StartStrengthPlan}
-                />
-                <Route
-                    exact
-                    path="/startplan/shred/:userid"
-                    component={StartShredPlan}
-                />
-                <Route
-                    exact
-                    path="/startplan/tone/:userid"
-                    component={StartTonePlan}
-                /> */}
-          <Route exact path="/" component={Home} />
-        </Switch>
+            {this.props.userProfile ?
+            this.returnRoute()
+            : null}
+
+            <Route exact path="/" component={Home} />
+          </Switch>
+        </Row>
       </Container>
     )
   }

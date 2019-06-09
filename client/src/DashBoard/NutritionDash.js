@@ -452,7 +452,7 @@ class NutritionDash extends Component {
 
     return (
       <Row>
-        <Col md="12" className="text-left schedule-col">         
+        <Col md="12" className="text-left schedule-col">
           <Collapse isOpen={this.state.openMeals}>
             <CardGroup>
              { this.props.profile.nutritionSchedule.map((meal , index) => {

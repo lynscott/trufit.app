@@ -89,7 +89,9 @@ class Stats extends Component {
 
 
     renderWeightTrackGraph = () => {
-      // let mostRecentWeighIn = this.props.profile.weighIns.length > 0 ?  : []
+      //Weight arr formatted for max and min values by 10
+      let weightArr = this.props.profile.weighIns.map(item=> Math.round(0.1*parseInt(item.weight, 10))/0.1)
+ 
 
       return (
               <Col md="12" className='p-2'>
@@ -138,7 +140,11 @@ class Stats extends Component {
                               ticks: {
                                 //  beginAtZero:true,
                                 fontColor: 'white',
-                                fontSize: 13
+                                fontSize: 13,
+                                // steps: 5,
+                                stepSize: 10,
+                                max: Math.max(...weightArr)+10,
+                                min: Math.min(...weightArr)-10
                               },
                               scaleLabel: {
                                 display: true,
