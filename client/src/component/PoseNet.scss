@@ -20,3 +20,11 @@
   .embed-responsive-21by9::before {
       display: none;
   }
+
+  .konvajs-content{
+    // width: 100% !important;
+    
+    canvas{
+      // width: 100% !important;
+    }
+  }

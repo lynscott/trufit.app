@@ -2,6 +2,11 @@ import {drawKeyPoints, drawSkeleton} from '../config/posenet_utils'
 import React, {Component} from 'react'
 import * as posenet from '@tensorflow-models/posenet'
 import './PoseNet.scss'
+import { Image, Stage, Layer, } from 'react-konva'
+import Konva from 'konva'
+
+const devCamID = '5d38061eef9bd6f3102cc898f46cb16abb0954db308c8c3ca7e3c9289acf5baa'
+const successColor = '#42f44e'
 
 class PoseNet extends Component {
   static defaultProps = {
@@ -18,13 +23,19 @@ class PoseNet extends Component {
     nmsRadius: 20,
     outputStride: 16,
     imageScaleFactor: 0.5,
-    skeletonColor: '#ffadea',
+    skeletonColor: '#008ed6',
     skeletonLineWidth: 6,
     loadingText: 'Loading...please be patient...'
   }
 
   constructor(props) {
     super(props, PoseNet.defaultProps)
+
+
+    this.state={
+      video:null,
+      width: 0
+    }
   }
 
   getCanvas = elem => {
@@ -35,7 +46,15 @@ class PoseNet extends Component {
     this.video = elem
   }
 
+  async componentWillUnmount() {
+    // this.video.stop()
+    this.state.video.srcObject.getTracks().forEach(track => track.stop())
+  }
+
   async componentDidMount() {
+    const width = this.divElement.clientWidth
+    this.setState({ width })
+
     try {
       await this.setupCamera()
     } catch (error) {
@@ -74,12 +93,15 @@ class PoseNet extends Component {
       audio: false,
       video: {
         facingMode: 'user',
+        deviceId: devCamID, //TODO: Remove later
         width: videoWidth,
         height: videoHeight
       }
     })
 
     video.srcObject = stream
+
+    this.setState({video})
 
     return new Promise(resolve => {
       video.onloadedmetadata = () => {
@@ -160,8 +182,10 @@ class PoseNet extends Component {
         canvasContext.restore()
       }
 
+
       poses.forEach(({score, keypoints}) => {
         if (score >= minPoseConfidence) {
+          // console.log(keypoints, 'KEYPOINTS')
           if (showPoints) {
             drawKeyPoints(
               keypoints,
@@ -170,11 +194,11 @@ class PoseNet extends Component {
               canvasContext
             )
           }
-          if (showSkeleton) {
+          if (showSkeleton ) {
             drawSkeleton(
               keypoints,
               minPartConfidence,
-              skeletonColor,
+              this.assesSkeleton(keypoints) ? successColor : skeletonColor,
               skeletonLineWidth,
               canvasContext
             )
@@ -186,14 +210,48 @@ class PoseNet extends Component {
     findPoseDetectionFrame()
   }
 
+  assesSkeleton = (keypoints) => {
+    let knee = keypoints.find(point =>{
+      return point.part === 'leftKnee'
+    })
+
+    let hip = keypoints.find(point =>{
+      return point.part === 'leftHip'
+    })
+
+    let depth = Math.abs(knee.position.y - hip.position.y)
+    // console.log(knee, hip, 'depth calc')
+    if (depth < 20) return true
+    else return false
+  }
+
+  handleClick = ( ) => {
+    this.state.video.pause()
+    this.state.video.srcObject.getTracks().forEach(track => track.stop())
+    console.log('logged')
+    // this.state.video.removeAttribute('src') // empty source
+
+    // this.state.video.load()
+  }
+
   render() {
     return (
-      <div>
-        <div style={{paddingTop:0}} className="embed-responsive embed-responsive-21by9">
+        <div ref={ (divElement) => this.divElement = divElement}
+             style={{padding:'10px', borderRadius:'10px'}} 
+             className="embed-responsive embed-responsive-21by9">
           <video id="videoNoShow" playsInline ref={this.getVideo} />
-          <canvas className="webcam" ref={this.getCanvas} />
+          {/* <canvas className="webcam" ref={this.getCanvas} /> */}
+          <Stage width={this.state.width} height={window.innerHeight/2}>
+            <Layer>
+              <Image
+                    ref={this.getCanvas}
+                    width={this.state.width} height={window.innerHeight/2}
+                    image={this.state.video} shadowBlur={5}
+                    onClick={this.handleClick}
+                />
+            </Layer>
+          </Stage>
         </div>
-      </div>
     )
   }
 }
