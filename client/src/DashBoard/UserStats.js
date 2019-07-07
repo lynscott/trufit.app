@@ -139,7 +139,7 @@ class Stats extends Component {
                             {
                               ticks: {
                                 //  beginAtZero:true,
-                                fontColor: 'white',
+                                fontColor: 'black',
                                 fontSize: 13,
                                 // steps: 5,
                                 stepSize: 10,
@@ -149,14 +149,14 @@ class Stats extends Component {
                               scaleLabel: {
                                 display: true,
                                 labelString: 'Weight (lbs)',
-                                fontColor: 'white'
+                                fontColor: 'black'
                               }
                             }
                           ],
                           xAxes: [
                             {
                               ticks: {
-                                fontColor: 'white',
+                                fontColor: 'black',
                                 fontSize: 12,
                                 source: 'auto'
                               },

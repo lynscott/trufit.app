@@ -1,3 +1,20 @@
+/* Color Theme From Logo - coolors.co/ec2167-ffffff-f47b28-f1614a-75c8ab */
+
+/* HSL */
+$color1: hsla(339%, 84%, 53%, 1);
+$color2: hsla(0%, 0%, 100%, 1);
+$color3: hsla(24%, 90%, 56%, 1);
+$color4: hsla(8%, 86%, 62%, 1);
+$color5: hsla(159%, 43%, 62%, 1);
+
+/* RGB */
+$color1: rgba(236, 33, 103, 1);
+$color2: rgba(255, 255, 255, 1);
+$color3: rgba(244, 123, 40, 1);
+$color4: rgba(241, 97, 74, 1);
+$color5: rgba(117, 200, 171, 1);
+
+
 .calendar-container, .rbc-calendar{
     min-height: 400px;
 }
@@ -28,7 +45,7 @@
 
 
 .sidebar-col{
-    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
+    background-color: '#cc370a';//linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
     color: white;
 
     .list-group-item, .lead{
@@ -37,7 +54,7 @@
 
     .card-title{
         color: white;
-        border-radius: 10px;
+        border-radius: 0px;
     }
 
     .list-group-item:hover{
@@ -52,12 +69,15 @@
 
 .card-wall {
     .card{
-        border: 2px lightgrey solid;
+        border: 0px;
         // border-color: lightgray;
         background-color: #eff0f2;
+        color: black;
 
         .card-header{
             font-family: 'Fira Sans', sans-serif;
+            color: white;
+            background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1)) !important;
         }
     }
 }

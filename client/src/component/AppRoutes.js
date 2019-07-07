@@ -22,6 +22,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import Loadable from 'react-loadable'
 
+import ReactAdmin from './Admin/ReactAdmin'
+
 // const LoadableComponent = Loadable({
 //   loader: () => import('./my-component'),
 //   loading: Loading,
@@ -48,6 +50,7 @@ const SideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
 const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
 const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
+
 
 
 class AppRoutes extends Component {
@@ -159,13 +162,14 @@ class AppRoutes extends Component {
   }
 
   renderAdmin = () => {
-    if ( this.props.userProfile.isAdmin)
+    if ( this.props.userProfile.isAdmin) {
       return (
      //   <Row>
      //     <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <Admin />
       //  </Row>
       )
+    }
     else return (
           // <Row>
           // <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
@@ -176,6 +180,8 @@ class AppRoutes extends Component {
         // {/* </Row> */}
         )
   }
+
+
 
   returnRoute = () => {
     if (this.props.userProfile.isAdmin)
@@ -221,6 +227,12 @@ class AppRoutes extends Component {
               exact
               path="/dashboard/nutrition"
               render={this.renderNutrition}
+            />
+
+            <Route
+              exact
+              path="/admin"
+              render={ReactAdmin}
             />
 
             <Route

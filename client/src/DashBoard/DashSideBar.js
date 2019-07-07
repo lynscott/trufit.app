@@ -81,11 +81,12 @@ class DashSideBar extends React.Component {
   render() {
     console.log(this.props)
     return (
-        <Nav vertical navbar className="sidebar-col col-md-2" >
+        <Nav vertical navbar className="sidebar-col col-md-2 bg-dark" >
           <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h3">
-            {this.props.user ? this.props.user.name : ''}
+           {/* <img src={' https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/tf1.png	'}/>  */}
+           {this.props.user ? this.props.user.name : ''}
           </CardHeader>
-          <CardTitle style={{fontFamily:'Fira Sans, sans-serif'}}>{new Date().toLocaleDateString()}</CardTitle>
+          {/* <CardTitle style={{fontFamily:'Fira Sans, sans-serif'}}>{new Date().toLocaleDateString()}</CardTitle> */}
 
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
           <Collapse isOpen={!this.state.collapsed} navbar>
