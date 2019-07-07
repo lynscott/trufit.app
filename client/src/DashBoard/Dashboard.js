@@ -249,14 +249,14 @@ class Dashboard extends Component {
       <CardColumns className="card-wall mt-4">
       
       {this.state.assessment?
-        <Card inverse color="primary">
+        <Card >
           <CardHeader>Assessment</CardHeader>
            <PoseNet/>
         </Card>
         : null}
         
         <Card>
-          <CardHeader>Recommended Macros</CardHeader>
+          <CardHeader >Recommended Macros</CardHeader>
           <CardSubtitle className="pt-2">
             {parseInt(this.props.profile.calories) + this.props.profile.currentGoal.value}cal
           </CardSubtitle>
@@ -276,19 +276,19 @@ class Dashboard extends Component {
           </CardBody>
         </Card>
 
-        <Card inverse color="primary">
-          <CardHeader>Weight Check-ins</CardHeader>
+        <Card>
+          <CardHeader >Weight Check-ins</CardHeader>
           <Stats />
         </Card>
 
-        <Card inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
-          <CardHeader style={{ margin: 0 }}>
+        <Card  style={{ color: '#333', borderColor: '#cc370a' }}>
+          <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
             Current Goal & Training Plan
           </CardHeader>
-          <CardText style={{ margin: 0 }}>
+          <CardText style={{ margin: 0, color:'black' }}>
             {this.props.profile ? this.props.profile.currentGoal.text : null}
           </CardText>
-          <CardText style={{ padding: '15px', fontSize:'15px' }}>
+          <CardText style={{ padding: '15px', fontSize:'15px', color:'black' }}>
             {this.props.profile.currentGoal.text === 'Weight Loss'
               ? WL
               : this.props.profile.currentGoal.text === 'Weight Gain'
@@ -312,8 +312,8 @@ class Dashboard extends Component {
           </Progress>
         </Card>
 
-        <Card inverse color="danger">
-          <CardHeader>Caloric Intake Tracking</CardHeader>
+        <Card >
+          <CardHeader >Caloric Intake Tracking</CardHeader>
 
           <BarChart
             display={this.props.windowWidth < 500 ? false : true}
@@ -323,14 +323,14 @@ class Dashboard extends Component {
         </Card>
 
         <Card>
-          <CardHeader>Nutrition Schedule</CardHeader>
+          <CardHeader >Nutrition Schedule</CardHeader>
           <CardBody>
             <NutritionTable />
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>Training Schedule</CardHeader>
+          <CardHeader >Training Schedule</CardHeader>
           <CardBody>
             {/* <CardTitle>Training Schedule</CardTitle> */}
             {/* <DashCalendar /> */}
@@ -359,12 +359,12 @@ class Dashboard extends Component {
         <Row>
           <Col>
            {/* {this.props.user.isAdmin?  */}
-           <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button>
+           {/* <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button> */}
            {/* : null} */}
           </Col>
           <Col>
            {/* {this.props.user.isAdmin?  */}
-           <Button color='info' onClick={()=> this.setState({assessment:false})}>End Assessment</Button>
+           {/* <Button color='info' onClick={()=> this.setState({assessment:false})}>End Assessment</Button> */}
            {/* : null} */}
           </Col>
         </Row>
@@ -377,12 +377,13 @@ class Dashboard extends Component {
     // console.log(this.props.profile)
     return (
       <Col
-        className="bg-dark"
+        className="bg-white"
         style={{
           paddingTop: '10px',
-          maxHeight: this.props.windowWidth < 500 ? '80vh' : null,
-          overflowY: 'scroll',
-          height: '100vh'
+          maxHeight: this.props.windowWidth < 500 ? '85vh' : null,
+          overflowY: this.props.windowWidth < 500 ? 'scroll': null,
+          height: '100vh',
+          // backgroundColor: '#b3b3b3'
         }}
         md="10"
       >

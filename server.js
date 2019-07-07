@@ -22,6 +22,7 @@ const pdf = require('html-pdf')
 const sgMail = require('@sendgrid/mail')
 const stripe = require('stripe')(keys.stripeSecret)
 const mongoose = require('mongoose')
+const cors = require('cors');
 const jwt = require('jwt-simple')
 const emailTemplate = require('./services/emailTemplate')
 const freePlanTemplate = require('./services/freePlanTemplate')
@@ -174,6 +175,7 @@ app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [/\/insecure
 app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
+app.use(cors({exposedHeaders:['Content-Range', 'Content-Length']}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -211,6 +213,47 @@ app.get('/api/exercises', async (req, res) => {
   }
   const exerciseList = await Exercises.find().select('-_id')
   res.send(exerciseList)
+})
+
+
+app.get('/api/profiles', async (req, res, next) => {
+  requireLogin(req, res, next)
+  const profiles = await UserProfile.find()
+  res.set('Content-Range', 'profiles' +' '+profiles.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  let ret = []
+  profiles.map((p,i)=>{
+    let prof = {
+      id:i,
+      ...p._doc
+    }
+    ret.push(prof)
+  })
+  res.send(ret)
+})
+
+
+app.get('/api/admin_exercises', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  const exerciseList = await Exercises.find()
+  res.set('Content-Range', 'exercises' +' '+exerciseList.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  let e2 =[]
+  exerciseList.map((item, index)=>{
+    // console.log(item)
+    newItem = {
+      name: item._doc.name,
+      id: index,
+      DBid: item._id
+    }
+
+    // console.log(newItem)
+    e2.push(newItem)
+  })
+  // console.log(e2)
+  res.send(e2)
 })
 
 app.get('/api/fetch_workouts', async (req, res) => {

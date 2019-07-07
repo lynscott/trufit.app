@@ -47,7 +47,7 @@ const barOptions = {
       {
         ticks: {
           //  beginAtZero:true,
-          fontColor: 'white',
+          fontColor: 'black',
           fontSize: 15,
           min: 0
         }
@@ -56,7 +56,7 @@ const barOptions = {
     xAxes: [
       {
         ticks: {
-          fontColor: 'white',
+          fontColor: 'black',
           fontSize: 15
         }
       }
@@ -667,10 +667,10 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-dark" style={{ paddingTop: '10px', maxHeight: this.props.windowWidth < 500 ? '80vh' : '100vh',
+      <Col className="bg-light" style={{ paddingTop: '10px', maxHeight: this.props.windowWidth < 500 ? '80vh' : '100vh',
       overflowY: 'scroll' }} md="10">
         {this.displayMacros()}
-        <Nav tabs>
+        <Nav tabs className='tab-nav'>
           <NavItem>
             <NavLink
               className={classnames({ active: this.state.activeTab === '1' })}
@@ -743,7 +743,7 @@ class NutritionDash extends Component {
 
   displayMacros = () => {
     return (
-      <Row className="justify-content-center py-2">
+      <Row className="justify-content-center py-2 bg-white">
         {/* <Col md="6" className="align-self-center text-white my-2">
   
           <CardText style={{margin:0}}>
@@ -804,7 +804,7 @@ class NutritionDash extends Component {
             </ButtonGroup>
           </ButtonToolbar>
         </Col> */}
-        <Col md="8" className=" my-2 text-white">
+        <Col md="8" className=" my-2 text-black bg-white">
           <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>
           Recommended Daily Intake:{' '}
                     {(
@@ -837,7 +837,7 @@ class NutritionDash extends Component {
 
 
   render() {
-    console.log(this.props.profile)
+    // console.log(this.props.profile)
     return this.props.profile ? this.renderNutritionTabs() : null
   }
 }
