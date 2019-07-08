@@ -254,32 +254,6 @@ class Dashboard extends Component {
            <PoseNet/>
         </Card>
         : null}
-        
-        <Card>
-          <CardHeader >Recommended Macros</CardHeader>
-          <CardSubtitle className="pt-2">
-            {parseInt(this.props.profile.calories) + this.props.profile.currentGoal.value}cal
-          </CardSubtitle>
-          <CardBody className="p-1">
-            <Pie
-              data={{
-                labels: ['Carbs', 'Protein', 'Fat'],
-                datasets: [
-                  {
-                    data: [carb, protein, fat],
-                    backgroundColor: ['#3acbe8', '#3ae89c', '#FFCE56'],
-                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#e89c3a']
-                  }
-                ]
-              }}
-            />
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader >Weight Check-ins</CardHeader>
-          <Stats />
-        </Card>
 
         <Card  style={{ color: '#333', borderColor: '#cc370a' }}>
           <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
@@ -312,14 +286,25 @@ class Dashboard extends Component {
           </Progress>
         </Card>
 
-        <Card >
-          <CardHeader >Caloric Intake Tracking</CardHeader>
-
-          <BarChart
-            display={this.props.windowWidth < 500 ? false : true}
-            calories={this.props.profile.calories}
-            planned={this.props.profile.nutritionCalories}
+        <Card>
+          <CardHeader >Recommended Macros</CardHeader>
+          <CardSubtitle className="pt-2">
+            {parseInt(this.props.profile.calories) + this.props.profile.currentGoal.value}cal
+          </CardSubtitle>
+          <CardBody className="p-1">
+            <Pie
+              data={{
+                labels: ['Carbs', 'Protein', 'Fat'],
+                datasets: [
+                  {
+                    data: [carb, protein, fat],
+                    backgroundColor: ['#3acbe8', '#3ae89c', '#FFCE56'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#e89c3a']
+                  }
+                ]
+              }}
             />
+          </CardBody>
         </Card>
 
         <Card>
@@ -337,6 +322,23 @@ class Dashboard extends Component {
             <CardText>No workouts scheduled! Select a plan and create a schedule.</CardText>
 
           </CardBody>
+        </Card>
+        
+
+        <Card>
+          <CardHeader >Weight Check-ins</CardHeader>
+          <Stats />
+        </Card>
+
+
+        <Card >
+          <CardHeader >Caloric Intake Tracking</CardHeader>
+
+          <BarChart
+            display={this.props.windowWidth < 500 ? false : true}
+            calories={this.props.profile.calories}
+            planned={this.props.profile.nutritionCalories}
+            />
         </Card>
       </CardColumns>
     )
