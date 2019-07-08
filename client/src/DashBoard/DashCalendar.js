@@ -101,7 +101,7 @@ class DashCalendar extends Component {
           />
         {/* </Col> */}
         {/* <Col md='4' className='align-self-center'> */}
-        <Button className='m-3' color='info'>Edit Workout Schedule</Button>
+        <Button className='m-3' color='dark'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
         {/* </Col> */}
       </React.Fragment>

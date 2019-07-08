@@ -24,11 +24,8 @@ import Loadable from 'react-loadable'
 
 import ReactAdmin from './Admin/ReactAdmin'
 
-// const LoadableComponent = Loadable({
-//   loader: () => import('./my-component'),
-//   loading: Loading,
-//   timeout: 5000
-// })
+//TODO: Clean up file
+
 const loaderCircle = (props) => {
   if (props.error) {
       console.log(props)
@@ -50,6 +47,7 @@ const SideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
 const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
 const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
+const TrainingDash = loadFromPath(() => import('../DashBoard/TrainingDash'))
 
 
 
@@ -126,16 +124,15 @@ class AppRoutes extends Component {
 
   renderPlans = () => {
     return (
-      // <DeviceOverview/>
 
       // <Row>
       //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        // {/* <TrainingDash/>  */}
+        <TrainingDash/> 
         // {/* TODO:Finish Component */}
-        <div className='col-md-10 bg-light'>
-        <h3 className='my-5'>This area is under construction, come back soon!</h3>
-          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div>
+        // <div className='col-md-10 bg-light'>
+        // <h3 className='my-5'>This area is under construction, come back soon!</h3>
+        //   <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+        // </div>
       // </Row>
     )
   }

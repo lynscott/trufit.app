@@ -48,11 +48,11 @@ const BarChart = ({ display, calories, planned }) => {
           datasets: [
             {
               label: 'Intake',
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: 'rgba(0,0,0,0.6)',
               borderColor: 'rgba(130, 128, 128,1)',
               borderWidth: 1,
-              hoverBackgroundColor: 'rgba(130, 128, 128,0.4)',
-              hoverBorderColor: 'rgba(255,99,132,1)',
+              hoverBackgroundColor: ' rgba(117, 200, 171, 0.4)', //'rgba(130, 128, 128,0.4)',
+              hoverBorderColor: 'rgba(117, 200, 171, 1)',
               data: [ planned, 592, -800]
             }
           ]
@@ -66,28 +66,28 @@ const BarChart = ({ display, calories, planned }) => {
             yAxes: [
               {
                 ticks: {
-                  fontColor: '#ffffff',
+                  fontColor: 'black',
                   fontSize: 12,
                   display: display
                 },
                 scaleLabel: {
                   display: true,
                   labelString: 'Calories',
-                  fontColor: 'white'
+                  fontColor: 'black'
                 }
               }
             ],
             xAxes: [
               {
                 ticks: {
-                  fontColor: '#ffffff',
+                  fontColor: 'black',
                   fontSize: 12,
                   display: display
                 },
                 scaleLabel: {
                   display: true,
                   labelString: 'Average Intake',
-                  fontColor: 'white'
+                  fontColor: 'black'
                 }
               }
             ]
@@ -187,7 +187,7 @@ class Dashboard extends Component {
           </Button>{' '}
           <Button
             className="m-3"
-            color="secondary"
+            color="dark"
             onClick={() => {
               this.setState({ update: false })
             }}
@@ -205,8 +205,9 @@ class Dashboard extends Component {
         isOpen={this.state.dropOpen}
         direction={'right'}
         toggle={this.toggleDrop}
+        // color='dark'
       >
-        <DropdownToggle caret>Change Goal</DropdownToggle>
+        <DropdownToggle color='dark' caret>Change Goal</DropdownToggle>
         <DropdownMenu>
           <DropdownItem
             onClick={() =>
@@ -281,7 +282,7 @@ class Dashboard extends Component {
           >
             Completion
           </CardSubtitle>
-          <Progress color="info" className="mx-3 mb-3" value={30}>
+          <Progress color="dark" className="mx-3 mb-3" value={30}>
             0%
           </Progress>
         </Card>
