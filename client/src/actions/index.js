@@ -231,25 +231,34 @@ export const foodSearch = (term) => async dispatch => {
 }
 
 export const foodSelect = (foodID) => async dispatch => {
-
   //TODO: Move this to a constants folder
+  //ASSUMPTION: This is making the assumption that the food is coming from a standardized USDA Food Database.
+  //            Any other query to a seperate database may require appropriate adjustments to this parser.
   let parseFood = (food) => {
-    let name = food[0].food.desc.name.replace(',',' ')
+    let item = food[0].food
+    let name = item.desc.name.replace(',',' ')
+
+    console.log('parseFood', item)
 
     let foodItem = {}
     foodItem.name = name
-    foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
+
+    // nutrients[1] energy (Calories)
+    // nutrients[3] fats
+    // nutrients[2] proteins
+    // nutrients[4] carbs
+    // foodItem.serving_label = item.nutrients[1].measures[0].label
     foodItem.serving = 3.5
-    foodItem.baseCal = food[0].food.nutrients[1].value
-    foodItem.baseFats = food[0].food.nutrients[3].value
-    foodItem.baseCarb = food[0].food.nutrients[4].value
-    foodItem.baseProtein = food[0].food.nutrients[2].value
-    foodItem.calories = food[0].food.nutrients[1].value
-    foodItem.fats = food[0].food.nutrients[3].value
-    foodItem.carb = food[0].food.nutrients[4].value
-    foodItem.protein = food[0].food.nutrients[2].value
+    foodItem.baseCal = item.nutrients[1].value
+    foodItem.baseFats = item.nutrients[3].value
+    foodItem.baseCarb = item.nutrients[4].value
+    foodItem.baseProtein = item.nutrients[2].value
+    foodItem.calories = item.nutrients[1].value
+    foodItem.fats = item.nutrients[3].value
+    foodItem.carb = item.nutrients[4].value
+    foodItem.protein = item.nutrients[2].value
     foodItem.active = false
-    foodItem.id = food[0].food.desc.ndbno
+    foodItem.id = item.desc.ndbno
 
     //Conversion form gram to oz
  
