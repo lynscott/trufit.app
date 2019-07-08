@@ -275,6 +275,13 @@ app.get('/api/admin_exercises', async (req, res) => {
   res.send(objMapper(exerciseList))
 })
 
+app.use('/api/profiles/:id', async (req, res) => {
+  console.log('Request Id:', req.params.id);
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  res.send(req.profiles)
+})
 
 //// END ////////
 

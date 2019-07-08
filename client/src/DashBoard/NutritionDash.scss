@@ -32,7 +32,8 @@ td, .truncate {
 
 .schedule-col{
     .meal-card{
-        border-radius: 10px;
+        // border-radius: 10px;
+        background-color: #eff0f2;
     }
 }
 
@@ -62,8 +63,12 @@ td, .truncate {
     }
 }
 
+.nutrition-btn{
+    background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+}
+
 .tab-nav {
     .nav-link {
-        background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+        // background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
     }
 }

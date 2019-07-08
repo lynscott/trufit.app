@@ -198,8 +198,8 @@ class NutritionDash extends Component {
   addItemButton = () => {
     return (
       <Button
-        className="my-2"
-        color={'primary'}
+        className="my-2 nutrition-btn"
+        // color={'primary'}
         disabled={this.props.foodSelected ? false : true}
         onClick={async () => {
           // await this.props.updateProfile({
@@ -236,7 +236,7 @@ class NutritionDash extends Component {
             this.props.foodSearch(value)
           }}
         />
-        <h6 className="text-white">
+        <h6 className="text-black">
           Nutrition Data Provided by the USDA Food Database
         </h6>
       </React.Fragment>
@@ -257,8 +257,8 @@ class NutritionDash extends Component {
 
     return (
       <Button
-        className="my-2"
-        color="danger"
+        className="my-2 nutrition-btn"
+        // color="danger"
         onClick={async () => {
           await this.props.updateProfile({
             keys: ['nutritionItems'],
@@ -275,8 +275,8 @@ class NutritionDash extends Component {
   removeItemButton = () => {
     return (
       <Button
-        className="my-2"
-        color="warning"
+        className="my-2 nutrition-btn"
+        // color="warning"
         disabled={!this.state.rowSelected}
         onClick={async () => {
           await this.props.updateFoodItem({ index: this.state.index })
@@ -292,8 +292,8 @@ class NutritionDash extends Component {
   addMealButton = () => {
     return (
       <Button
-        className="my-2"
-        color="success"
+        className="my-2 "
+        color="dark"
         size="lg" block
         disabled={this.state.time && this.state.products.length > 1? false: true}
         onClick={async () => {
@@ -462,8 +462,8 @@ class NutritionDash extends Component {
                         body
                         key={index}
                         className="m-1 meal-card"
-                        inverse
-                        color="light"
+                        // inverse
+                        // color="light"
                       >
                         <CardTitle
                           style={{
@@ -483,7 +483,7 @@ class NutritionDash extends Component {
                         {parseMeals(meal)}
 
                         <Button
-                          color="primary"
+                          color="dark"
                           onClick={() => removeMeal(index)}
                           className="m-2"
                         >
@@ -819,7 +819,7 @@ class NutritionDash extends Component {
                 datasets: [
                   {
                     data: this.getMealMacros(),
-                    backgroundColor: 'rgb(122, 212, 234, 0.4)', //'rgba(255,99,132,0.2)',
+                    backgroundColor: 'rgb(0, 0, 0, 0.4)', //'rgba(255,99,132,0.2)',
                     borderColor: 'rgba(255,255,255,1)',
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(255,99,132,0.2)',

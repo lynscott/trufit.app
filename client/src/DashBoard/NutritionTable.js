@@ -109,7 +109,7 @@ class NextMeal extends Component {
           })}
           </Col>
           <Button
-            color="primary"
+            color="dark"
             // onClick={() => removeMeal(index)} TODO:
             className="m-2"
           >
