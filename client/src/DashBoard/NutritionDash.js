@@ -65,15 +65,21 @@ const barOptions = {
 }
 
 export const formatMealTime = (mealTime) => {
-  let hr = parseInt(mealTime.split(':')[0])
-  let min = parseInt(mealTime.split(':')[1])
-  let now = new Date()
-  now.setHours(hr, min)
-  if (hr > 12) {
-    hr = hr - 1
-  }
+  if (mealTime) {
+    let hr = parseInt(mealTime.split(':')[0])
+    let min = parseInt(mealTime.split(':')[1])
+    let now = new Date()
+    now.setHours(hr, min)
+    if (hr > 12) {
+      hr = hr - 1
+    }
 
-  return now
+    return now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+  else return 'No Time Set.'
 
 
 }
@@ -124,6 +130,7 @@ class NutritionDash extends Component {
 
   componentDidMount = async () => {
     await this.props.fetchProfile()
+    await this.props.fetchMeals()
     this.calculateTotals()
   }
 
@@ -295,19 +302,20 @@ class NutritionDash extends Component {
         className="my-2 "
         color="dark"
         size="lg" block
-        disabled={this.state.time && this.state.products.length > 1? false: true}
+        disabled={this.state.products.length > 1? false: true}
         onClick={async () => {
           this.state.products.splice(-1)
-          await this.props.updateProfile({
-            keys: ['nutritionSchedule'],
-            nutritionSchedule: {items:this.state.products, time:this.state.time}
-          })
+          // await this.props.updateProfile({
+          //   keys: ['nutritionSchedule'],
+          //   nutritionSchedule: {items:this.state.products, time:this.state.time}
+          // })
+          await this.props.createNewMeal({items:this.state.products})
           // await this.props.updateFoodItem({ index: this.state.index })
           // this.calculateTotals()
           this.setState({ products: this.state.resetProducts, time:null })
         }}
       >
-        Add Meal
+        Create Meal
       </Button>
     )
   }
@@ -426,19 +434,6 @@ class NutritionDash extends Component {
         fats = fats + parseInt(item.fats)
       })
 
-      // //Update state
-      // // this.updateBar(fats, carb, protein)
-      // this.setState((prevState, props) => {
-      //   // console.log(props, 'WTF IS PROPS?')
-      //   if (prevState.planProtein !== this.state.planProtein) {
-      //     return {
-      //       planProtein: prevState.planProtein + protein,
-      //       planCarb: prevState.planCarb + carb,
-      //       planFats: prevState.planFats + fats
-      //     }
-      //   }
-      // })
-
       //Add calories to meal card
       meals.push(
           <CardText className="row justify-content-center" >
@@ -455,7 +450,7 @@ class NutritionDash extends Component {
         <Col md="12" className="text-left schedule-col">
           <Collapse isOpen={this.state.openMeals}>
             <CardGroup>
-             { this.props.profile.nutritionSchedule.map((meal , index) => {
+             { this.props.userMeals.map((meal , index) => {
               //  console.log(meal, 'TWO')
                     return (
                       <Card
@@ -474,17 +469,13 @@ class NutritionDash extends Component {
                         >
                         
                         {/* Needs times */}
-                          {formatMealTime(meal.time).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                          {/* {meal.time} */}
+                          {/* {formatMealTime(meal.time)} */}
                         </CardTitle>
                         {parseMeals(meal)}
 
                         <Button
                           color="dark"
-                          onClick={() => removeMeal(index)}
+                          // onClick={() => removeMeal(index)}
                           className="m-2"
                         >
                           Remove Meal
@@ -810,7 +801,7 @@ class NutritionDash extends Component {
                     {(
                       Number(this.props.profile.calories) +
                       this.props.profile.currentGoal.value
-                    ).toFixed()+'cal'} // 
+                    ).toFixed()+'cal'} <br/> 
           Your Planned Daily Intake: {this.state.nutritionCals}cal</h5>
           <Bar
             legend={{ position: 'bottom' }}
@@ -837,7 +828,7 @@ class NutritionDash extends Component {
 
 
   render() {
-    // console.log(this.props.profile)
+    // console.log(this.props.userMeals)
     return this.props.profile ? this.renderNutritionTabs() : null
   }
 }
@@ -846,7 +837,8 @@ const mapStateToProps = state => {
   return {
     terms: state.nutrition.searchList,
     foodSelected: state.nutrition.foodSelected,
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    userMeals: state.nutrition.userMeals
   }
 }
 

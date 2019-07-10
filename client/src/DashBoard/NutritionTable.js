@@ -53,7 +53,7 @@ class NextMeal extends Component {
     let meals = this.props.profile.nutritionSchedule
     let index = 0
 
-    if (this.props.profile.nutritionSchedule.length > 0) {
+    if (this.props.userNutritionPlans.length > 0) {
 
       meals.sort((a, b) =>
         Math.abs(formatMealTime(a.time) - new Date()) > Math.abs(formatMealTime(b.time) - new Date())
@@ -148,7 +148,8 @@ class NextMeal extends Component {
 
 const mapStateToProps = state => {
   return {
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    userNutritionPlans: state.nutrition.userNutritionPlans
   }
 }
 

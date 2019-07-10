@@ -201,14 +201,14 @@ app.get('/api/meals', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
-  const userMeals = await model.Meals.find({ creator: req.user.id })
+  const userMeals = await models.Meals.find({ creator: req.user.id }).select('-creator')
   res.send(userMeals)
 })
 
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
-  const allPlans = await model.PlanTemplates.find().select('-_id')
+  const allPlans = await models.PlanTemplates.find().select('-_id')
   res.send(allPlans)
 })
 
@@ -453,9 +453,9 @@ app.post('/api/new_meal', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   let { items, calories } = req.body
-  let meal = new models.Meal({
-    items: times,
-    time: time,
+  let meal = new models.Meals({
+    items: items,
+    // time: time,
     calories: calories,
     creator: req.user.id
   })
