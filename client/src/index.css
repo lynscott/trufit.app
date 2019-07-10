@@ -12,6 +12,11 @@ html {
   /* overflow-x: hidden; */
 }
 
+#root, .main-row, .main-container{
+  height: 100%;
+}
+
+
 body.modal-open-noscroll
 {
     margin-right: 0!important;

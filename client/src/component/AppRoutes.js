@@ -195,13 +195,13 @@ class AppRoutes extends Component {
   render() {
     // console.log(this.props)
     return (
-      <Container fluid>
+      <Container className='main-container' fluid>
         { window.location.pathname.includes('dashboard') === false?
         <Fade in={this.state.scroll > 50 ? true: false} > 
           <Nav className="navbar" />
         </Fade>
         : null}
-        <Row style={{margin:0}}>
+        <Row className='main-row' style={{margin:0}}>
         { window.location.pathname.includes('dashboard') ? 
         <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
         : null}

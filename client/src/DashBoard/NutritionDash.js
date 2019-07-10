@@ -21,7 +21,7 @@ import {
   CardTitle,
   CardText,
   CardGroup,
-  Collapse
+  Collapse, CardBody
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
@@ -122,7 +122,7 @@ class NutritionDash extends Component {
       planFats:0,
       items: [],
       openMeals: true,
-      selected: [],
+      mealsSelected: [],
       time: null,
       barData: [0,0,0]
     }
@@ -161,8 +161,8 @@ class NutritionDash extends Component {
     let fats = 0
     let cals = 0
     let nutritionCals = 0
-    for (let i = 0; i < this.props.profile.nutritionSchedule.length; i++) {
-      this.props.profile.nutritionSchedule[i].items.map(item=>{
+    for (let i = 0; i < this.props.userMeals.length; i++) {
+      this.props.userMeals[i].items.map(item=>{
         // fats = Number(item.fats) + Number(fats)
         // carbs = Number(item.carb) + Number(carbs)
         // prot = Number(item.protein) + Number(prot)
@@ -376,7 +376,7 @@ class NutritionDash extends Component {
     let carb = 0
     let fats = 0
 
-    this.props.profile.nutritionSchedule.map(meal=>{ 
+    this.props.userMeals.map(meal=>{ 
       meal.items.map(item=>{
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -412,20 +412,7 @@ class NutritionDash extends Component {
 
       //Parse macro info from meals
       meal.items.forEach((item, i) => {
-        meals.push(
-          <CardText key={i} className="row justify-content-center">
-            <React.Fragment>
-              <Col md="6"className="truncate text-center">
-                <Badge color="light">{item.name}</Badge>
-              </Col>
-              <Col md="6" className="text-center">
-                <Badge color="warning">
-                  {item.serving + 'oz'}
-                </Badge>
-              </Col>
-            </React.Fragment>
-          </CardText>
-        )
+        meals.push(<ListGroupItem className='meal-item' key={i}>{item.name + ' '+ item.serving + ' OZ'}</ListGroupItem>)
 
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -435,28 +422,23 @@ class NutritionDash extends Component {
       })
 
       //Add calories to meal card
-      meals.push(
-          <CardText className="row justify-content-center" >
-            <Col md='6' className="truncate text-center text-dark">Total Calories:</Col>
-            <Col md='6' className="truncate text-center text-dark">{cals}</Col>
-          </CardText>
-        )
+      meals.push( <ListGroupItem className='meal-item'>Total Calories: {cals}</ListGroupItem>)
       
-      return meals
+      return <ListGroup>{meals}</ListGroup>
     }
 
     return (
-      <Row>
-        <Col md="12" className="text-left schedule-col">
-          <Collapse isOpen={this.state.openMeals}>
-            <CardGroup>
+      // <Row>
+      //   <Col md="12" className=" schedule-col">
+            <CardGroup className=" schedule-col">
              { this.props.userMeals.map((meal , index) => {
               //  console.log(meal, 'TWO')
                     return (
                       <Card
                         body
                         key={index}
-                        className="m-1 meal-card"
+                        className={this.state.selectedMeal === index? ' selected "m-1 meal-card " ': "m-1 meal-card "}
+                        onClick={()=>this.setState({selectedMeal:index})}
                         // inverse
                         // color="light"
                       >
@@ -468,26 +450,23 @@ class NutritionDash extends Component {
                           }}  
                         >
                         
-                        {/* Needs times */}
+                        {/* Needs times */} Meal {index+1}
                           {/* {formatMealTime(meal.time)} */}
                         </CardTitle>
                         {parseMeals(meal)}
 
                         <Button
-                          color="dark"
+                          color="danger"
                           // onClick={() => removeMeal(index)}
                           className="m-2"
                         >
-                          Remove Meal
+                          Delete Meal
                         </Button>
                       </Card>
                     )
                   })
                 }
             </CardGroup>
-          </Collapse>
-        </Col>
-      </Row>
     )
   }
 
@@ -653,6 +632,25 @@ class NutritionDash extends Component {
     }
   }
 
+  renderNutritionPlans = () => {
+    
+    return(
+      <>
+        <h1>Plans</h1>
+        <Card className='bg-secondary'>
+          <CardBody>
+            + Add Plan
+            <ListGroup>
+              {this.state.mealsSelected.map((meal,i) => {
+                return <ListGroupItem>Meal{ i }Set a time:<input type='time' /></ListGroupItem>
+              })}
+            </ListGroup>
+          </CardBody>
+        </Card>
+      </>
+    )
+  }
+
 
 
 
@@ -670,7 +668,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Schedule
+              Plan Builder
             </NavLink>
           </NavItem>
           <NavItem>
@@ -681,7 +679,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Plan
+              Meal Builder
             </NavLink>
           </NavItem>
         </Nav>
@@ -695,25 +693,29 @@ class NutritionDash extends Component {
                 <Col md="3">{this.addItemButton()}</Col>
                 <Col md="3">{this.manualEntryButton()}</Col>
                 <Col md="3">{this.removeItemButton()}</Col>
-                <Col md='3'><h6 className='text-white mb-0'>Set a meal time</h6>
+                {/* <Col md='3'><h6 className='text-white mb-0'>Set a meal time</h6>
                   <Input style={{marginBottom:'15px'}} onChange={e => {
                   this.setState({ time: e.target.value })
                   }} placeholder="Set Time" type="time"/>
-                </Col>
+                </Col> */}
               </Row>
             </Col>
             {this.renderTable()}
             {this.addMealButton()}
           </TabPane>
-          <TabPane tabId="1">
-            {this.props.profile.nutritionSchedule.length > 0 ? (
+          <TabPane tabId="1" className='text-left'>
+            {this.props.userMeals.length > 0 ? (
               <React.Fragment>
+               <Button color={'dark'} className='mt-4' onClick={()=>this.setState({openMeals:!this.state.openMeals})}
+                  >{this.state.openMeals ? 'Hide Meals':'Show Meals'}</Button>
                 <Row className="my-3">
-                  <Col md="12">{this.renderMealSchedule()}</Col>
+                
+                <Collapse isOpen={this.state.openMeals}>
+                  <Col className='meal-side' >{this.renderMealSchedule()}</Col>
+                </Collapse>
+                  <Col className='plan-side' >{this.renderNutritionPlans()}</Col>
                 </Row>
-                <Row>
-                  {/* <Col md="12">{this.makeSchedule()}</Col> */}
-                </Row>
+                
               </React.Fragment>
             ) : (
               <Row className="my-3">
@@ -795,7 +797,7 @@ class NutritionDash extends Component {
             </ButtonGroup>
           </ButtonToolbar>
         </Col> */}
-        <Col md="8" className=" my-2 text-black bg-white">
+        <Col md="6" className=" my-2 text-black bg-white">
           <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>
           Recommended Daily Intake:{' '}
                     {(
