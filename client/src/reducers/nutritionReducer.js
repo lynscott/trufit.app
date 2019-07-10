@@ -1,8 +1,10 @@
-import {FOOD_SEARCH, FOOD_SELECTED} from '../actions'
+import {FOOD_SEARCH, FOOD_SELECTED, FETCH_MEALS } from '../actions'
 
 const initialState = {
     searchList: [],
-    foodSelected: null
+    foodSelected: null,
+    userMeals: [],
+    userNutritionPlans: []
   }
 
 export default function(state = initialState, action) {
@@ -17,6 +19,16 @@ export default function(state = initialState, action) {
         ...state,
         foodSelected:action.payload
     }
+    case FETCH_MEALS:
+      return {
+        ...state,
+        userMeals: action.payload
+      }
+    case 'UPDATE_MEAL':
+      return {
+        ...state,
+        newMeal: action.payload
+      }
   default:
     return state
   }

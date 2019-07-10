@@ -28,6 +28,11 @@ export const WEEKLY_CHECKIN = 'WEEKLY_CHECKIN'
 export const NEW_WORKOUT_SUCCESS = 'NEW_WORKOUT_SUCCESS'
 export const NEW_WORKOUT_FAILED = 'NEW_WORKOUT_FAILED'
 export const FETCH_WORKOUTS = 'FETCH_WORKOUTS'
+export const CREATE_NEW_MEAL = 'CREATE_NEW_MEAL'
+export const CREATE_NEW_MEAL_FAILED = 'CREATE_NEW_MEAL_FAILED'
+export const FETCH_MEALS = 'FETCH_MEALS'
+
+
 
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
@@ -185,6 +190,24 @@ export const createNewPlan = (values) => async dispatch => {
 
 }
 
+
+export const createNewMeal = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/new_meal', values)
+    dispatch({type: CREATE_NEW_MEAL})
+  } catch (error) {
+    dispatch({type: CREATE_NEW_MEAL_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+
+export const fetchMeals = () => async dispatch => {
+  const res = await axios.get('/api/meals')
+
+  dispatch({ type: FETCH_MEALS, payload: res.data })
+}
 
 export const createNewWorkout = (values) => async dispatch => {
 
