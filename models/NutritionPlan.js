@@ -3,6 +3,8 @@ const { Schema } = mongoose;
 
 const nutritionSchema = new Schema({
   day: String, //Optional
+  name: String,
+  created_date: Date,
   completions: [Date],
   type: String,
   items: [{ type: Schema.Types.ObjectId, ref: 'Meal' }],
