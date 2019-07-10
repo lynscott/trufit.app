@@ -306,3 +306,11 @@ export const fetchWorkouts = () => async dispatch => {
 
   dispatch({ type: FETCH_WORKOUTS, payload:res.data })
 }
+
+
+export const sendSlackFeedback = (values) => async dispatch => {
+  console.log(values)
+  let res = await axios.post('https://hooks.slack.com/services/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', {data:values})
+  console.log(res)
+  dispatch({ type: 'SENT', payload:res.data })
+}

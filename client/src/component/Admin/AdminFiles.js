@@ -15,6 +15,19 @@ export const ExerciseList = props => (
 )
 
 
+export const PlanList = props => (
+    <List {...props}>
+        <Datagrid rowClick="edit">
+            {/* <TextField source="id" /> */}
+            {/* <NumberField source="__v" /> */}
+            {/* <ArrayField source="workouts"><SingleFieldList  ></SingleFieldList></ArrayField> */}
+            <TextField source="category" />
+            <TextField source="planName" />
+            {/* <ReferenceField source="_id" reference="s"><TextField source="id" /></ReferenceField> */}
+        </Datagrid>
+    </List>
+)
+
 export const ProfileList = props => (
     <List {...props}>
         <Datagrid >

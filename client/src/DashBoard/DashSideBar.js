@@ -19,6 +19,9 @@ import {
 import './Sidebar.scss'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import SlackFeedback,  { themes } from 'react-slack-feedback'
+import keys from '../config/keys'
+
 
 class DashSideBar extends React.Component {
   constructor(props) {
@@ -90,67 +93,102 @@ class DashSideBar extends React.Component {
 
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
           <Collapse isOpen={!this.state.collapsed} navbar>
+          <div className='nav-links'>
+            <NavItem active={this.state.currentTab === 'overview' ? true : false}>
+              <Link style={{textDecoration:'none'}} to="/dashboard/overview">
+                <NavLink active={this.state.currentTab === 'overview' ? true : false} 
+                        onClick={() => this.setState({ currentTab: 'overview' },()=>{
+                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                              this.toggleNavbar()
+                          }
+                        })} >
+                      Overview
+                </NavLink>
+              </Link>
+            </NavItem >
 
-          <NavItem active={this.state.currentTab === 'overview' ? true : false}>
-            <Link style={{textDecoration:'none'}} to="/dashboard/overview">
-              <NavLink active={this.state.currentTab === 'overview' ? true : false} 
-                      onClick={() => this.setState({ currentTab: 'overview' },()=>{
-                        if (!this.state.collapsed && this.props.windowWidth < 500) {
-                            this.toggleNavbar()
-                        }
-                      })} >
-                    Overview
-              </NavLink>
-            </Link>
-          </NavItem >
+            <NavItem active={this.state.currentTab === 'nutrition' ? true : false}>     
+              <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
+                <NavLink onClick={() => this.setState({ currentTab: 'nutrition' },()=>{
+                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                              this.toggleNavbar()
+                          }
+                        })} >
+                    Nutrition
+                </NavLink>
+              </Link>
+            </NavItem>
 
-          <NavItem active={this.state.currentTab === 'nutrition' ? true : false}>     
-            <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
-              <NavLink onClick={() => this.setState({ currentTab: 'nutrition' },()=>{
-                        if (!this.state.collapsed && this.props.windowWidth < 500) {
-                            this.toggleNavbar()
-                        }
-                      })} >
-                  Nutrition
-              </NavLink>
-            </Link>
-          </NavItem>
+            <NavItem active={this.state.currentTab === 'training' ? true : false}>
+              <Link style={{textDecoration:'none'}} to="/dashboard/plans">
+                <NavLink  onClick={() => this.setState({ currentTab: 'training' },()=>{
+                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                              this.toggleNavbar()
+                          }
+                        })} >
+                    Training
+                </NavLink>
+              </Link>
+            </NavItem>
 
-          <NavItem active={this.state.currentTab === 'training' ? true : false}>
-            <Link style={{textDecoration:'none'}} to="/dashboard/plans">
-              <NavLink  onClick={() => this.setState({ currentTab: 'training' },()=>{
-                        if (!this.state.collapsed && this.props.windowWidth < 500) {
-                            this.toggleNavbar()
-                        }
-                      })} >
-                  Training
-              </NavLink>
-            </Link>
-          </NavItem>
+            <NavItem active={this.state.currentTab === 'settings' ? true : false}>
+              <Link style={{textDecoration:'none'}} to="/dashboard/settings">
+                <NavLink  onClick={() => this.setState({ currentTab: 'settings' },()=>{
+                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                              this.toggleNavbar()
+                          }
+                        })} >
+                    Settings
+                </NavLink>
+              </Link>
+            </NavItem>
 
-          <NavItem active={this.state.currentTab === 'settings' ? true : false}>
-            <Link style={{textDecoration:'none'}} to="/dashboard/settings">
-              <NavLink  onClick={() => this.setState({ currentTab: 'settings' },()=>{
-                        if (!this.state.collapsed && this.props.windowWidth < 500) {
-                            this.toggleNavbar()
-                        }
-                      })} >
-                  Settings
-              </NavLink>
-            </Link>
-          </NavItem>
+            <NavItem>
+              <a
+                href={'/api/logout'}
+                key="2"
+                id="title"
+                // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
+                className="nav-item nav-link px-2"
+              >
+                Sign-out
+              </a>
+            </NavItem> 
+          </div>
 
-          <NavItem>
-            <a
-              href={'/api/logout'}
-              key="2"
-              id="title"
-              // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
-              className="nav-item nav-link px-2"
-            >
-              Sign-out
-            </a>
-          </NavItem> 
+
+          <SlackFeedback
+            channel="#user-feedback"
+            errorTimeout={8 * 1000}
+            onClose={() => {}}
+            onOpen={() => {}}
+            sentTimeout={5 * 1000}
+            showChannel={false}
+            showIcon={true}
+            theme={themes.dark}
+            user={this.props.user ? 
+              this.props.user.email + ' ' + this.props.user.name
+            : null}
+            onSubmit={(payload, success, error) => {
+              let logPromise =  new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                  resolve(console.log(payload))
+                }, 300)
+              })
+              if (keys.slackWebHook) {
+                return fetch(keys.slackWebHook, {
+                  method: 'POST',
+                  body: JSON.stringify(payload)
+                })
+                .then(success)
+                .catch(error)
+              } else {
+               return logPromise.then(success)
+              }
+            }
+            }
+            onImageUpload={(file, success, error) => {}}
+          />
 
           {this.props.profile ?
             this.renderAdminLink()

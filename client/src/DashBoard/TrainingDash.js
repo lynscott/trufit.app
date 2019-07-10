@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import * as actions from '../actions'
 import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
-
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
+import './TrainingDash.scss'
 import {
   Col,
   Row,
@@ -21,11 +21,12 @@ import {
   Input,
   Button,
   Media,
-  Jumbotron
+  Jumbotron, Card, CardImg, CardTitle, CardText, CardColumns,
+  CardSubtitle, CardBody
 } from 'reactstrap'
 
 const localizer = BigCalendar.momentLocalizer(moment)
-const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 class TrainingDash extends Component {
   constructor(props) {
@@ -38,9 +39,10 @@ class TrainingDash extends Component {
     }
   }
 
-  toggle = () => {
+  toggle = (index) => {
     this.setState(prevState => ({
-      collapse: !prevState.collapse
+      collapse: !prevState.collapse,
+      index:index
     }))
   }
 
@@ -60,72 +62,74 @@ class TrainingDash extends Component {
     )
   }
 
-  renderPlans = () => {
-    console.log(this.state.daysSelected)
-    return (
-      <>
-        <Media onClick={this.toggle}>
-          <Media left href="#">
-            {/* <Media object data-src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/Resize_main.JPG" alt="Generic placeholder image" /> */}
-            <img
-              style={{ height: '200px', width: '200px' }}
-              src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/Resize_main.JPG"
-            />
-          </Media>
-          <Media body>
-            <Media heading>Weight Loss</Media>
-            <p>
-              Keep your intensity and focus high! Be sure to warm up properly
-              and keep your form strict. 60s rest break between sets. Great
-              cardio can be treadmill, stairmaster, a jog/running something to
-              keep your body moving at a steady pace for the alloted time.
-            </p>
-          </Media>
-        </Media>
-        <Collapse isOpen={this.state.collapse}>
-          <Form style={{width:'50%', minWidth:'50%'}}>
-            <FormGroup check>
-              <Label >
-                What days can you workout?
-              </Label>
-              <Row>
-                <Col>
-                  <Input type="checkbox" onChange={(e)=>{
-                    console.log(e.target.value)
-                    this.state.daysSelected.push('mon')
-                    }} name="radio1" >
-                    {this.state.daysSelected.includes('mon') ? <Input type="time" name="mon_time"/> : null}
-                  </Input>Monday<br/> 
-                  <Input type="checkbox" name="radio2" />Tuesday<br/>
-                  <Input type="checkbox" name="radio2" />Wednesday<br/>
-                  <Input type="checkbox" name="radio2" />Thursday<br/>
-                </Col>
-                <Col>
-                  <Input type="checkbox" name="radio1" />Friday<br/> 
-                  <Input type="checkbox" name="radio2" />Saturday<br/>
-                  <Input type="checkbox" name="radio2" />Sunday<br/>
-                  {/* <Input type="radio" name="radio2" />Thursday<br/> */}
-                </Col> 
-              </Row>
-            </FormGroup>
 
-            <FormGroup>
-              <Label for="examplePassword">What time?</Label>
-              <Input
-                type="time"
-                name="time"
-                id="examplePassword"
-                placeholder="password placeholder"
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label for="exampleSelect">When do you want to start?</Label>
-              <Input type="date" name="date" id="exampleSelect" />
-            </FormGroup>
-          </Form>
-        </Collapse>
-      </>
+  renderPlanInit = () => {
+
+    return(
+      <Collapse isOpen={this.state.collapse}>
+        <Form >
+            <Row>
+            <Label >
+              What days can you workout?
+            </Label>
+              {days.map((day,i)=>{
+                return (
+                      <Col key={i}>
+                        <Label size="lg" >{day}</Label>
+                        <Input type="checkbox" onChange={(e)=>{
+                                this.state.daysSelected.push(day) }}  
+                                name={day} bsSize="lg"  />
+                      </Col>
+                      )
+              })}
+            </Row>
+          
+          {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
+          {/* <Row>
+            <Label for="examplePassword">What time?</Label>
+            <Input
+              type="time"
+              name="time"
+              // id="examplePassword"
+              placeholder="time"
+            />
+          </Row>
+
+          <Row>
+            <Label for="exampleSelect">When do you want to start?</Label>
+            <Input type="date" name="date" id="exampleSelect" />
+          </Row> */}
+
+          <Button className='m-4' type={'submit'}>Set Training Plan</Button>
+        </Form>
+      </Collapse>
     )
+  }
+
+ 
+
+  planWall = () => {
+    let plans = []
+    this.props.plans.map((plan,i)=>{
+      plans.push(
+        <Card key={i} className={i === this.state.index? 'active':null}>
+        { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
+        <CardBody onClick={()=> this.toggle(i)}>
+          <CardTitle>{plan.planName}</CardTitle>
+          <CardSubtitle>{plan.category}</CardSubtitle>
+          <CardText>Description</CardText>
+          {/* <Button>Button</Button> */}
+        </CardBody>
+      </Card>
+      )
+    })
+
+    return (
+      <CardColumns className='plan-wall bg-dark p-3'>
+        {plans}
+      </CardColumns>
+    )
+
   }
 
   render() {
@@ -136,7 +140,8 @@ class TrainingDash extends Component {
                     <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
                     <hr className="my-2" />
                     <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
-          {this.props.profile ? this.renderPlans() : null}
+          {this.props.profile ? this.planWall() : null}
+          {this.renderPlanInit()}
         </Jumbotron>
       </Col>
     )
