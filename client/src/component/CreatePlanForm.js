@@ -365,24 +365,24 @@ class CreatePlanForm extends Component {
 
   async onSubmit(values) {
     // console.log(values)
-    let weeks = this.props.values.plan.weeks
-    let dayKeys = Object.keys(weeks[0].day)
-    console.log(dayKeys)
-    let workouts = []
-    console.log(weeks)
-    for (let i = 0; i < weeks.length; i++) {
-      // console.log(weeks[i])
-      for (let j = 0; j < dayKeys.length; j++) {
-        // console.log(weeks[i].day[dayKeys[j]])
-        if (weeks[i].day[dayKeys[j]].workout) {
-          workouts.push(weeks[i].day[dayKeys[j]].workout)
-        }   
-      }
+    // let weeks = this.props.values.plan.weeks
+    // let dayKeys = Object.keys(weeks[0].day)
+    // console.log(dayKeys)
+    // let workouts = []
+    // console.log(weeks)
+    // for (let i = 0; i < weeks.length; i++) {
+    //   // console.log(weeks[i])
+    //   for (let j = 0; j < dayKeys.length; j++) {
+    //     // console.log(weeks[i].day[dayKeys[j]])
+    //     if (weeks[i].day[dayKeys[j]].workout) {
+    //       workouts.push(weeks[i].day[dayKeys[j]].workout)
+    //     }   
+    //   }
       
-    }
+    // }
     let newValues = {
       ...values,
-      workouts
+      workouts: this.state.selected
     }
     console.log(newValues, 'Altered with workouts!')
     try {
@@ -401,7 +401,7 @@ class CreatePlanForm extends Component {
   }
 
   render() {
-    console.log(this.props, 'PROPS')
+    // console.log(this.props, 'PROPS', this.state)
     const { handleSubmit } = this.props
 
     return (

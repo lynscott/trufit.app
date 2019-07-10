@@ -7,6 +7,7 @@ import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
 import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
+
 // import CreatePlanForm from './CreatePlanForm'
 import {
   Button,
@@ -98,6 +99,7 @@ const BarChart = ({ display, calories, planned }) => {
   )
 }
 
+//TODO: Move to const folder
 const WL =
   'Focus primarily on weight loss, which will reduce muscle as well as fat.'
 const WG =
@@ -256,7 +258,7 @@ class Dashboard extends Component {
         </Card>
         : null}
 
-        <Card  style={{ color: '#333', borderColor: '#cc370a' }}>
+        <Card  style={{ color: '#333', borderColor: '#cc370a', paddingBottom:'15px' }}>
           <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
             Current Goal & Training Plan
           </CardHeader>
@@ -273,18 +275,7 @@ class Dashboard extends Component {
               : null}
           </CardText>
           {this.dropDownToggle()}
-          <CardSubtitle
-            style={{
-              textAlign: 'left',
-              paddingLeft: '15px',
-              marginTop: '10px'
-            }}
-          >
-            Completion
-          </CardSubtitle>
-          <Progress color="dark" className="mx-3 mb-3" value={30}>
-            0%
-          </Progress>
+          
         </Card>
 
         <Card>
@@ -351,7 +342,6 @@ class Dashboard extends Component {
       // <Row style={{ padding: 0, marginBottom: '10px' }}>
       // {/* {this.affirmationChange()} */}
       <Jumbotron className="text-left" style={{ width: '100%' }}>
-        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
         {/* <h1 className="display-3">Hello, world!</h1> */}
         {this.affirmationChange()}
         <hr className="my-2" />
@@ -360,10 +350,22 @@ class Dashboard extends Component {
           <Button color="primary">Learn More</Button>
         </p> */}
         <Row>
-          <Col>
+          <Col md='4'>
            {/* {this.props.user.isAdmin?  */}
            {/* <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button> */}
            {/* : null} */}
+            <CardSubtitle
+              style={{
+                textAlign: 'left',
+                paddingLeft: '15px',
+                marginTop: '10px'
+              }}
+            >
+              Plan Completion
+            </CardSubtitle>
+            <Progress color="dark" className="mx-3" value={30}>
+              0%
+            </Progress>
           </Col>
           <Col>
            {/* {this.props.user.isAdmin?  */}

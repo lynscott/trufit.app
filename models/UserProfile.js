@@ -6,9 +6,8 @@ const initialState = {
 }
 
 const userProfileSchema = new Schema ({
-//   googleID: String,
   affirmation: {type:String, default:"Hey there! I'm your affirmation text! Double tap me and enter something as a reminder why you won\'t quit!"},
-  messages: {type:[String], default:[]},
+  messages: [Schema.Types.Mixed],
   events: {type:[String], default:[]},
   progressPics: {type:[String], default:[]},
   weighIns: [Schema.Types.Mixed],
@@ -16,12 +15,14 @@ const userProfileSchema = new Schema ({
   baseSomaType: {type:Object},
   calories: String,
   currentGoal: {type:Object, default:{text:'Choose a Goal', value:0}},
-  trainingTracker: Number,
   nutritionSchedule: [Schema.Types.Mixed],
   nutritionCalories: Number,
   nutritionItems: {type:Array, default:[{ name: 'Total', serving:'', serving_label:'', calories: 0, fats: 0, protein: 0, carb: 0 }]},
   email: {type:String, unique:true, lowercase:true},
-  _user: { type: Schema.Types.ObjectId, ref: 'User' }
+  _user: { type: Schema.Types.ObjectId, ref: 'User' },
+  trainingPlans: [{ 
+    type: Schema.ObjectId, 
+    ref: 'Plans' }]
 },{ usePushEach: true });
 
-mongoose.model('profile', userProfileSchema);
+module.exports = mongoose.model('profile', userProfileSchema);

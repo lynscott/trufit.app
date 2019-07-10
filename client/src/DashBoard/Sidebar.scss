@@ -8,5 +8,24 @@
 
   .nav-link{
     color: white !important;
+    
+  }
+
+  .nav-links{
+
+    .active {
+      // background-color: 
+      background-image: linear-gradient( to right , rgba(244, 123, 40, .3), rgba(241, 97, 74, .3));
+      border-radius: 15px;
+      color: white !important;
+    }
+  }
+
+  .fprCaL, .hiaJXm{
+    position: inherit;
+  }
+
+  .eQeaZq {
+    width: auto;
   }
 }

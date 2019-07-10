@@ -10,11 +10,7 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local')
 const cookieParser = require('cookie-parser')
-require('./models/User')
-require('./models/Plans')
-require('./models/UserProfile')
-require('./models/Workouts')
-require('./models/Exercises')
+const models = require('./models/index')
 const cookieSession = require('cookie-session')
 const requireLogin = require('./middlewares/requireLogin')
 const fs = require('fs')
@@ -35,14 +31,15 @@ mongoose.Promise = require('bluebird')
 // mongoose.connect('mongodb://localhost:27017')
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
 // mongoose.model('exercises', new mongoose.Schema())
-
+// console.log(models)
 sgMail.setApiKey(keys.sendGridKey)
 
-const User = mongoose.model('users')
-const Plan = mongoose.model('plans')
-const Exercises = mongoose.model('exercises')
-const UserProfile = mongoose.model('profile')
-const Workout = mongoose.model('workouts')
+//TODO: Replace const in code with model calls
+const User = models.User
+const Plan = models.Plan
+const Exercises = models.Exercises
+const UserProfile = models.UserProfile
+const Workout = models.Workouts 
 
 const localLogin = new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   User.findOne({ email: email }, (err, user) => {
@@ -200,10 +197,18 @@ app.get('/api/plans', async (req, res) => {
   res.send(userPlans)
 })
 
+app.get('/api/meals', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  const userMeals = await model.Meals.find({ creator: req.user.id })
+  res.send(userMeals)
+})
+
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
-  const allPlans = await Plan.find().select('-_id')
+  const allPlans = await model.PlanTemplates.find().select('-_id')
   res.send(allPlans)
 })
 
@@ -390,23 +395,73 @@ app.post('/api/signin', passport.authenticate('local', { session: true }), async
 })
 
 app.post('/api/new_plan_template', async (req, res) => {
-  // if (!req.user && ) {
-  //   return res.status(401).send({ error: 'You must log in!' });
-  // }
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
   let { plan, workouts } = req.body
-  let plan_template = new Plan({
-    planName: plan.title,
+  let plan_template = new models.PlanTemplates({
+    name: plan.title,
     category: plan.category,
     logo: plan.logo,
-    template: plan,
+    created_date: Date.now(),
+    creator: req.user.id,
+    description:plan.description,
     workouts: workouts,
   })
-  plan_template = await plan_template.save()
-  // req.user.plans.push(plan.id);
-  // const user = await req.user.save();
+  await plan_template.save()
+
   res.status(200).send('Success')
 })
 
+app.post('/api/new_user_plan', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { plan, template } = req.body
+  let user_plan = new models.PlanTemplates({
+    end_date,
+    start_date,
+    template,
+    days,
+    active: true
+  })
+  await user_plan.save()
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/nutrition_plan', async (req, res) => {
+  if (!req.user ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { plan, items, day, type } = req.body
+  let nutrition_plan = new models.NutritionPlan({
+    items: items,
+    creator: req.user.id,
+  })
+  day ? nutrition_plan.day = day : null
+  type ? nutrition_plan.type = type : null
+  await nutrition_plan.save()
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/new_meal', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { items, calories } = req.body
+  let meal = new models.Meal({
+    items: times,
+    time: time,
+    calories: calories,
+    creator: req.user.id
+  })
+  await meal.save()
+  res.status(200).send('Success')
+})
 
 app.post('/api/new_workout', async (req, res) => {
   if (!req.user ) {

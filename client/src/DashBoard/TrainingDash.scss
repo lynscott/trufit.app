@@ -1,0 +1,17 @@
+.plan-wall{
+    .active{
+        border: 3px solid red ;
+    }
+
+    form{
+        .form-check-input {
+            position: initial !important;
+            margin: 0 !important;
+        }
+    }
+}
+
+.form-check-input {
+    position: initial ;
+    margin: 0 ;
+}
