@@ -7,6 +7,7 @@ export const PLAN_SELECTED = 'plan_selected'
 export const CONTACT = 'contact'
 export const TRAINING_FORM = 'training_form'
 export const FETCH_USER = 'fetch_user'
+export const FETCH_USER_AUTHENTICATING = 'fetch_user_authenticating'
 export const INTAKE_FORM = 'intake_form'
 export const FETCH_PLANS = 'fetch_plans'
 export const FETCH_PLAN = 'fetch_plan'
@@ -92,6 +93,7 @@ export const intakeToneForm = (values, history, id) => async dispatch => {
 
 //FETCH USER OAUTH
 export const fetchUser = () => async dispatch => {
+  dispatch({ type: FETCH_USER_AUTHENTICATING})
   const res = await axios.get('/api/logged_user/')
   // console.log(res.data)
 

@@ -45,8 +45,6 @@ const columns = [
 
 class NextMeal extends Component {
   componentDidUpdate = (prevProps, prevState) => {
-    // if (this.pr) {
-    // }
   }
 
   renderNextMeal = () => {
