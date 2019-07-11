@@ -193,8 +193,9 @@ class NutritionDash extends Component {
    */
   calculateTotals = () => {
     // Remove the total row
-    this.state.products.splice(-1)
 
+    let newProducts = [...this.state.products]
+    newProducts.splice(-1)
 
     let carbs = 0
     let prot = 0
@@ -210,14 +211,13 @@ class NutritionDash extends Component {
       })
     }
 
-    for (let i = 0; i < this.state.products.length; i++) {
+    for (let i = 0; i < newProducts.length; i++) {
       // console.log(this.state.products[i])
-      fats = Number(this.state.products[i].fats) + Number(fats)
-      carbs = Number(this.state.products[i].carb) + Number(carbs)
-      prot = Number(this.state.products[i].protein) + Number(prot)
+      fats = Number(newProducts[i].fats) + Number(fats)
+      carbs = Number(newProducts[i].carb) + Number(carbs)
+      prot = Number(newProducts[i].protein) + Number(prot)
       cals =
-        Number(this.state.products[i].calories) + Number(cals)
-      
+        Number(newProducts[i].calories) + Number(cals)
     }
 
     //TODO: Add recommended macros to user macros
@@ -230,7 +230,7 @@ class NutritionDash extends Component {
     // console.log('ACTIVE', fats, carbs, prot, cals, this.state.products)
     
     // Replace the total row with the new calculations
-    this.state.products.push({
+    newProducts.push({
       name: 'Total',
       serving: '',
       serving_label: '',
@@ -240,7 +240,7 @@ class NutritionDash extends Component {
       carb: Math.round(carbs)
     })
 
-    this.setState({nutritionCals:Math.round(nutritionCals)})
+    this.setState({products: newProducts, nutritionCals:Math.round(nutritionCals)})
   }
 
   addItemButton = () => {
@@ -254,11 +254,15 @@ class NutritionDash extends Component {
           //   keys: ['nutritionItems'],
           //   nutritionItems: this.props.foodSelected
           // })
-          this.setState(() => {
-            this.state.products.unshift(this.props.foodSelected)
+
+          // Add the selected product to the list of products
+          let newProducts = [...this.state.products]
+          newProducts.unshift(this.props.foodSelected)
+
+          console.log('addItemButton', this.props.foodSelected, newProducts)
+          this.setState({products: newProducts}, () => {
             this.calculateTotals()
           })
-
         }}
       >
         Add Food Item
@@ -529,6 +533,7 @@ class NutritionDash extends Component {
       {
         dataField: 'name',
         text: 'Food Item',
+        editor: Type.TEXT,
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(cell, colIndex)
           if (row.name === 'Total') {
@@ -550,8 +555,9 @@ class NutritionDash extends Component {
       {
         dataField: 'serving',
         text: 'Amount(oz)',
-        editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => (
-          <NumbersOnlyEntry { ...editorProps } value={ value } />),
+        editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
+          return <NumbersOnlyEntry { ...editorProps } value={ value } />
+        },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
           if (row.name === 'Total') {
@@ -615,11 +621,11 @@ class NutritionDash extends Component {
             blurToSave: true,
             autoSelectText: true,
             beforeSaveCell: (oldValue, newValue, row, column) => {
-              console.log('beforeSaveCell', oldValue, newValue, row, 'before save log')
+              console.log('beforeSaveCell', oldValue, newValue, row, column, 'before save log')
 
               // User did not select any value, preserver the old value.
               if(newValue === "") newValue = oldValue
-              this.updateMacros(newValue, this.state.index)
+              if(column.name === 'serving') this.updateMacros(newValue, this.state.index)
               
               /*
               else {
