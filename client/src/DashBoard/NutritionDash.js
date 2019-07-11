@@ -625,7 +625,7 @@ class NutritionDash extends Component {
 
               // User did not select any value, preserver the old value.
               if(newValue === "") newValue = oldValue
-              if(column.name === 'serving') this.updateMacros(newValue, this.state.index)
+              if(column.dataField === 'serving') this.updateMacros(newValue, this.state.index)
               
               /*
               else {
