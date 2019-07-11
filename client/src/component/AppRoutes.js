@@ -63,8 +63,9 @@ class AppRoutes extends Component {
   }
   componentDidMount() {
     // console.log(isMobileSafari, isSafari, isIOS)
+
+    // This also performs authentication!!!!
     this.props.fetchUser()
-    
     
     window.addEventListener('scroll', this.handleScroll)
 
@@ -104,22 +105,35 @@ class AppRoutes extends Component {
     }
   }
 
-  renderDash = matchProps => {
-    if (
-      window.localStorage.getItem('token') !== null ||
-      this.props.currentUser !== null
-    ) {
-      return this.renderOverview()
+  /**
+   * Check to see whether or not the user is authenticated. If so render the component appropriately.
+   * Perform all authentication checks here.
+   * Otherwises redirect to root.
+   * Must return a function as this is expected from routes.
+   */
+  authCheckOrRedirect = componentRendererFunc => {
+    // Required for asynchronous authentication.
+    // You must handle the authentication race condition on direct routes.
+    if(this.props.isAuthenticating){
+      console.log('blah')
+      return () => <div>Loading...</div>
     }
 
-    return <Redirect to="/" />
+    if(this.props.currentUser && !this.props.isAuthenticating) {
+      console.log('blah2')
+      return () => componentRendererFunc()
+    }
+      console.log('blah3')
+
+    return () => <Redirect to="/" />
+  }
+
+  renderDash = matchProps => {
+    return this.renderOverview()
   }
 
   renderNutrition = () => {
-    return (
-      
-        <NutritionDash/>
-    )
+        return <NutritionDash/>
   }
 
   renderPlans = () => {
@@ -151,11 +165,11 @@ class AppRoutes extends Component {
 
   renderOverview = () => {
     return (
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <Dash />
-     // {/* </Row> */}
-    )
+          // <Row>
+          //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
+            <Dash />
+        // {/* </Row> */}
+        )
   }
 
   renderAdmin = () => {
@@ -216,26 +230,26 @@ class AppRoutes extends Component {
               component={ShowPlan}
             />
 
-            <Route exact path="/dashboard/overview" render={this.renderDash} />
+            <Route exact path="/dashboard/overview" render={this.authCheckOrRedirect(this.renderDash)} />
             {/* <Route exact path='/n/admin/dashboard' render={this.renderDashboard} /> */}
-            <Route exact path="/dashboard/plans" render={this.renderPlans} />
+            <Route exact path="/dashboard/plans" render={this.authCheckOrRedirect(this.renderPlans)} />
 
             <Route
               exact
               path="/dashboard/nutrition"
-              render={this.renderNutrition}
+              render={this.authCheckOrRedirect(this.renderNutrition)}
             />
 
             <Route
               exact
               path="/admin"
-              render={ReactAdmin}
+              render={this.authCheckOrRedirect(ReactAdmin)}
             />
 
             <Route
               exact
               path="/dashboard/settings"
-              render={this.renderAccountSettings}
+              render={this.authCheckOrRedirect(this.renderAccountSettings)}
             />
 
             {this.props.userProfile ?
@@ -253,6 +267,7 @@ class AppRoutes extends Component {
 const mapStateToProps = state => {
   return {
     currentUser: state.auth.user,
+    isAuthenticating: state.auth.isAuthenticating,
     userProfile: state.auth.userProfile
   }
 }
