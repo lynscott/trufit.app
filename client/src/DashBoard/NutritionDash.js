@@ -35,6 +35,15 @@ import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+const EMPTY_FOOD_ENTRY = {
+  name: '',
+  serving: '',
+  calories: 0,
+  fats: 0,
+  protein: 0,
+  carb: 0
+}
+
 
 const barOptions = {
   legend: {
@@ -84,6 +93,40 @@ export const formatMealTime = (mealTime) => {
   else return 'No Time Set.'
 
 
+}
+
+/**
+ * Used for a custom cell edit in NutritionDash.
+ * Only allow integer entries into the cell.
+ */
+class NumbersOnlyEntry extends Component {
+  /*
+  static propTypes = {
+    value: PropTypes.number,
+    onUpdate: PropTypes.func.isRequired
+  }*/
+
+  static defaultProps = {
+    value: 0
+  }
+
+  getValue() {
+    return parseFloat(this.text.value);
+  }
+
+  render() {
+    const { value, onUpdate, ...rest } = this.props;
+
+    return [
+      <input
+        { ...rest }
+        style={{textAlign: 'center', width: '100%', height: '100%'}}
+        key="text"
+        ref={ node => this.text = node }
+        type="number"
+      />,
+    ];
+  }
 }
 
 class NutritionDash extends Component {
@@ -155,9 +198,15 @@ class NutritionDash extends Component {
   /****************************************
    * HELPER FUNCTIONS *********************
    ****************************************/
+  /**
+   * Calculate the total macros by iterating through the products.
+   */
   calculateTotals = () => {
- 
-    this.state.products.splice(-1)
+    // Remove the total row
+
+    let newProducts = [...this.state.products]
+    newProducts.splice(-1)
+
     let carbs = 0
     let prot = 0
     let fats = 0
@@ -172,14 +221,13 @@ class NutritionDash extends Component {
       })
     }
 
-    for (let i = 0; i < this.state.products.length; i++) {
+    for (let i = 0; i < newProducts.length; i++) {
       // console.log(this.state.products[i])
-      fats = Number(this.state.products[i].fats) + Number(fats)
-      carbs = Number(this.state.products[i].carb) + Number(carbs)
-      prot = Number(this.state.products[i].protein) + Number(prot)
+      fats = Number(newProducts[i].fats) + Number(fats)
+      carbs = Number(newProducts[i].carb) + Number(carbs)
+      prot = Number(newProducts[i].protein) + Number(prot)
       cals =
-        Number(this.state.products[i].calories) + Number(cals)
-      
+        Number(newProducts[i].calories) + Number(cals)
     }
 
     //TODO: Add recommended macros to user macros
@@ -191,7 +239,8 @@ class NutritionDash extends Component {
 
     // console.log('ACTIVE', fats, carbs, prot, cals, this.state.products)
     
-    this.state.products.push({
+    // Replace the total row with the new calculations
+    newProducts.push({
       name: 'Total',
       serving: '',
       serving_label: '',
@@ -200,8 +249,40 @@ class NutritionDash extends Component {
       protein: Math.round(prot),
       carb: Math.round(carbs)
     })
-    this.setState({nutritionCals:Math.round(nutritionCals)})
-    // this.forceUpdate()
+
+    this.setState({products: newProducts, nutritionCals:Math.round(nutritionCals)})
+  }
+
+  /**
+   * Add a product into a table and perform necessary updates. Or any other
+   * side-effect logic.
+   */
+  addProduct = (product) => {
+    // Add the selected product to the list of products
+    let newProducts = [...this.state.products]
+    newProducts.unshift(product)
+
+    console.log('addProduct', product, newProducts)
+    this.setState({products: newProducts}, () => {
+      this.calculateTotals()
+    })
+  }
+
+
+  /**
+   * Check to see if the product already exists.
+   * This is a SHALLOW check against only the name
+   */
+   isOkayToAddProduct = (product) => {
+     console.log('isOkayToAddProduct', product)
+    if(!product) return false
+
+    // Existence check
+    for(let p of this.state.products){
+      if(p.name === product.name) return false
+    }
+
+    return true
   }
 
   addItemButton = () => {
@@ -209,19 +290,15 @@ class NutritionDash extends Component {
       <Button
         className="my-2 nutrition-btn"
         // color={'primary'}
-        disabled={this.props.foodSelected ? false : true}
+        disabled={!this.isOkayToAddProduct(this.props.foodSelected)}
         onClick={async () => {
           // await this.props.updateProfile({
           //   keys: ['nutritionItems'],
           //   nutritionItems: this.props.foodSelected
           // })
-          this.setState(() => {
-            this.state.products.unshift(this.props.foodSelected)
-            this.calculateTotals()
-          })
-          console.log(this.state.products)
-          // this.forceUpdate()
-        }}
+          this.addProduct(this.props.foodSelected)
+        }
+      }
       >
         Add Food Item
       </Button>
@@ -273,6 +350,7 @@ class NutritionDash extends Component {
             keys: ['nutritionItems'],
             nutritionItems: emtpyItem
           })
+          this.addProduct(EMPTY_FOOD_ENTRY)
           // this.forceUpdate()
         }}
       >
@@ -289,8 +367,14 @@ class NutritionDash extends Component {
         disabled={!this.state.rowSelected}
         onClick={async () => {
           await this.props.updateFoodItem({ index: this.state.index })
-          this.calculateTotals()
-          this.setState({ rowSelected: false })
+
+          // Remove the product.
+          let newProducts = [...this.state.products]
+          newProducts.splice(this.state.index, 1)
+
+          this.setState({ products: newProducts, rowSelected: false }, () => {
+            this.calculateTotals()
+          })
         }}
       >
         Remove Item
@@ -335,31 +419,23 @@ class NutritionDash extends Component {
    * UPDATE MACROS  *
    ******************/
 
-  updateMacros = async newValue => {
-    let i = this.state.index
-    let newRow = this.state.products[i]
+   /**
+    * Update the macro for the state.
+    */
+  updateMacros = (newValue, rowIndex) => {
+    let i = rowIndex
+    let newProducts = [...this.state.products]
 
     console.log('correct', newValue)
-    newRow.fats = (
-      this.state.products[i].baseFats *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.carb = (
-      this.state.products[i].baseCarb *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.protein = (
-      this.state.products[i].baseProtein *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.calories = (
-      this.state.products[i].baseCal *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.serving = newValue
+    newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].serving = newValue
 
-    this.setState({ rowSelected: false })
-    this.calculateTotals()
+    this.setState({ products: newProducts, rowSelected: false }, () => {
+      this.calculateTotals()
+    })
   }
 
 
@@ -499,6 +575,7 @@ class NutritionDash extends Component {
       {
         dataField: 'name',
         text: 'Food Item',
+        editor: Type.TEXT,
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(cell, colIndex)
           if (row.name === 'Total') {
@@ -520,9 +597,8 @@ class NutritionDash extends Component {
       {
         dataField: 'serving',
         text: 'Amount(oz)',
-        editor: {
-          type: Type.SELECT,
-          options: makeArray()
+        editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
+          return <NumbersOnlyEntry { ...editorProps } value={ value } />
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
@@ -581,25 +657,32 @@ class NutritionDash extends Component {
               ? 'table-mobile bg-light'
               : 'bg-light'
           }
-          cellEdit={cellEditFactory({
+          cellEdit={
+            cellEditFactory({
             mode: 'dbclick',
             blurToSave: true,
             autoSelectText: true,
-            beforeSaveCell: async (oldValue, newValue, row, column) => {
-              // console.log(newValue, row, 'before save log')
+            beforeSaveCell: (oldValue, newValue, row, column) => {
+              console.log('beforeSaveCell', oldValue, newValue, row, column, 'before save log')
 
-
-              if (!isNaN(newValue) && newValue !== ' ') {
-                this.updateMacros(newValue)
-              } else {
+              // User did not select any value, preserver the old value.
+              if(newValue === "") newValue = oldValue
+              if(column.dataField === 'serving' && !isNaN(newValue)) this.updateMacros(newValue, this.state.index)
+              
+              /*
+              else {
                 // console.log('send to save')
                 await this.props.updateFoodItem({
                   index: this.state.index,
                   replace: row
                 })
-              }
+              }*/
+            },
+             afterSaveCell: (oldValue, newValue, row, column) => {
+               console.log('afterSaveEdit', row)
             },
             onStartEdit: (row, column, rowIndex, columnIndex) => { 
+              console.log('onStartEdit', row, rowIndex)
               if (rowIndex !== this.state.index) {
                 this.setState({index:rowIndex})
               }
@@ -610,6 +693,9 @@ class NutritionDash extends Component {
       )
   }
 
+  /**
+   * Builds the corresponding CSS class name for the selected row.
+   */
   rowClasses = (row, rowIndex) => {
     if (
       rowIndex === this.state.index &&
@@ -620,6 +706,9 @@ class NutritionDash extends Component {
     }
   }
 
+  /**
+   * Dictates the behavior of a row when it has been selected.
+   */
   selectRow = {
     mode: 'checkbox',
     clickToSelect: true,
@@ -631,12 +720,14 @@ class NutritionDash extends Component {
     onSelect: (row, isSelect, rowIndex, e) => {
       console.log(rowIndex, 'INDEX')
       if (row.name !== 'Total') {
-        this.rowClasses(rowIndex)
         this.setState({ index: rowIndex, rowSelected: true })
       }
     }
   }
 
+  /**
+   * Not currently being used.
+   */
   rowEvents = {
     onClick: (e, row, rowIndex) => {
       // console.log(rowIndex, 'selected')
@@ -675,8 +766,6 @@ class NutritionDash extends Component {
       </>
     )
   }
-
-
 
 
   renderNutritionTabs = () => {

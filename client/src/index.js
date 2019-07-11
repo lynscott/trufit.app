@@ -37,9 +37,7 @@ const store = createStore(rootReducer(history), {}, composeEnhancers(applyMiddle
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <BrowserRouter>
         <AppRoutes/>
-      </BrowserRouter>
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root')
