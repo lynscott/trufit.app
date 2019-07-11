@@ -44,6 +44,16 @@ const EMPTY_FOOD_ENTRY = {
   carb: 0
 }
 
+const TOTAL_EMPTY_ENTRY = {
+  name: 'Total',
+  serving: '',
+  serving_label: '',
+  calories: 0,
+  fats: 0,
+  protein: 0,
+  carb: 0
+}
+
 
 const barOptions = {
   legend: {
@@ -140,28 +150,8 @@ class NutritionDash extends Component {
       nutritionCals: 0,
       
       activeTab: '1',
-      products: [
-        {
-          name: 'Total',
-          serving: '',
-          serving_label: '',
-          calories: 0,
-          fats: 0,
-          protein: 0,
-          carb: 0
-        }
-      ],
-      resetProducts: [
-        {
-          name: 'Total',
-          serving: '',
-          serving_label: '',
-          calories: 0,
-          fats: 0,
-          protein: 0,
-          carb: 0
-        }
-      ],
+      products: [ TOTAL_EMPTY_ENTRY ],
+      resetProducts: [ TOTAL_EMPTY_ENTRY ],
       planProtein:0,
       planCarb:0,
       planFats:0,
@@ -405,9 +395,25 @@ class NutritionDash extends Component {
         size="lg" block
         disabled={this.state.products.length > 1? false: true}
         onClick={async () => {
+          // Remove the total empty entry from the list of products
           this.state.products.splice(-1)
+<<<<<<< HEAD
           await this.props.createNewMeal({items:this.state.products}) 
           this.setState({ products: this.state.resetProducts, time:null })
+=======
+
+          // await this.props.updateProfile({
+          //   keys: ['nutritionSchedule'],
+          //   nutritionSchedule: {items:this.state.products, time:this.state.time}
+          // })
+          await this.props.createNewMeal({items:this.state.products})
+          // await this.props.updateFoodItem({ index: this.state.index })
+          // this.calculateTotals()
+          this.setState({ products: [ TOTAL_EMPTY_ENTRY ], time:null }, () => {
+            // Update the list of meals.
+            this.props.fetchMeals()
+          })
+>>>>>>> 38f2d6e7949162fcdf1ee2ff87098dda7603fa04
         }}
       >
         Create Meal
