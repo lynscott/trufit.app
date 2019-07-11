@@ -35,6 +35,15 @@ import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+const EMPTY_FOOD_ENTRY = {
+  name: '',
+  serving: '',
+  calories: 0,
+  fats: 0,
+  protein: 0,
+  carb: 0
+}
+
 
 const barOptions = {
   legend: {
@@ -107,13 +116,14 @@ class NumbersOnlyEntry extends Component {
 
   render() {
     const { value, onUpdate, ...rest } = this.props;
+
     return [
       <input
         { ...rest }
         style={{textAlign: 'center', width: '100%', height: '100%'}}
         key="text"
         ref={ node => this.text = node }
-        type="text"
+        type="number"
       />,
     ];
   }
@@ -243,6 +253,21 @@ class NutritionDash extends Component {
     this.setState({products: newProducts, nutritionCals:Math.round(nutritionCals)})
   }
 
+  /**
+   * Add a product into a table and perform necessary updates. Or any other
+   * side-effect logic.
+   */
+  addProduct = (product) => {
+    // Add the selected product to the list of products
+    let newProducts = [...this.state.products]
+    newProducts.unshift(product)
+
+    console.log('addProduct', product, newProducts)
+    this.setState({products: newProducts}, () => {
+      this.calculateTotals()
+    })
+  }
+
   addItemButton = () => {
     return (
       <Button
@@ -254,16 +279,9 @@ class NutritionDash extends Component {
           //   keys: ['nutritionItems'],
           //   nutritionItems: this.props.foodSelected
           // })
-
-          // Add the selected product to the list of products
-          let newProducts = [...this.state.products]
-          newProducts.unshift(this.props.foodSelected)
-
-          console.log('addItemButton', this.props.foodSelected, newProducts)
-          this.setState({products: newProducts}, () => {
-            this.calculateTotals()
-          })
-        }}
+          this.addProduct(this.props.foodSelected)
+        }
+      }
       >
         Add Food Item
       </Button>
@@ -315,6 +333,7 @@ class NutritionDash extends Component {
             keys: ['nutritionItems'],
             nutritionItems: emtpyItem
           })
+          this.addProduct(EMPTY_FOOD_ENTRY)
           // this.forceUpdate()
         }}
       >
@@ -625,7 +644,7 @@ class NutritionDash extends Component {
 
               // User did not select any value, preserver the old value.
               if(newValue === "") newValue = oldValue
-              if(column.dataField === 'serving') this.updateMacros(newValue, this.state.index)
+              if(column.dataField === 'serving' && !isNaN(newValue)) this.updateMacros(newValue, this.state.index)
               
               /*
               else {
