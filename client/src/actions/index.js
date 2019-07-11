@@ -220,6 +220,18 @@ export const createNewWorkout = (values) => async dispatch => {
 
 }
 
+
+export const saveNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/nutrition_plan', values)
+    dispatch({type: 'SAVE_NUTRITION_PLAN'})
+  } catch (error) {
+    dispatch({type: 'SAVE_NUTRITION_PLAN', payload:'Error Occured'+ error})
+  }
+
+}
+
 export const fetchPlanTemps = () => async dispatch => {
   const res = await axios.get('/api/plan_templates')
   // console.log(res.data, 'res from temp call')
