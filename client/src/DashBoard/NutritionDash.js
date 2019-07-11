@@ -33,6 +33,8 @@ import classnames from 'classnames'
 import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 
 const barOptions = {
   legend: {
@@ -437,8 +439,8 @@ class NutritionDash extends Component {
                       <Card
                         body
                         key={index}
-                        className={this.state.selectedMeal === index? ' selected "m-1 meal-card " ': "m-1 meal-card "}
-                        onClick={()=>this.setState({selectedMeal:index})}
+                        className={this.state.selectedMeal === index? "m-1 meal-card selected" : "m-1 meal-card "}
+                        // onClick={()=>this.setState({selectedMeal:index})}
                         // inverse
                         // color="light"
                       >
@@ -450,17 +452,28 @@ class NutritionDash extends Component {
                           }}  
                         >
                         
-                        {/* Needs times */} Meal {index+1}
+                        {/* Needs times */} <span> Meal {index+1}</span>
                           {/* {formatMealTime(meal.time)} */}
                         </CardTitle>
                         {parseMeals(meal)}
 
                         <Button
                           color="danger"
+                          outline
+                          size='sm'
                           // onClick={() => removeMeal(index)}
                           className="m-2"
                         >
                           Delete Meal
+                        </Button>
+                        <Button
+                          color="success"
+                          outline
+                          size='sm'
+                          onClick={() => this.setState({mealsSelected:[...this.state.mealsSelected,{meal, index:'Meal '+ (index+1)}] })}
+                          className="m-2"
+                        >
+                          Add to Plan
                         </Button>
                       </Card>
                     )
@@ -632,8 +645,17 @@ class NutritionDash extends Component {
     }
   }
 
+  removeMealFromPlan = (i) => {
+    console.log(this.state.mealsSelected, i)
+    let fullArr = this.state.mealsSelected
+    fullArr.splice(i,1)
+    this.setState({ mealsSelected:
+      [...fullArr]
+    })
+  }
+
   renderNutritionPlans = () => {
-    
+    console.log(this.state.mealsSelected)
     return(
       <>
         <h1>Plans</h1>
@@ -642,11 +664,14 @@ class NutritionDash extends Component {
             + Add Plan
             <ListGroup>
               {this.state.mealsSelected.map((meal,i) => {
-                return <ListGroupItem>Meal{ i }Set a time:<input type='time' /></ListGroupItem>
+                return <ListGroupItem><span className='mx-3'>{meal.index } Set a time:</span> 
+                <input className='mx-3' type='time' /> 
+                <FontAwesomeIcon className='mx-3' onClick={()=>this.removeMealFromPlan(i)} icon="minus-circle" size={'1x'} /></ListGroupItem>
               })}
             </ListGroup>
           </CardBody>
         </Card>
+        <Button color='dark'>Save Meal</Button>
       </>
     )
   }
@@ -708,7 +733,7 @@ class NutritionDash extends Component {
               <React.Fragment>
                <Button color={'dark'} className='mt-4' onClick={()=>this.setState({openMeals:!this.state.openMeals})}
                   >{this.state.openMeals ? 'Hide Meals':'Show Meals'}</Button>
-                <Row className="my-3">
+                <Row className="my-3 justify-content-center">
                 
                 <Collapse isOpen={this.state.openMeals}>
                   <Col className='meal-side' >{this.renderMealSchedule()}</Col>

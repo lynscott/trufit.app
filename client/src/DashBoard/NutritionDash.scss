@@ -35,6 +35,12 @@ td, .truncate {
         // border-radius: 10px;
         background-color: #eff0f2;
     }
+
+    .selected{
+        // box-shadow: 0 0 50px;
+        // transition: 0.3s blue;
+        border: 3px solid linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+    }
 }
 
 .no-meals-badge{
