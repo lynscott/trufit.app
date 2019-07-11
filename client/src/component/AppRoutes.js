@@ -43,7 +43,7 @@ const loadFromPath = (loaderCallBack) => Loadable({
 
 const Home = loadFromPath(() => import('./App'))
 const About = lazy(() => import('./About'))
-const SideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
+const DashSideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
 const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
 const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
@@ -115,15 +115,12 @@ class AppRoutes extends Component {
     // Required for asynchronous authentication.
     // You must handle the authentication race condition on direct routes.
     if(this.props.isAuthenticating){
-      console.log('blah')
       return () => <div>Loading...</div>
     }
 
     if(this.props.currentUser && !this.props.isAuthenticating) {
-      console.log('blah2')
       return () => componentRendererFunc()
     }
-      console.log('blah3')
 
     return () => <Redirect to="/" />
   }
@@ -192,6 +189,21 @@ class AppRoutes extends Component {
         )
   }
 
+  /**
+   * Anything related to sidebar logic.
+   */
+  renderSidebar = () => {
+    return <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+  }
+
+  /**
+   * Anything related to home navigation logic.
+   */
+  renderHomeNavigation = () => {
+    return <Fade in={this.state.scroll > 50} > 
+          <Nav className="navbar" />
+        </Fade>
+  }
 
 
   returnRoute = () => {
@@ -210,16 +222,9 @@ class AppRoutes extends Component {
     // console.log(this.props)
     return (
       <Container className='main-container' fluid>
-        { window.location.pathname.includes('dashboard') === false?
-        <Fade in={this.state.scroll > 50 ? true: false} > 
-          <Nav className="navbar" />
-        </Fade>
-        : null}
+        <Route exact path="/" render={this.renderHomeNavigation} />
         <Row className='main-row' style={{margin:0}}>
-        { window.location.pathname.includes('dashboard') ? 
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        : null}
-        
+        <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
             {/* <Route exact path="/about" component={About} /> */}
             {/* <Route exact path="/dashboard" render={this.renderDash} /> */}

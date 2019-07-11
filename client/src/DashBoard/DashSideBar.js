@@ -1,6 +1,6 @@
 // import * as icons from 'Constants/SVGIcons'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import * as actions from '../actions'
 import { connect } from 'react-redux'
 import {
@@ -28,10 +28,9 @@ class DashSideBar extends React.Component {
     super(props)
 
     this.state = {
-      page: 'Course-List',
+      // page: 'Course-List',
       updateMessage: '',
       update: false,
-      currentTab: 'overview',
       collapsed: this.props.windowWidth < 500 ? true:false,
       expanded: true
     }
@@ -58,18 +57,17 @@ class DashSideBar extends React.Component {
 
 
   renderAdminLink = () => {
-    
     if (this.props.profile.isAdmin)
       return(
           <>
             <hr/>
-            <NavItem active={this.state.currentTab === 'admin' ? true : false}>
+            <NavItem active={this.props.currentTab === 'admin'}>
             <Link style={{textDecoration:'none'}} to="/dashboard/admin">
-              <NavLink  onClick={() => this.setState({ currentTab: 'admin' },()=>{
+              <NavLink  onClick={() => {
                         if (!this.state.collapsed && this.props.windowWidth < 500) {
                             this.toggleNavbar()
                         }
-                      })} >
+                      }} >
                   Admin 
               </NavLink>
             </Link>
@@ -94,50 +92,50 @@ class DashSideBar extends React.Component {
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
           <Collapse isOpen={!this.state.collapsed} navbar>
           <div className='nav-links'>
-            <NavItem active={this.state.currentTab === 'overview' ? true : false}>
+            <NavItem active={this.props.currentTab === "overview"}>
               <Link style={{textDecoration:'none'}} to="/dashboard/overview">
-                <NavLink active={this.state.currentTab === 'overview' ? true : false} 
-                        onClick={() => this.setState({ currentTab: 'overview' },()=>{
+                <NavLink
+                        onClick={ ()=>{
                           if (!this.state.collapsed && this.props.windowWidth < 500) {
                               this.toggleNavbar()
                           }
-                        })} >
+                        }} >
                       Overview
                 </NavLink>
-              </Link>
+              </Link> 
             </NavItem >
 
-            <NavItem active={this.state.currentTab === 'nutrition' ? true : false}>     
+            <NavItem active={this.props.currentTab === "nutrition"}>     
               <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
-                <NavLink onClick={() => this.setState({ currentTab: 'nutrition' },()=>{
+                <NavLink onClick={ ()=>{
                           if (!this.state.collapsed && this.props.windowWidth < 500) {
                               this.toggleNavbar()
                           }
-                        })} >
+                        }} >
                     Nutrition
                 </NavLink>
               </Link>
             </NavItem>
 
-            <NavItem active={this.state.currentTab === 'training' ? true : false}>
+            <NavItem active={this.props.currentTab === "plans"}>
               <Link style={{textDecoration:'none'}} to="/dashboard/plans">
-                <NavLink  onClick={() => this.setState({ currentTab: 'training' },()=>{
+                <NavLink  onClick={()=>{
                           if (!this.state.collapsed && this.props.windowWidth < 500) {
                               this.toggleNavbar()
                           }
-                        })} >
+                        }} >
                     Training
                 </NavLink>
               </Link>
             </NavItem>
 
-            <NavItem active={this.state.currentTab === 'settings' ? true : false}>
+            <NavItem active={this.props.currentTab === "settings"}>
               <Link style={{textDecoration:'none'}} to="/dashboard/settings">
-                <NavLink  onClick={() => this.setState({ currentTab: 'settings' },()=>{
+                <NavLink  onClick={ ()=>{
                           if (!this.state.collapsed && this.props.windowWidth < 500) {
                               this.toggleNavbar()
                           }
-                        })} >
+                        }} >
                     Settings
                 </NavLink>
               </Link>
@@ -199,7 +197,32 @@ class DashSideBar extends React.Component {
   }
 }
 
-export default windowSize(connect(
-  null,
+/**
+ * Select the current tab from the router. This will make
+ * the state of the sidebar controlled by the router pathname
+ */
+const tabSelectorFromRoute = (pathname) => {
+  switch(pathname){
+    case "/dashboard/overview":
+      return "overview"
+    case "/dashboard/plans":
+      return "plans"
+    case "/dashboard/nutrition":
+      return "nutrition"
+    case "/dashboard/settings":
+      return "settings"
+    default:
+      return "overview"
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+    currentTab: tabSelectorFromRoute(state.router.location.pathname)
+  }
+}
+
+export default windowSize(withRouter(connect(
+  mapStateToProps,
   actions
-)(DashSideBar))
+)(DashSideBar)))
