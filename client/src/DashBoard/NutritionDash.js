@@ -110,7 +110,7 @@ class NumbersOnlyEntry extends Component {
     return [
       <input
         { ...rest }
-        style={{width: '100%', height: '100%'}}
+        style={{textAlign: 'center', width: '100%', height: '100%'}}
         key="text"
         ref={ node => this.text = node }
         type="text"
