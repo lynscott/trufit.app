@@ -268,6 +268,7 @@ class NutritionDash extends Component {
     })
   }
 
+
   /**
    * Check to see if the product already exists.
    * This is a SHALLOW check against only the name
@@ -366,8 +367,14 @@ class NutritionDash extends Component {
         disabled={!this.state.rowSelected}
         onClick={async () => {
           await this.props.updateFoodItem({ index: this.state.index })
-          this.calculateTotals()
-          this.setState({ rowSelected: false })
+
+          // Remove the product.
+          let newProducts = [...this.state.products]
+          newProducts.splice(this.state.index, 1)
+
+          this.setState({ products: newProducts, rowSelected: false }, () => {
+            this.calculateTotals()
+          })
         }}
       >
         Remove Item
