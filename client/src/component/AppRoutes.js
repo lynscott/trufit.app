@@ -223,6 +223,8 @@ class AppRoutes extends Component {
     return (
       <Container className='main-container' fluid>
         <Route exact path="/" render={this.renderHomeNavigation} />
+        <Route exact path="/dashboard" render={() => <Redirect to="/dashboard/overview"/> }/>
+
         <Row className='main-row' style={{margin:0}}>
         <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
