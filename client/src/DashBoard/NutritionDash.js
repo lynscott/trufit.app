@@ -268,12 +268,28 @@ class NutritionDash extends Component {
     })
   }
 
+  /**
+   * Check to see if the product already exists.
+   * This is a SHALLOW check against only the name
+   */
+   isOkayToAddProduct = (product) => {
+     console.log('isOkayToAddProduct', product)
+    if(!product) return false
+
+    // Existence check
+    for(let p of this.state.products){
+      if(p.name === product.name) return false
+    }
+
+    return true
+  }
+
   addItemButton = () => {
     return (
       <Button
         className="my-2 nutrition-btn"
         // color={'primary'}
-        disabled={this.props.foodSelected ? false : true}
+        disabled={!this.isOkayToAddProduct(this.props.foodSelected)}
         onClick={async () => {
           // await this.props.updateProfile({
           //   keys: ['nutritionItems'],
