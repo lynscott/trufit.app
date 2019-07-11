@@ -155,9 +155,14 @@ class NutritionDash extends Component {
   /****************************************
    * HELPER FUNCTIONS *********************
    ****************************************/
+  /**
+   * Calculate the total macros by iterating through the products.
+   */
   calculateTotals = () => {
- 
+    // Remove the total row
     this.state.products.splice(-1)
+
+
     let carbs = 0
     let prot = 0
     let fats = 0
@@ -191,6 +196,7 @@ class NutritionDash extends Component {
 
     // console.log('ACTIVE', fats, carbs, prot, cals, this.state.products)
     
+    // Replace the total row with the new calculations
     this.state.products.push({
       name: 'Total',
       serving: '',
@@ -200,8 +206,8 @@ class NutritionDash extends Component {
       protein: Math.round(prot),
       carb: Math.round(carbs)
     })
+
     this.setState({nutritionCals:Math.round(nutritionCals)})
-    // this.forceUpdate()
   }
 
   addItemButton = () => {
@@ -219,8 +225,7 @@ class NutritionDash extends Component {
             this.state.products.unshift(this.props.foodSelected)
             this.calculateTotals()
           })
-          console.log(this.state.products)
-          // this.forceUpdate()
+
         }}
       >
         Add Food Item
@@ -335,28 +340,19 @@ class NutritionDash extends Component {
    * UPDATE MACROS  *
    ******************/
 
-  updateMacros = async newValue => {
-    let i = this.state.index
-    let newRow = this.state.products[i]
+   /**
+    * Update the macro for the state
+    */
+  updateMacros = (newValue, rowIndex) => {
+    let i = rowIndex
+    let newProducts = {... this.state.products }
 
     console.log('correct', newValue)
-    newRow.fats = (
-      this.state.products[i].baseFats *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.carb = (
-      this.state.products[i].baseCarb *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.protein = (
-      this.state.products[i].baseProtein *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.calories = (
-      this.state.products[i].baseCal *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.serving = newValue
+    newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts.carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts.protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts.calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts.serving = newValue
 
     this.setState({ rowSelected: false })
     this.calculateTotals()
@@ -521,7 +517,7 @@ class NutritionDash extends Component {
         dataField: 'serving',
         text: 'Amount(oz)',
         editor: {
-          type: Type.SELECT,
+          type: Type.TEXT,
           options: makeArray()
         },
         editable: (cell, row, rowIndex, colIndex) => {
@@ -581,25 +577,36 @@ class NutritionDash extends Component {
               ? 'table-mobile bg-light'
               : 'bg-light'
           }
-          cellEdit={cellEditFactory({
+          cellEdit={
+            cellEditFactory({
             mode: 'dbclick',
             blurToSave: true,
             autoSelectText: true,
-            beforeSaveCell: async (oldValue, newValue, row, column) => {
-              // console.log(newValue, row, 'before save log')
+            beforeSaveCell: (oldValue, newValue, row, column) => {
+              console.log('beforeSaveCell', oldValue, newValue, row, 'before save log')
 
+              // User did not select any value, preserver the old value.
+              if(newValue === "") newValue = oldValue
 
+              /*
               if (!isNaN(newValue) && newValue !== ' ') {
-                this.updateMacros(newValue)
-              } else {
+                this.updateMacros(newValue, this.state.index)
+              } */
+              
+              /*
+              else {
                 // console.log('send to save')
                 await this.props.updateFoodItem({
                   index: this.state.index,
                   replace: row
                 })
-              }
+              }*/
+            },
+             afterSaveCell: (oldValue, newValue, row, column) => {
+               console.log('afterSaveEdit', row)
             },
             onStartEdit: (row, column, rowIndex, columnIndex) => { 
+              console.log('onStartEdit', row, rowIndex)
               if (rowIndex !== this.state.index) {
                 this.setState({index:rowIndex})
               }
@@ -610,6 +617,9 @@ class NutritionDash extends Component {
       )
   }
 
+  /**
+   * Builds the corresponding CSS class name for the selected row.
+   */
   rowClasses = (row, rowIndex) => {
     if (
       rowIndex === this.state.index &&
@@ -620,6 +630,9 @@ class NutritionDash extends Component {
     }
   }
 
+  /**
+   * Dictates the behavior of a row when it has been selected.
+   */
   selectRow = {
     mode: 'checkbox',
     clickToSelect: true,
@@ -631,12 +644,14 @@ class NutritionDash extends Component {
     onSelect: (row, isSelect, rowIndex, e) => {
       console.log(rowIndex, 'INDEX')
       if (row.name !== 'Total') {
-        this.rowClasses(rowIndex)
         this.setState({ index: rowIndex, rowSelected: true })
       }
     }
   }
 
+  /**
+   * Not currently being used.
+   */
   rowEvents = {
     onClick: (e, row, rowIndex) => {
       // console.log(rowIndex, 'selected')
@@ -675,8 +690,6 @@ class NutritionDash extends Component {
       </>
     )
   }
-
-
 
 
   renderNutritionTabs = () => {
