@@ -86,6 +86,39 @@ export const formatMealTime = (mealTime) => {
 
 }
 
+/**
+ * Used for a custom cell edit in NutritionDash.
+ * Only allow integer entries into the cell.
+ */
+class NumbersOnlyEntry extends Component {
+  /*
+  static propTypes = {
+    value: PropTypes.number,
+    onUpdate: PropTypes.func.isRequired
+  }*/
+
+  static defaultProps = {
+    value: 0
+  }
+
+  getValue() {
+    return parseFloat(this.text.value);
+  }
+
+  render() {
+    const { value, onUpdate, ...rest } = this.props;
+    return [
+      <input
+        { ...rest }
+        style={{width: '100%', height: '100%'}}
+        key="text"
+        ref={ node => this.text = node }
+        type="text"
+      />,
+    ];
+  }
+}
+
 class NutritionDash extends Component {
   constructor(props) {
     super(props)
@@ -341,7 +374,7 @@ class NutritionDash extends Component {
    ******************/
 
    /**
-    * Update the macro for the state
+    * Update the macro for the state.
     */
   updateMacros = (newValue, rowIndex) => {
     let i = rowIndex
@@ -516,10 +549,8 @@ class NutritionDash extends Component {
       {
         dataField: 'serving',
         text: 'Amount(oz)',
-        editor: {
-          type: Type.TEXT,
-          options: makeArray()
-        },
+        editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => (
+          <NumbersOnlyEntry { ...editorProps } value={ value } />),
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
           if (row.name === 'Total') {
