@@ -378,17 +378,18 @@ class NutritionDash extends Component {
     */
   updateMacros = (newValue, rowIndex) => {
     let i = rowIndex
-    let newProducts = {... this.state.products }
+    let newProducts = [...this.state.products]
 
     console.log('correct', newValue)
     newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
-    newProducts.carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
-    newProducts.protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
-    newProducts.calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
-    newProducts.serving = newValue
+    newProducts[i].carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].serving = newValue
 
-    this.setState({ rowSelected: false })
-    this.calculateTotals()
+    this.setState({ products: newProducts, rowSelected: false }, () => {
+      this.calculateTotals()
+    })
   }
 
 
@@ -618,11 +619,7 @@ class NutritionDash extends Component {
 
               // User did not select any value, preserver the old value.
               if(newValue === "") newValue = oldValue
-
-              /*
-              if (!isNaN(newValue) && newValue !== ' ') {
-                this.updateMacros(newValue, this.state.index)
-              } */
+              this.updateMacros(newValue, this.state.index)
               
               /*
               else {
