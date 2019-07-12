@@ -20,7 +20,7 @@ import {
   Card,
   CardTitle,
   CardText,
-  CardGroup, Label,
+  CardGroup, Label, InputGroupAddon,
   Collapse, CardBody, InputGroup
 } from 'reactstrap'
 import { connect } from 'react-redux'
@@ -121,11 +121,11 @@ class NumbersOnlyEntry extends Component {
   }
 
   getValue() {
-    return parseFloat(this.text.value);
+    return parseFloat(this.text.value)
   }
 
   render() {
-    const { value, onUpdate, ...rest } = this.props;
+    const { value, onUpdate, ...rest } = this.props
 
     return [
       <input
@@ -135,7 +135,7 @@ class NumbersOnlyEntry extends Component {
         ref={ node => this.text = node }
         type="number"
       />,
-    ];
+    ]
   }
 }
 
@@ -161,7 +161,8 @@ class NutritionDash extends Component {
       time: null,
       barData: [0,0,0],
       manualEntry: false,
-      manualItem: {}
+      manualItem: {},
+      deleteMeals: false
     }
   }
 
@@ -481,7 +482,8 @@ class NutritionDash extends Component {
   renderMealSchedule = () => {
 
     let removeMeal = async i => {
-      await this.props.updateFoodItem({ removeSchedule: i })
+      await this.props.deleteMeal({ id: i })
+      await this.props.fetchMeals()
     }
 
 
@@ -494,7 +496,7 @@ class NutritionDash extends Component {
 
       //Parse macro info from meals
       meal.items.forEach((item, i) => {
-        meals.push(<ListGroupItem className='meal-item' key={i}>{item.name + ' '+ item.serving + ' OZ'}</ListGroupItem>)
+        meals.push(<ListGroupItem className='meal-item truncate' key={i}>{item.name + ' ' +item.serving + ' OZ'}</ListGroupItem>)
 
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -504,42 +506,48 @@ class NutritionDash extends Component {
       })
 
       //Add calories to meal card
-      meals.push( <ListGroupItem className='meal-item'>Total Calories: {cals}</ListGroupItem>)
+      meals.push( <ListGroupItem className='meal-item '>Total Calories: {cals}</ListGroupItem>)
       
       return <ListGroup>{meals}</ListGroup>
     }
 
     return (
             <CardGroup className=" schedule-col">
-              {this.props.userMeals.map((meal , index) => {
+              <Row>
+                {this.props.userMeals.map((meal , index) => {
                     return (
-                      <Card body key={index}
-                        className={this.state.selectedMeal === index? "m-1 meal-card selected" : "m-1 meal-card "} >
+                      <Col md='5'>
+                        <Card body key={index}
+                          className={'m-1 meal-card '}>
 
-                        <CardTitle
-                          style={{ fontWeight: 'bold', textAlign: 'center', color: 'black'}} >
-                          {/* Needs times */} 
-                          <span> Meal {index+1}</span>
-                          {/* {formatMealTime(meal.time)} */}
-                        </CardTitle>
+                          <CardTitle
+                            style={{ fontWeight: 'bold', textAlign: 'center', color: 'black'}} >
+                            {/* Needs times */} 
+                            <span> Meal {index+1}</span>
+                            {/* {formatMealTime(meal.time)} */}
+                          </CardTitle>
 
-                        {parseMeals(meal)}
+                          {parseMeals(meal)}
 
-                        <Button color="danger" outline size='sm'
-                          // onClick={() => removeMeal(index)}TODO: Implement
-                          className="m-2"> Delete Meal
-                        </Button>
+                          <Collapse className='text-center' isOpen={this.state.deleteMeals} >
+                            <Button color="danger" outline size='sm'
+                              onClick={() => removeMeal(meal._id)}
+                              className="m-2"> Delete Meal
+                            </Button>
+                          </Collapse>
 
-                        <Button color="success" outline size='sm'
-                          onClick={() => this.setState({mealsSelected:[...this.state.mealsSelected,{meal, index:'Meal '+ (index+1)}] })}
-                          className="m-2"
-                        >Add to Plan
-                        </Button>
+                          <Button color="success" outline size='sm'
+                            onClick={() => this.setState({mealsSelected:[...this.state.mealsSelected,{meal, index:'Meal '+ (index+1)}] })}
+                            className="m-2"
+                          >Add to Plan
+                          </Button>
 
-                      </Card>
+                        </Card>
+                      </Col>
                     )
                   })
                 }
+              </Row>
             </CardGroup>
     )
   }
@@ -651,7 +659,7 @@ class NutritionDash extends Component {
               console.log('beforeSaveCell', oldValue, newValue, row, column, 'before save log')
 
               // User did not select any value, preserve the old value.
-              if(newValue === "") newValue = oldValue
+              if(newValue === '') newValue = oldValue
               if(column.dataField === 'serving' && !isNaN(newValue)) this.updateMacros(newValue, this.state.index)
               
               /*
@@ -731,7 +739,17 @@ class NutritionDash extends Component {
   }
 
   renderNutritionPlans = () => {
-    console.log(this.state.mealsSelected)
+    let setTime = (e, i) => {
+      
+      let newMeal = this.state.mealsSelected[i]
+      let newArr = this.state.mealsSelected
+      console.log(newMeal, 'NEW MEAL')
+      newMeal.time = e.target.value
+      newArr[i] = newMeal
+      return newArr
+
+    }
+
     return(
       <>
         <h1>Plans</h1>
@@ -740,14 +758,24 @@ class NutritionDash extends Component {
             + Add Plan
             <ListGroup>
               {this.state.mealsSelected.map((meal,i) => {
-                return <ListGroupItem><span className='mx-3'>{meal.index } Set a time:</span> 
-                <input className='mx-3' type='time' /> 
-                <FontAwesomeIcon className='mx-3' onClick={()=>this.removeMealFromPlan(i)} icon="minus-circle" size={'1x'} /></ListGroupItem>
+                return <ListGroupItem><span >{meal.index } </span>
+                <InputGroup>
+                <Label>Name (optional)</Label> 
+                <Input  type='text' />
+                <Label>Day (optional)</Label> 
+                <Input  type='text' />
+                <Label>Set a time:</Label> 
+                <Input onChange={(e)=>{this.setState({mealsSelected:setTime(e,i)})}} type='time' />
+                  <InputGroupAddon addonType="append">
+                    <Button color="danger" onClick={()=>this.removeMealFromPlan(i)}>Remove</Button>
+                  </InputGroupAddon>
+                </InputGroup>
+                </ListGroupItem>
               })}
             </ListGroup>
           </CardBody>
         </Card>
-        <Button color='dark'>Save Meal</Button>
+        <Button className='text-center mt-3'  color='dark'>Save Meal</Button>
       </>
     )
   }
@@ -807,12 +835,18 @@ class NutritionDash extends Component {
               <React.Fragment>
                <Button color={'dark'} className='mt-4' onClick={()=>this.setState({openMeals:!this.state.openMeals})}
                   >{this.state.openMeals ? 'Hide Meals':'Show Meals'}</Button>
+
                 <Row className="my-3 justify-content-center">
                 
-                <Collapse isOpen={this.state.openMeals}>
-                  <Col className='meal-side' >{this.renderMealSchedule()}</Col>
-                </Collapse>
-                  <Col className='plan-side' >{this.renderNutritionPlans()}</Col>
+                  <Collapse className='col-md-6 text-center' isOpen={this.state.openMeals}>
+
+                    <Button color={'danger'} outline={this.state.deleteMeals ? false:true} className='my-3' 
+                      onClick={()=>this.setState({deleteMeals:!this.state.deleteMeals})} >
+                      <FontAwesomeIcon icon="trash-alt" size={'1x'} /></Button>
+                    {this.renderMealSchedule()}
+                  </Collapse>
+
+                  <Col className='plan-side' md='6'>{this.renderNutritionPlans()}</Col>
                 </Row>
                 
               </React.Fragment>
@@ -820,7 +854,7 @@ class NutritionDash extends Component {
               <Row className="my-3">
                 <Col md="12">
                   <h1 className='no-meals-badge'>
-                    <Badge color="info">
+                    <Badge color="dark">
                       Create a nutrition plan to schedule some meals!
                     </Badge>
                   </h1>

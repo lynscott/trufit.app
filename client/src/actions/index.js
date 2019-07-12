@@ -32,6 +32,8 @@ export const FETCH_WORKOUTS = 'FETCH_WORKOUTS'
 export const CREATE_NEW_MEAL = 'CREATE_NEW_MEAL'
 export const CREATE_NEW_MEAL_FAILED = 'CREATE_NEW_MEAL_FAILED'
 export const FETCH_MEALS = 'FETCH_MEALS'
+export const DELETE_MEAL = 'DELETE_MEAL'
+export const EDIT_MEAL = 'EDIT_MEAL'
 
 
 
@@ -204,12 +206,27 @@ export const createNewMeal = (values) => async dispatch => {
 
 }
 
-
+//MEAL SECTION///
 export const fetchMeals = () => async dispatch => {
   const res = await axios.get('/api/meals')
 
   dispatch({ type: FETCH_MEALS, payload: res.data })
 }
+
+
+export const deleteMeal = (i) => async dispatch => {
+  const res = await axios.post('/api/delete_meal', i)
+
+  dispatch({ type: DELETE_MEAL, payload: res.data })
+}
+
+
+export const editMeal = (updates) => async dispatch => {
+  const res = await axios.post('/api/edit_meal', updates)
+
+  dispatch({ type: EDIT_MEAL, payload: res.data })
+}
+///
 
 export const createNewWorkout = (values) => async dispatch => {
 

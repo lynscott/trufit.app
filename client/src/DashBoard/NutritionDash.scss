@@ -7,6 +7,13 @@ td, .truncate {
     max-width: fit-content;
 }
 
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
 .selected-row{
     background-color: #008ed6 !important;
     color:white;

@@ -28,8 +28,8 @@ const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 mongoose.Promise = require('bluebird')
-mongoose.connect('mongodb://localhost:27017')
-// mongoose.connect(keys.mongoURI, { useMongoClient: true })
+// mongoose.connect('mongodb://localhost:27017')
+mongoose.connect(keys.mongoURI, { useMongoClient: true })
 // mongoose.model('exercises', new mongoose.Schema())
 // console.log(models)
 sgMail.setApiKey(keys.sendGridKey)
@@ -398,20 +398,34 @@ app.post('/api/new_plan_template', async (req, res) => {
   if (!req.user  ) {
     return res.status(401).send({ error: 'You must log in!' });
   }
+  
   let { plan, workouts } = req.body
-  let plan_template = new models.PlanTemplates({
-    name: plan.title,
-    category: plan.category,
-    logo: plan.logo,
-    created_date: Date.now(),
-    creator: req.user.id,
-    description:plan.description,
-    workouts: workouts,
-  })
-  await plan_template.save()
+  console.log(workouts)
+  // let plan_template = new models.PlanTemplates({
+  //   name: plan.title,
+  //   category: plan.category,
+  //   logo: plan.logo,
+  //   created_date: Date.now(),
+  //   creator: req.user.id,
+  //   // description:plan.description,
+  //   workouts: workouts,
+  // })
+  // await plan_template.save()
 
   res.status(200).send('Success')
 })
+
+
+app.post('/api/delete_meal', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id } = req.body
+  await models.Meals.deleteOne({_id:id})
+
+  res.status(200).send('Success')
+})
+
 
 app.post('/api/new_user_plan', async (req, res) => {
   if (!req.user  ) {
@@ -498,6 +512,7 @@ app.post('/api/update_profile', async (req, res, next) => {
   })
 })
 
+//DEPRECATED
 app.post('/api/update_food_item', async (req, res, next) => {
   requireLogin(req, res, next)
 
