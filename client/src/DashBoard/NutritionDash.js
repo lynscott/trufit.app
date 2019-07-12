@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import BootstrapTable from 'react-bootstrap-table-next'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import {
@@ -110,11 +111,10 @@ export const formatMealTime = (mealTime) => {
  * Only allow integer entries into the cell.
  */
 class NumbersOnlyEntry extends Component {
-  /*
   static propTypes = {
     value: PropTypes.number,
     onUpdate: PropTypes.func.isRequired
-  }*/
+  }
 
   static defaultProps = {
     value: 0
@@ -133,6 +133,7 @@ class NumbersOnlyEntry extends Component {
         style={{textAlign: 'center', width: '100%', height: '100%'}}
         key="text"
         ref={ node => this.text = node }
+        min={0}
         type="number"
       />,
     ]
@@ -267,7 +268,7 @@ class NutritionDash extends Component {
    * This is a SHALLOW check against only the name
    */
    isOkayToAddProduct = (product) => {
-     console.log('isOkayToAddProduct', product)
+    //console.log('isOkayToAddProduct', product)
     if(!product) return false
 
     // Existence check
@@ -317,8 +318,20 @@ class NutritionDash extends Component {
     )
   }
 
-  manualEntryButton = () => {
+  /**
+   * Validate any manual entry appropriately.
+   * Name should be alphanumeric
+   * Numbers should only be floats.
+   */
+  manualEntryIsInvalid = (key, value) => {
+    //console.log('manualEntryValidate', key, value, typeof(value))
+    if(value == undefined || value == null || value === '') return true
+    if(key != 'name' && isNaN(value)) return true
 
+    return false
+  }
+
+  manualEntryButton = () => {
     return (
       <Button className="my-2 nutrition-btn"
         onClick={async () => this.setState({manualEntry:!this.state.manualEntry})}
@@ -330,32 +343,39 @@ class NutritionDash extends Component {
   manualItemEditor = () => {
     let fields = []
 
-    //Create input form from empty item keys
+    // Create input form from empty item keys
     Object.keys(EMPTY_FOOD_ENTRY).map((key,i)=>{
       fields.push(
         <>
           {this.props.windowWidth < 500 ? <Label>{key}</Label> : null}
-          <Input key={i} invalid={this.state.manualItem[key] ? false:true} 
-            onChange={(e)=>addKey(e, key)} placeholder={key} name={key} />
+
+          <Input key={i} invalid={this.manualEntryIsInvalid(key, this.state.manualItem[key])} value={this.state.manualEntry ? this.state.manualItem[key] : ''}
+            onChange={(e)=>addKey(e, key)} placeholder={key} type={key != 'name' ? 'number' : null} min={0} name={key} />
         </>
           )
     })
 
-    //Update object key in state
+    // Update object key in state
     let addKey = (e,key) => {
+      // Do not allow alphabet for non-name entries
+      if(key != 'name' && isNaN(e.target.value)) return
+
+      // Update the item.
       let newItem = this.state.manualItem
-      newItem[key] = e.target.value
+
+      if(key == 'name') newItem[key] = e.target.value
+      else newItem[key] = parseFloat(e.target.value)
       this.setState({manualItem:newItem})
     }
 
     return (
       <>
         <InputGroup className='m-2'>{fields}</InputGroup>
-        <Button onClick={async ()=>{
-          await this.addProduct(this.state.manualItem)
+        <Button onClick={()=>{
+          this.addProduct(this.state.manualItem)
           this.setState({manualEntry:false, manualItem:{}})
         }}
-         disabled={Object.keys(this.state.manualItem).length === 6 ? false:true } className='mb-2'>Add To Table</Button>
+         disabled={Object.keys(this.state.manualItem).length != 6 || !this.isOkayToAddProduct(this.state.manualItem)} className='mb-2'>Add To Table</Button>
       </>
     )
   }
@@ -431,12 +451,13 @@ class NutritionDash extends Component {
     let i = rowIndex
     let newProducts = [...this.state.products]
 
-    console.log('correct', newValue)
     newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
     newProducts[i].carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
     newProducts[i].protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
     newProducts[i].calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
     newProducts[i].serving = newValue
+
+    console.log('updateMacros', newValue, rowIndex, newProducts[i])
 
     this.setState({ products: newProducts, rowSelected: false }, () => {
       this.calculateTotals()
@@ -591,7 +612,7 @@ class NutritionDash extends Component {
         dataField: 'serving',
         text: 'Amount(oz)',
         editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
-          return <NumbersOnlyEntry { ...editorProps } value={ value } />
+          return <NumbersOnlyEntry { ...editorProps } value={ value } onUpdate={() => {}}/>
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
