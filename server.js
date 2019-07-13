@@ -496,6 +496,46 @@ app.post('/api/new_meal', async (req, res) => {
   res.status(200).send('Success')
 })
 
+
+
+app.post('/api/log_meal', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id, log  } = req.body
+  await models.NutritionPlan.findOne({_id:id}, (err, plan) => {
+    // console.log(meal.completions, meal)
+    if (err) {
+      return err
+    }
+
+    if (plan) {
+      let arr = [...plan.log]
+      arr.push(log)
+      plan.log = arr
+      plan.save()
+      console.log(plan.log)
+      res.status(200).send('Success')
+    }
+
+  })
+  // await models.Meals.findOne({_id:id}, (err, meal) => {
+  //   // console.log(meal.completions, meal)
+  //   if (err) {
+  //     return err
+  //   }
+
+  //   if (meal) {
+  //     let arr = meal.completions
+  //     arr.push(new Date(timestamp))
+  //     meal.completions = arr
+  //     meal.save()
+  //     res.status(200).send('Success')
+  //   }
+
+  // })
+})
+
 app.post('/api/new_workout', async (req, res) => {
   if (!req.user ) {
     // console.log(req.user)
