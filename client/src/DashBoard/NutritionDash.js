@@ -238,9 +238,6 @@ class NutritionDash extends Component {
     let nutritionCals = 0
     for (let i = 0; i < this.props.userMeals.length; i++) {
       this.props.userMeals[i].items.map(item=>{
-        // fats = Number(item.fats) + Number(fats)
-        // carbs = Number(item.carb) + Number(carbs)
-        // prot = Number(item.protein) + Number(prot)
         nutritionCals = Number(item.calories) + Number(nutritionCals)
       })
     }
@@ -402,7 +399,9 @@ class NutritionDash extends Component {
       <>
         <InputGroup className='m-2'>{fields}</InputGroup>
         <Button onClick={()=>{
-          this.addProduct(this.state.manualItem)
+          let manualItem = this.state.manualItem
+          manualItem.manualEntry = true
+          this.addProduct(manualItem)
           this.setState({manualEntry:false, manualItem:{}})
         }} color='dark'
          disabled={Object.keys(this.state.manualItem).length != 6 || !this.isOkayToAddProduct(this.state.manualItem)} 
@@ -481,6 +480,9 @@ class NutritionDash extends Component {
   updateMacros = (newValue, rowIndex) => {
     let i = rowIndex
     let newProducts = [...this.state.products]
+
+    if(newProducts[i].manualEntry)
+      return //No updates for manual items
 
     newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
     newProducts[i].carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
@@ -646,9 +648,10 @@ class NutritionDash extends Component {
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
-          if (row.name === 'Total') {
+          if (row.name === 'Total' || row.manualEntry) {
             return false
           }
+  
           return true
         }
       },
