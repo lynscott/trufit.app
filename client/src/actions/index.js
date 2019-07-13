@@ -34,6 +34,10 @@ export const CREATE_NEW_MEAL_FAILED = 'CREATE_NEW_MEAL_FAILED'
 export const FETCH_MEALS = 'FETCH_MEALS'
 export const DELETE_MEAL = 'DELETE_MEAL'
 export const EDIT_MEAL = 'EDIT_MEAL'
+export const CREATE_NUTRITION_PLAN = 'CREATE_NUTRITION_PLAN'
+export const CREATE_NUTRITION_PLAN_FAILED = 'CREATE_NUTRITION_PLAN_FAILED'
+export const FETCH_NUTRITION_PLANS = 'FETCH_NUTRITION_PLANS'
+export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
 
 
 
@@ -181,6 +185,34 @@ export const fetchExercises = () => async dispatch => {
   const res = await axios.get('/api/exercises')
 
   dispatch({ type: FETCH_EXERCISES, payload: res.data })
+}
+
+export const fetchNutritionPlans = () => async dispatch => {
+  const res = await axios.get('/api/nutrition_plans')
+
+  dispatch({ type: FETCH_NUTRITION_PLANS, payload: res.data })
+}
+
+export const createNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/nutrition_plan', values)
+    dispatch({type: CREATE_NUTRITION_PLAN})
+  } catch (error) {
+    dispatch({type: CREATE_NUTRITION_PLAN_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+export const deleteNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/delete_nutrition_plan', values)
+    dispatch({type: DELETE_PLAN_SUCCESS})
+  } catch (error) {//TODO: Make user feedback for fail
+    dispatch({type: 'DELETE_PLAN_FAILED', payload:'Error Occured'+ error})
+  }
+
 }
 
 export const createNewPlan = (values) => async dispatch => {

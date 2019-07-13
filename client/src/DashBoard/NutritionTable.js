@@ -48,9 +48,30 @@ class NextMeal extends Component {
   }
 
   renderNextMeal = () => {
+    
+
+    return (
+      <CardText className="row">
+        <Col md="6">
+          <h5>
+            <Badge color="dark" style={{ whiteSpace: 'normal' }}>
+              {' '}
+              No Meals Scheduled Yet!
+            </Badge>
+          </h5>
+        </Col>
+        <Col md="6">
+          <h5>
+            <Badge color="info" style={{ whiteSpace: 'normal' }}>
+              Have you created a nutrition plan?
+            </Badge>
+          </h5>
+        </Col>
+      </CardText>
+    )
+
     let meals = this.props.profile.nutritionSchedule
     let index = 0
-
     if (this.props.userNutritionPlans.length > 0) {
 
       meals.sort((a, b) =>
