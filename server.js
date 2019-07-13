@@ -30,8 +30,6 @@ const app = express()
 mongoose.Promise = require('bluebird')
 // mongoose.connect('mongodb://localhost:27017')
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
-// mongoose.model('exercises', new mongoose.Schema())
-// console.log(models)
 sgMail.setApiKey(keys.sendGridKey)
 
 //TODO: Replace const in code with model calls
@@ -212,6 +210,14 @@ app.get('/api/plan_templates', async (req, res, next) => {
   res.send(allPlans)
 })
 
+
+app.get('/api/nutrition_plans', async (req, res, next) => {
+  requireLogin(req, res, next)
+
+  const allPlans = await models.NutritionPlan.find({creator:req.user.id}).select('-creator')
+  res.send(allPlans)
+})
+
 app.get('/api/exercises', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
@@ -281,7 +287,7 @@ app.get('/api/admin_exercises', async (req, res) => {
 })
 
 app.use('/api/profiles/:id', async (req, res) => {
-  console.log('Request Id:', req.params.id);
+  // console.log('Request Id:', req.params.id);
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
@@ -427,6 +433,16 @@ app.post('/api/delete_meal', async (req, res) => {
 })
 
 
+app.post('/api/delete_nutrition_plan', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id } = req.body
+  await models.NutritionPlan.deleteOne({_id:id})
+
+  res.status(200).send('Success')
+})
+
 app.post('/api/new_user_plan', async (req, res) => {
   if (!req.user  ) {
     return res.status(401).send({ error: 'You must log in!' });
@@ -449,13 +465,16 @@ app.post('/api/nutrition_plan', async (req, res) => {
   if (!req.user ) {
     return res.status(401).send({ error: 'You must log in!' });
   }
-  let { plan, items, day, type } = req.body
+  let { items, day, name } = req.body
+  let itemIds = items.map((item)=> item.meal._id)
+  // console.log(itemIds)
   let nutrition_plan = new models.NutritionPlan({
-    items: items,
+    scheduleData: items,
     creator: req.user.id,
+    items: itemIds
   })
   day ? nutrition_plan.day = day : null
-  type ? nutrition_plan.type = type : null
+  name ? nutrition_plan.name = name : null
   await nutrition_plan.save()
 
   res.status(200).send('Success')
