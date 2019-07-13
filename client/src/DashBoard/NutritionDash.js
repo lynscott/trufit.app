@@ -35,7 +35,7 @@ import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import {FULL_LAYOUT_WIDTH, COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
 
 const EMPTY_FOOD_ENTRY = {
   name: '',
@@ -928,7 +928,7 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" md="10">
+      <Col className="bg-light" md="10" style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>
