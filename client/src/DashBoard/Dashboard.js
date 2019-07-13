@@ -7,6 +7,7 @@ import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
 import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
+import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
 
 // import CreatePlanForm from './CreatePlanForm'
 import {
@@ -327,7 +328,7 @@ class Dashboard extends Component {
           <CardHeader >Caloric Intake Tracking</CardHeader>
 
           <BarChart
-            display={this.props.windowWidth < 500 ? false : true}
+            display={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? false : true}
             calories={this.props.profile.calories}
             planned={this.props.profile.nutritionCalories}
             />
@@ -383,12 +384,7 @@ class Dashboard extends Component {
     return (
       <Col
         className="bg-white"
-        style={{
-          paddingTop: '10px',
-          maxHeight: this.props.windowWidth < 500 ? '85vh' : null,
-          overflowY: this.props.windowWidth < 500 ? 'scroll': null,
-          height: '100vh',
-          // backgroundColor: '#b3b3b3'
+        style={{ // backgroundColor: '#b3b3b3' 
         }}
         md="10"
       >
