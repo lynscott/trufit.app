@@ -185,7 +185,7 @@ class DashSideBar extends React.Component {
               }
             }
             }
-            onImageUpload={(file, success, error) => {}}
+            onImageUpload={(file, success, error) => {}} // Not in use, will hide.
           />
 
           {this.props.profile ?
