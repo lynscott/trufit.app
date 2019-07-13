@@ -7,7 +7,7 @@ import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
 import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
-import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
 
 // import CreatePlanForm from './CreatePlanForm'
 import {
@@ -379,12 +379,18 @@ class Dashboard extends Component {
     )
   }
 
+
   render() {
     // console.log(this.props.profile)
+
+    console.log(this.props.windowWidth)
     return (
       <Col
         className="bg-white"
         style={{ // backgroundColor: '#b3b3b3' 
+          padding: '10px',
+          overflow: 'hidden',
+          height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null
         }}
         md="10"
       >
