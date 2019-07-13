@@ -383,7 +383,6 @@ class Dashboard extends Component {
   render() {
     // console.log(this.props.profile)
 
-    console.log(this.props.windowWidth)
     return (
       <Col
         className="bg-white"
