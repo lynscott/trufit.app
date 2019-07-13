@@ -35,6 +35,7 @@ import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {FULL_LAYOUT_WIDTH, COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
 
 const EMPTY_FOOD_ENTRY = {
   name: '',
@@ -128,6 +129,8 @@ class NumbersOnlyEntry extends Component {
 
   render() {
     const { value, onUpdate, ...rest } = this.props
+
+    console.log(value, onUpdate, rest)
 
     return [
       <input
@@ -375,7 +378,7 @@ class NutritionDash extends Component {
     Object.keys(EMPTY_FOOD_ENTRY).map((key,i)=>{
       fields.push(
         <>
-          {this.props.windowWidth < 500 ? <Label>{key}</Label> : null}
+          {this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? <Label>{key}</Label> : null}
 
           <Input key={i} invalid={this.manualEntryIsInvalid(key, this.state.manualItem[key])} value={this.state.manualEntry ? this.state.manualItem[key] : ''}
             onChange={(e)=>addKey(e, key)} placeholder={key} type={key != 'name' ? 'number' : null} min={0} name={key} />
@@ -691,7 +694,7 @@ class NutritionDash extends Component {
           columns={columns}
           rowClasses={this.rowClasses}
           classes={
-            this.props.windowWidth < 500 === true
+            this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH === true
               ? 'table-mobile bg-light'
               : 'bg-light'
           }
@@ -922,8 +925,7 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" style={{ paddingTop: '10px', maxHeight: this.props.windowWidth < 500 ? '80vh' : '100vh',
-      overflowY: 'scroll' }} md="10">
+      <Col className="bg-light" md="10" style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>

@@ -1,5 +1,5 @@
 // import * as icons from 'Constants/SVGIcons'
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import * as actions from '../actions'
 import { connect } from 'react-redux'
@@ -21,7 +21,7 @@ import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SlackFeedback,  { themes } from 'react-slack-feedback'
 import keys from '../config/keys'
-
+import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
 
 class DashSideBar extends React.Component {
   constructor(props) {
@@ -31,8 +31,8 @@ class DashSideBar extends React.Component {
       // page: 'Course-List',
       updateMessage: '',
       update: false,
-      collapsed: this.props.windowWidth < 500 ? true:false,
-      expanded: true
+      collapsed: this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ,
+      expanded: true // Not in use
     }
   }
 
@@ -45,9 +45,9 @@ class DashSideBar extends React.Component {
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.windowWidth !== this.props.windowWidth) {
           this.setState(()=>{
-            if( this.props.windowWidth < 500 && !this.state.collapsed) {
+            if( this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH && !this.state.collapsed) {
               this.toggleNavbar()
-            } else if (this.props.windowWidth > 500 && this.state.collapsed) {
+            } else if (this.props.windowWidth > COLLAPSE_TRIGGER_WIDTH && this.state.collapsed) {
               this.toggleNavbar()
             }
             
@@ -64,7 +64,7 @@ class DashSideBar extends React.Component {
             <NavItem active={this.props.currentTab === 'admin'}>
             <Link style={{textDecoration:'none'}} to="/dashboard/admin">
               <NavLink  onClick={() => {
-                        if (!this.state.collapsed && this.props.windowWidth < 500) {
+                        if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
                             this.toggleNavbar()
                         }
                       }} >
@@ -91,11 +91,11 @@ class DashSideBar extends React.Component {
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
           <Collapse isOpen={!this.state.collapsed} navbar>
           <div className='nav-links'>
-            <NavItem active={this.props.currentTab === "overview"}>
+            <NavItem active={this.props.currentTab === 'overview'}>
               <Link style={{textDecoration:'none'}} to="/dashboard/overview">
                 <NavLink
                         onClick={ ()=>{
-                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                          if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
                               this.toggleNavbar()
                           }
                         }} >
@@ -104,10 +104,10 @@ class DashSideBar extends React.Component {
               </Link> 
             </NavItem >
 
-            <NavItem active={this.props.currentTab === "nutrition"}>     
+            <NavItem active={this.props.currentTab === 'nutrition'}>     
               <Link style={{textDecoration:'none'}} to="/dashboard/nutrition">
                 <NavLink onClick={ ()=>{
-                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                          if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
                               this.toggleNavbar()
                           }
                         }} >
@@ -116,10 +116,10 @@ class DashSideBar extends React.Component {
               </Link>
             </NavItem>
 
-            <NavItem active={this.props.currentTab === "plans"}>
+            <NavItem active={this.props.currentTab === 'plans'}>
               <Link style={{textDecoration:'none'}} to="/dashboard/plans">
                 <NavLink  onClick={()=>{
-                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                          if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
                               this.toggleNavbar()
                           }
                         }} >
@@ -132,7 +132,7 @@ class DashSideBar extends React.Component {
             {/* <NavItem active={this.props.currentTab === "settings"}>
               <Link style={{textDecoration:'none'}} to="/dashboard/settings">
                 <NavLink  onClick={ ()=>{
-                          if (!this.state.collapsed && this.props.windowWidth < 500) {
+                          if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
                               this.toggleNavbar()
                           }
                         }} >
@@ -204,16 +204,16 @@ class DashSideBar extends React.Component {
  */
 const tabSelectorFromRoute = (pathname) => {
   switch(pathname){
-    case "/dashboard/overview":
-      return "overview"
-    case "/dashboard/plans":
-      return "plans"
-    case "/dashboard/nutrition":
-      return "nutrition"
-    case "/dashboard/settings":
-      return "settings"
+    case '/dashboard/overview':
+      return 'overview'
+    case '/dashboard/plans':
+      return 'plans'
+    case '/dashboard/nutrition':
+      return 'nutrition'
+    case '/dashboard/settings':
+      return 'settings'
     default:
-      return "overview"
+      return 'overview'
   }
 }
 

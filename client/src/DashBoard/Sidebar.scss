@@ -1,14 +1,22 @@
 
+/**
+ Slack Feedback CSS Override.
+*/
+
 
 .sidebar-col{
   // .list-group-item{
   //   width: 100%;
   // }
   padding: 8px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 
   .nav-link{
     color: white !important;
-    
+    font-size: 1.1em;
   }
 
   .nav-links{
@@ -25,7 +33,57 @@
     position: inherit;
   }
 
+  // Slack Feedback Button Container
+  .fprCaL {
+    margin: 0 !important;
+
+    textarea {
+      min-height: 100px !important;
+    }
+  }
+
+  // Slack Feedback Modal Container
   .eQeaZq {
-    width: auto;
+    top: 0 !important; 
+    left: 0 !important; 
+    bottom: 0 !important; 
+    right: 0 !important;
+    width: auto !important;
+
+    // Header Container for input
+    .ekNHSJ {
+
+    }
+
+    // Content Container for input (Contains the message, labels, etc...)
+    .evxZXb {
+
+      // Feedback type header
+      .dcEPCg {
+
+      }
+
+      // Feedback types ( labels )
+      .lmlLhn {
+        margin-bottom: unset;
+
+        & > li {
+          padding: 0.5em;
+        }
+      }
+
+    }
+
+    // Disabling image upload for input
+    .diWaeG {
+      display: none;
+    }
+  }
+
+  // Slack Feedback Trigger Button 
+  .hiaJXm {
+    overflow: hidden !important;
+    display: block !important;
+    text-overflow: ellipsis !important;
   }
 }
