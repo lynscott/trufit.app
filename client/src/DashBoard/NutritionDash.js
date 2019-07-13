@@ -87,7 +87,7 @@ const barOptions = {
   }
 }
 
-export const formatMealTime = (mealTime) => {
+export const formatMealTime = (mealTime, reformat=true) => {
   if (mealTime) {
     let hr = parseInt(mealTime.split(':')[0])
     let min = parseInt(mealTime.split(':')[1])
@@ -97,7 +97,8 @@ export const formatMealTime = (mealTime) => {
       hr = hr - 1
     }
 
-    return now.toLocaleTimeString('en-US', {
+    if( !reformat) return now
+    else return now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     })
@@ -630,21 +631,12 @@ class NutritionDash extends Component {
           return true
         }
       },
-      // {
-      //   dataField: 'serving_label',
-      //   text: 'Serving',
-      //   editable: (cell, row, rowIndex, colIndex) => {
-      //     if (rowIndex === this.row.name === 'Total'.length) {
-      //       return false
-      //     }
-      //     return true
-      //   }
-      // },
       {
         dataField: 'serving',
         text: 'Amount(oz)',
         editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
-          return <NumbersOnlyEntry { ...editorProps } value={ value } onUpdate={() => {}}/>
+          if(row.name === 'Total') return null
+          else return <NumbersOnlyEntry { ...editorProps } value={ value } onUpdate={() => {}}/>
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
@@ -659,7 +651,6 @@ class NutritionDash extends Component {
         dataField: 'calories',
         text: 'Calories',
         editable: (cell, row, rowIndex, colIndex) => {
-          // console.log(cell, row)
           if (row.id === 'manual') {
             return true
           }
@@ -823,9 +814,16 @@ class NutritionDash extends Component {
         plans.push(
           <ListGroupItem key={i}>
 
+            <Collapse isOpen={this.props.profile.activeNutritionPlan === plan._id}>
+              <FontAwesomeIcon icon="star" size={'1x'} />
+            </Collapse>
+
             <ListGroupItemHeading className='text-center'>{plan.name} - {plan.day? plan.day: 'N/A'}</ListGroupItemHeading>
 
             <ButtonGroup size="sm" style={{display:'block', textAlign:'center', marginBottom:'10px'}}>
+
+            <Button className='text-center' color={'dark'}>Set as active plan</Button>
+
               <Button className='text-center' onClick={()=>{
                 this.state.showMealsFor !==null ? this.setState({showMealsFor:null}):
                 this.setState({showMealsFor:i})}} >Show Meals</Button>
@@ -835,7 +833,7 @@ class NutritionDash extends Component {
                 }} color='warning'> <FontAwesomeIcon icon="trash-alt" size={'1x'} /></Button>
             </ButtonGroup>
 
-            <Collapse className='text-center' isOpen={this.state.deletePlan !== null  && this.state.deletePlan===i}>
+            <Collapse className='text-center' isOpen={this.state.deletePlan !== null && this.state.deletePlan===i}>
               <Button onClick={async ()=>{
                 await this.props.deleteNutritionPlan({id:plan._id})
                 this.props.fetchNutritionPlans()
@@ -917,7 +915,6 @@ class NutritionDash extends Component {
           </CardBody>
         </Card>
 
-        
       </>
     )
   }

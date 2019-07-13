@@ -80,7 +80,6 @@ class DashSideBar extends React.Component {
 
 
   render() {
-    console.log(this.props)
     return (
         <Nav vertical navbar className="sidebar-col col-md-2 bg-dark" >
           <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h3">
@@ -129,7 +128,8 @@ class DashSideBar extends React.Component {
               </Link>
             </NavItem>
 
-            <NavItem active={this.props.currentTab === "settings"}>
+            {/* TODO: Create settings page */}
+            {/* <NavItem active={this.props.currentTab === "settings"}>
               <Link style={{textDecoration:'none'}} to="/dashboard/settings">
                 <NavLink  onClick={ ()=>{
                           if (!this.state.collapsed && this.props.windowWidth < 500) {
@@ -139,7 +139,7 @@ class DashSideBar extends React.Component {
                     Settings
                 </NavLink>
               </Link>
-            </NavItem>
+            </NavItem> */}
 
             <NavItem>
               <a
@@ -184,13 +184,14 @@ class DashSideBar extends React.Component {
                return logPromise.then(success)
               }
             }
-            }
+            }//TODO: wire up
             onImageUpload={(file, success, error) => {}}
           />
 
           {this.props.profile ?
             this.renderAdminLink()
            : null}
+
           </Collapse>     
         </Nav>
     )

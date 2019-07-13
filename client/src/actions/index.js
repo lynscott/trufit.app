@@ -38,6 +38,7 @@ export const CREATE_NUTRITION_PLAN = 'CREATE_NUTRITION_PLAN'
 export const CREATE_NUTRITION_PLAN_FAILED = 'CREATE_NUTRITION_PLAN_FAILED'
 export const FETCH_NUTRITION_PLANS = 'FETCH_NUTRITION_PLANS'
 export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
+export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
 
 
 
@@ -257,6 +258,13 @@ export const editMeal = (updates) => async dispatch => {
   const res = await axios.post('/api/edit_meal', updates)
 
   dispatch({ type: EDIT_MEAL, payload: res.data })
+}
+
+
+export const logMealComplete  = (updates) => async dispatch => {
+  const res = await axios.post('/api/log_meal', updates)
+
+  dispatch({ type: MARK_MEAL_COMPLETE, payload: res.data })
 }
 ///
 

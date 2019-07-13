@@ -5,7 +5,7 @@ import * as actions from '../actions'
 import classnames from 'classnames'
 import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
-import PoseNet from '../component/PoseNet'
+// import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
 
 // import CreatePlanForm from './CreatePlanForm'
@@ -251,12 +251,6 @@ class Dashboard extends Component {
     return (
       <CardColumns className="card-wall mt-4">
       
-      {this.state.assessment?
-        <Card >
-          <CardHeader>Assessment</CardHeader>
-           <PoseNet/>
-        </Card>
-        : null}
 
         <Card  style={{ color: '#333', borderColor: '#cc370a', paddingBottom:'15px' }}>
           <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
@@ -325,13 +319,13 @@ class Dashboard extends Component {
 
         <Card >
           <CardHeader >Caloric Intake Tracking</CardHeader>
-
           <BarChart
             display={this.props.windowWidth < 500 ? false : true}
             calories={this.props.profile.calories}
             planned={this.props.profile.nutritionCalories}
             />
         </Card>
+
       </CardColumns>
     )
   }
@@ -339,42 +333,24 @@ class Dashboard extends Component {
 
   renderDashTopStats = () => {
     return (
-      // <Row style={{ padding: 0, marginBottom: '10px' }}>
-      // {/* {this.affirmationChange()} */}
+
       <Jumbotron className="text-left" style={{ width: '100%' }}>
-        {/* <h1 className="display-3">Hello, world!</h1> */}
         {this.affirmationChange()}
         <hr className="my-2" />
-        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
-        {/* <p className="lead">
-          <Button color="primary">Learn More</Button>
-        </p> */}
+
+        {this.props.plans.length > 0 ?
         <Row>
           <Col md='4'>
-           {/* {this.props.user.isAdmin?  */}
-           {/* <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button> */}
-           {/* : null} */}
-            <CardSubtitle
-              style={{
-                textAlign: 'left',
-                paddingLeft: '15px',
-                marginTop: '10px'
-              }}
-            >
+            <CardSubtitle style={{ textAlign: 'left', paddingLeft: '15px', marginTop: '10px'}}>
               Plan Completion
             </CardSubtitle>
             <Progress color="dark" className="mx-3" value={30}>
               0%
             </Progress>
           </Col>
-          <Col>
-           {/* {this.props.user.isAdmin?  */}
-           {/* <Button color='info' onClick={()=> this.setState({assessment:false})}>End Assessment</Button> */}
-           {/* : null} */}
-          </Col>
         </Row>
+        : null}
       </Jumbotron>
-      // </Row>
     )
   }
 
@@ -406,7 +382,7 @@ class Dashboard extends Component {
 function mapStateToProps(state, { auth }) {
   return {
     user: state.auth.user,
-    plans: state.plans.planTemps,
+    plans: state.plans.userPlans,
     profile: state.auth.userProfile
   }
 }

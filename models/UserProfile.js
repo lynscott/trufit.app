@@ -19,10 +19,10 @@ const userProfileSchema = new Schema ({
   nutritionCalories: Number,
   nutritionItems: {type:Array, default:[{ name: 'Total', serving:'', serving_label:'', calories: 0, fats: 0, protein: 0, carb: 0 }]},
   email: {type:String, unique:true, lowercase:true},
+  activePlan: {type: Schema.ObjectId, ref: 'Plans' },
+  activeNutritionPlan: {type: Schema.ObjectId, ref: 'NutritionPlan' },
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
-  trainingPlans: [{ 
-    type: Schema.ObjectId, 
-    ref: 'Plans' }]
+  trainingPlans: [{ type: Schema.ObjectId, ref: 'Plans' }]
 },{ usePushEach: true });
 
 module.exports = mongoose.model('profile', userProfileSchema);
