@@ -7,6 +7,7 @@ export const PLAN_SELECTED = 'plan_selected'
 export const CONTACT = 'contact'
 export const TRAINING_FORM = 'training_form'
 export const FETCH_USER = 'fetch_user'
+export const FETCH_USER_AUTHENTICATING = 'fetch_user_authenticating'
 export const INTAKE_FORM = 'intake_form'
 export const FETCH_PLANS = 'fetch_plans'
 export const FETCH_PLAN = 'fetch_plan'
@@ -28,6 +29,20 @@ export const WEEKLY_CHECKIN = 'WEEKLY_CHECKIN'
 export const NEW_WORKOUT_SUCCESS = 'NEW_WORKOUT_SUCCESS'
 export const NEW_WORKOUT_FAILED = 'NEW_WORKOUT_FAILED'
 export const FETCH_WORKOUTS = 'FETCH_WORKOUTS'
+export const CREATE_NEW_MEAL = 'CREATE_NEW_MEAL'
+export const CREATE_NEW_MEAL_FAILED = 'CREATE_NEW_MEAL_FAILED'
+export const FETCH_MEALS = 'FETCH_MEALS'
+export const DELETE_MEAL = 'DELETE_MEAL'
+export const EDIT_MEAL = 'EDIT_MEAL'
+export const CREATE_NUTRITION_PLAN = 'CREATE_NUTRITION_PLAN'
+export const CREATE_NUTRITION_PLAN_FAILED = 'CREATE_NUTRITION_PLAN_FAILED'
+export const FETCH_NUTRITION_PLANS = 'FETCH_NUTRITION_PLANS'
+export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
+export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
+
+export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
+
+
 
 
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
@@ -87,6 +102,7 @@ export const intakeToneForm = (values, history, id) => async dispatch => {
 
 //FETCH USER OAUTH
 export const fetchUser = () => async dispatch => {
+  dispatch({ type: FETCH_USER_AUTHENTICATING})
   const res = await axios.get('/api/logged_user/')
   // console.log(res.data)
 
@@ -174,6 +190,34 @@ export const fetchExercises = () => async dispatch => {
   dispatch({ type: FETCH_EXERCISES, payload: res.data })
 }
 
+export const fetchNutritionPlans = () => async dispatch => {
+  const res = await axios.get('/api/nutrition_plans')
+
+  dispatch({ type: FETCH_NUTRITION_PLANS, payload: res.data })
+}
+
+export const createNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/nutrition_plan', values)
+    dispatch({type: CREATE_NUTRITION_PLAN})
+  } catch (error) {
+    dispatch({type: CREATE_NUTRITION_PLAN_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+export const deleteNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/delete_nutrition_plan', values)
+    dispatch({type: DELETE_PLAN_SUCCESS})
+  } catch (error) {//TODO: Make user feedback for fail
+    dispatch({type: 'DELETE_PLAN_FAILED', payload:'Error Occured'+ error})
+  }
+
+}
+
 export const createNewPlan = (values) => async dispatch => {
 
   try {
@@ -186,6 +230,46 @@ export const createNewPlan = (values) => async dispatch => {
 }
 
 
+export const createNewMeal = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/new_meal', values)
+    dispatch({type: CREATE_NEW_MEAL})
+  } catch (error) {
+    dispatch({type: CREATE_NEW_MEAL_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+//MEAL SECTION///
+export const fetchMeals = () => async dispatch => {
+  const res = await axios.get('/api/meals')
+
+  dispatch({ type: FETCH_MEALS, payload: res.data })
+}
+
+
+export const deleteMeal = (i) => async dispatch => {
+  const res = await axios.post('/api/delete_meal', i)
+
+  dispatch({ type: DELETE_MEAL, payload: res.data })
+}
+
+
+export const editMeal = (updates) => async dispatch => {
+  const res = await axios.post('/api/edit_meal', updates)
+
+  dispatch({ type: EDIT_MEAL, payload: res.data })
+}
+
+
+export const logMealComplete  = (updates) => async dispatch => {
+  const res = await axios.post('/api/log_meal', updates)
+
+  dispatch({ type: MARK_MEAL_COMPLETE, payload: res.data })
+}
+///
+
 export const createNewWorkout = (values) => async dispatch => {
 
   try {
@@ -193,6 +277,18 @@ export const createNewWorkout = (values) => async dispatch => {
     dispatch({type: NEW_WORKOUT_SUCCESS})
   } catch (error) {
     dispatch({type: NEW_WORKOUT_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+
+export const saveNutritionPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/nutrition_plan', values)
+    dispatch({type: 'SAVE_NUTRITION_PLAN'})
+  } catch (error) {
+    dispatch({type: 'SAVE_NUTRITION_PLAN', payload:'Error Occured'+ error})
   }
 
 }
@@ -231,27 +327,36 @@ export const foodSearch = (term) => async dispatch => {
 }
 
 export const foodSelect = (foodID) => async dispatch => {
-
   //TODO: Move this to a constants folder
+  //ASSUMPTION: This is making the assumption that the food is coming from a standardized USDA Food Database.
+  //            Any other query to a seperate database may require appropriate adjustments to this parser.
   let parseFood = (food) => {
-    let name = food[0].food.desc.name.replace(',',' ')
+    let item = food[0].food
+    let name = item.desc.name.replace(',',' ')
+
+    console.log('parseFood', item)
 
     let foodItem = {}
     foodItem.name = name
-    foodItem.serving_label = food[0].food.nutrients[1].measures[0].label
-    foodItem.serving = 3.5
-    foodItem.baseCal = food[0].food.nutrients[1].value
-    foodItem.baseFats = food[0].food.nutrients[3].value
-    foodItem.baseCarb = food[0].food.nutrients[4].value
-    foodItem.baseProtein = food[0].food.nutrients[2].value
-    foodItem.calories = food[0].food.nutrients[1].value
-    foodItem.fats = food[0].food.nutrients[3].value
-    foodItem.carb = food[0].food.nutrients[4].value
-    foodItem.protein = food[0].food.nutrients[2].value
-    foodItem.active = false
-    foodItem.id = food[0].food.desc.ndbno
 
-    //Conversion form gram to oz
+    // nutrients[1] energy (Calories)
+    // nutrients[3] fats
+    // nutrients[2] proteins
+    // nutrients[4] carbs
+    // foodItem.serving_label = item.nutrients[1].measures[0].label
+    foodItem.serving = 3.5
+    foodItem.baseCal = item.nutrients[1].value
+    foodItem.baseFats = item.nutrients[3].value
+    foodItem.baseCarb = item.nutrients[4].value
+    foodItem.baseProtein = item.nutrients[2].value
+    foodItem.calories = item.nutrients[1].value
+    foodItem.fats = item.nutrients[3].value
+    foodItem.carb = item.nutrients[4].value
+    foodItem.protein = item.nutrients[2].value
+    foodItem.active = false
+    foodItem.id = item.desc.ndbno
+
+    //Conversion from gram to oz
  
     return foodItem
   }
@@ -296,4 +401,11 @@ export const fetchWorkouts = () => async dispatch => {
   let res = await axios.get('/api/fetch_workouts')
 
   dispatch({ type: FETCH_WORKOUTS, payload:res.data })
+}
+
+export const setSideBarWidth = (width) => async dispatch => {
+  // let width = await document.getElementById('sidebar-dash')
+
+  if (width !== undefined)
+    dispatch({type:SET_SIDEBAR_WIDTH, payload:width})
 }

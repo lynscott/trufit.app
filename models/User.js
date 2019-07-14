@@ -15,7 +15,6 @@ const userSchema = new Schema ({
   email: {type:String, unique:true, lowercase:true},
   password: String,
   startDate: Date,
-  plans: [String],
   provider: String,
   isAdmin: Boolean,
   isBetaTester: Boolean
@@ -56,4 +55,4 @@ userSchema.methods.comparePassword = function(candidatePassword, userPassword ,c
   });
 }
 
-mongoose.model('users', userSchema);
+module.exports = mongoose.model('users', userSchema);

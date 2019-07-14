@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import rootReducer from './reducers/index.js'
@@ -15,10 +15,19 @@ import { routerMiddleware } from 'connected-react-router'
 import createRootReducer from './reducers'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faUserPlus, faInfoCircle, faTools } from '@fortawesome/free-solid-svg-icons'
+//TODO: export/import to const file for icons
+import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle, faSquare,
+  faCheckSquare, faWrench, faToolbox } from '@fortawesome/free-solid-svg-icons'
 
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
+
+// HACK: console.log suppression on production build.
+// WARNING: We need to eject the app in order to do this the RIGHT way!!!! This is not secure.
+if (process.env.NODE_ENV !== 'development') {
+  console.log = () => {}
+}
+
  
 export const history = createBrowserHistory()
 
@@ -26,9 +35,10 @@ history.listen(_ => {
   window.scrollTo(0, 0)  
 })
  
-library.add(faUserCircle, faUserPlus, faInfoCircle, faTools )
+library.add(faUserCircle, faUserPlus, faInfoCircle, faSquare, faCheckSquare,
+  faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle, faWrench, faToolbox )
 
-const composeEnhancers = composeWithDevTools({
+const composeEnhancers = process.env.NODE_ENV !== 'development' ? compose : composeWithDevTools({
   // options like actionSanitizer, stateSanitizer
 })
 
@@ -37,9 +47,7 @@ const store = createStore(rootReducer(history), {}, composeEnhancers(applyMiddle
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <BrowserRouter>
         <AppRoutes/>
-      </BrowserRouter>
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root')

@@ -3,7 +3,8 @@ import { FETCH_PLANS, FETCH_PLAN , FETCH_PLAN_TEMPLATES} from '../actions'
 
 const initState = {
   planTemps: [],
-  userPlans: {}
+  userPlans: [],
+  
 }
 
 //_.mapKeys(action.payload, '_id')
