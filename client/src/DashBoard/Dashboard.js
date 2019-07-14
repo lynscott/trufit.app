@@ -41,7 +41,7 @@ import { Pie, Bar } from 'react-chartjs-2'
 import ViewPlan from './ViewPlan'
 import windowSize from 'react-window-size'
 
-const BarChart = ({ display, calories, planned }) => {
+const BarChart = ({ display, calories, planned, todaysIntake }) => {
   return (
     <Col md="12" className="p-2">
       <Bar
@@ -55,7 +55,7 @@ const BarChart = ({ display, calories, planned }) => {
               borderWidth: 1,
               hoverBackgroundColor: ' rgba(117, 200, 171, 0.4)', //'rgba(130, 128, 128,0.4)',
               hoverBorderColor: 'rgba(117, 200, 171, 1)',
-              data: [ planned, 592, -800]
+              data: [ planned, todaysIntake, Math.abs(planned-todaysIntake)]
             }
           ]
         }}
@@ -88,7 +88,7 @@ const BarChart = ({ display, calories, planned }) => {
                 },
                 scaleLabel: {
                   display: true,
-                  labelString: 'Average Intake',
+                  labelString: 'Today',
                   fontColor: 'black'
                 }
               }
@@ -122,12 +122,26 @@ class Dashboard extends Component {
       currentGoal: 'No Goal Selected',
       updateMessage: 'Testing',
       update: false,
-      assessment: false
+      assessment: false,
+      todaysCalories: 0,
+      userLogs: [],
+      userMeals: []
     }
   }
 
   componentDidMount = async () => {
     await this.props.fetchProfile()
+    await this.props.fetchNutritionPlans()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(this.props.userNutritionPlans !== prevProps.userNutritionPlans) {
+      this.setState({
+        userLogs: this.props.userNutritionPlans[0].log,
+        userMeals: this.props.userNutritionPlans[0].scheduleData
+      }, this.calculateTodaysIntake())
+      
+    }
   }
 
   toggle(tab) {
@@ -147,21 +161,16 @@ class Dashboard extends Component {
   affirmationChange = () => {
     if (this.state.update === false) {
       return (
-        <p
-          className="lead affirmation"
-          style={{ fontSize: '1.2rem' }}
-          onDoubleClick={() => this.setState({ update: true })}
-        >
-          {this.props.profile
-            ? this.props.profile.affirmation !== ''
-              ? this.props.profile.affirmation
-              : 'Tap to fill out'
-            : ''}
+        <p className="lead affirmation" style={{ fontSize: '1.2rem' }}
+          onDoubleClick={() => this.setState({ update: true })} >
+          {this.props.profile ? this.props.profile.affirmation !== ''
+            ? this.props.profile.affirmation : 'Tap to fill out' : ''}
         </p>
       )
     } else {
       return (
         <React.Fragment>
+
           <Form className="row">
             <Input
               type="text"
@@ -175,9 +184,8 @@ class Dashboard extends Component {
               }
             />
           </Form>
-          <Button
-            className="m-3"
-            color="info"
+
+          <Button className="m-3" color="info"
             onClick={async () => {
               await this.props.updateProfile({
                 keys: ['affirmation'],
@@ -188,15 +196,12 @@ class Dashboard extends Component {
           >
             Update Affirmation
           </Button>{' '}
-          <Button
-            className="m-3"
-            color="dark"
-            onClick={() => {
-              this.setState({ update: false })
-            }}
-          >
+
+          <Button className="m-3" color="dark"
+            onClick={() => this.setState({ update: false })} >
             Cancel
           </Button>{' '}
+
         </React.Fragment>
       )
     }
@@ -247,11 +252,25 @@ class Dashboard extends Component {
     )
   }
 
+
+  calculateTodaysIntake = () => {
+    let cal = 0
+    this.state.userLogs.forEach(log=> {
+      if (new Date(log.timestamp).toDateString() === new Date().toDateString()) {
+        this.state.userMeals.find((data)=> data.meal._id === log.id).meal.items.map((item)=>{
+          cal = cal + parseInt(item.calories)
+        })
+      }
+    })
+
+    // console.log(cal, 'TOTAL CAL')
+    this.setState({todaysCalories:cal})
+  }
+
   renderOverviewWall = () => {
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
-      
 
         <Card  style={{ color: '#333', borderColor: '#cc370a', paddingBottom:'15px' }}>
           <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
@@ -319,11 +338,12 @@ class Dashboard extends Component {
 
 
         <Card >
-          <CardHeader >Caloric Intake Tracking</CardHeader>
+          <CardHeader>Daily Caloric Intake Tracking</CardHeader>
           <BarChart
             display={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? false : true}
             calories={this.props.profile.calories}
             planned={this.props.profile.nutritionCalories}
+            todaysIntake={this.state.todaysCalories}
             />
         </Card>
 
@@ -384,7 +404,8 @@ function mapStateToProps(state, { auth }) {
   return {
     user: state.auth.user,
     plans: state.plans.userPlans,
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    userNutritionPlans: state.nutrition.userNutritionPlans
   }
 }
 
