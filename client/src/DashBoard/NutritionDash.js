@@ -43,7 +43,7 @@ const EMPTY_FOOD_ENTRY = {
   calories: 0,
   fats: 0,
   protein: 0,
-  carb: 0lertlertlertlertlertlertlertlertlert
+  carb: 0
 }
 
 const TOTAL_EMPTY_ENTRY = {
