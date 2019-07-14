@@ -130,8 +130,6 @@ class NumbersOnlyEntry extends Component {
   render() {
     const { value, onUpdate, ...rest } = this.props
 
-    console.log(value, onUpdate, rest)
-
     return [
       <input
         { ...rest }
@@ -636,6 +634,9 @@ class NutritionDash extends Component {
       },
       {
         dataField: 'serving',
+        events: {
+          onDoubleClick: (e, column, columnIndex, row, rowIndex) => { alert('hey')},
+        },
         text: 'Amount(oz)',
         editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
           if(row.name === 'Total') return null
@@ -925,7 +926,7 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" md="10" style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
+      <Col className="bg-light" md="10">
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>
