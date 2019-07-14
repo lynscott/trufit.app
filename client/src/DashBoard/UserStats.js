@@ -35,7 +35,7 @@ class Stats extends Component {
     renderCheckInModal = () => {
       return (  
           <Modal isOpen={this.state.checkInModal} toggle={this.toggle} className={this.props.className}>
-            <ModalHeader toggle={this.toggle}>Weekly Check-in</ModalHeader>
+            <ModalHeader toggle={this.toggle}>Weekly Check-In</ModalHeader>
             <ModalBody>
               Enter your current weight in lbs
             <Input className='mx-auto' 
@@ -44,11 +44,11 @@ class Stats extends Component {
               this.setState({checkInWeight:event.target.value})
             }}
             style={{maxWidth:'fit-content', backgroundColor:'lightgrey'}} type="number" name="weight"/>
-              <p style={{marginTop:'20px'}}>Upload an accompanying progress picture (coming soon)</p>
-            <Input className='mx-auto' type="file" name="file" />
+              {/* <p style={{marginTop:'20px'}}>Upload an accompanying progress picture (coming soon)</p>
+            <Input className='mx-auto' type="file" name="file" /> */}
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={()=> {
+              <Button color="dark" onClick={()=> {
                 if (this.state.checkInWeight) {
                   this.props.updateProfile({keys:['weighIns'], weighIns:{weight:this.state.checkInWeight, date:new Date()}})
                   this.toggle()
@@ -85,6 +85,17 @@ class Stats extends Component {
           <Button color="dark" onClick={this.toggle}>Check-In</Button>
         )
       }
+    }
+
+
+    renderFirstCheckIn = () => {
+
+      return (
+            <Col md="12" className='p-2'>
+              <p>Your first weight check in! Click below to get started.</p>
+              {this.renderButton()}
+            </Col>
+        )
     }
 
 
@@ -183,7 +194,7 @@ class Stats extends Component {
 
     render(){
         return(
-            this.props.profile ? this.renderWeightTrackGraph() : null
+            this.props.profile.weighIns.length > 0 ? this.renderWeightTrackGraph() : this.renderFirstCheckIn()
         )
     }
 }
