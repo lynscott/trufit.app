@@ -556,7 +556,7 @@ class NutritionDash extends Component {
 
       //Parse macro info from meals
       meal.items.forEach((item, i) => {
-        meals.push(<ListGroupItem className='meal-item truncate' key={i}>{item.name + ' ' +item.serving + ' OZ'}</ListGroupItem>)
+        meals.push(<ListGroupItem className='meal-item truncate-meal' key={i}>{item.name + ' ' +item.serving + ' OZ'}</ListGroupItem>)
 
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -827,7 +827,7 @@ class NutritionDash extends Component {
 
             <ButtonGroup size="sm" style={{display:'block', textAlign:'center', marginBottom:'10px'}}>
 
-            <Button className='text-center' color={'dark'}>Set as active plan</Button>
+            {/* TODO: Finish option <Button className='text-center' color={'dark'}>Set as active plan</Button> */}
 
               <Button className='text-center' onClick={()=>{
                 this.state.showMealsFor !==null ? this.setState({showMealsFor:null}):
