@@ -974,7 +974,7 @@ class NutritionDash extends Component {
             {this.addMealButton()}
           </TabPane>
           <TabPane tabId="1" className='text-left'>
-            {this.props.userMeals.length > 0 ? (
+            {this.props.userMeals.length > 0 || this.props.userNutritionPlans.length > 0 ? (
               <React.Fragment>
                <Button color={'dark'} className='mt-4' onClick={()=>this.setState({openMeals:!this.state.openMeals})}
                   >{this.state.openMeals ? 'Hide Meals':'Show Meals'}</Button>
