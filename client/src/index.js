@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import rootReducer from './reducers/index.js'
@@ -19,6 +19,13 @@ import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrash
 
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
+
+// HACK: console.log suppression on production build.
+// WARNING: We need to eject the app in order to do this the RIGHT way!!!! This is not secure.
+if (process.env.NODE_ENV !== 'development') {
+  console.log = () => {}
+}
+
  
 export const history = createBrowserHistory()
 
@@ -28,7 +35,7 @@ history.listen(_ => {
  
 library.add(faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle )
 
-const composeEnhancers = composeWithDevTools({
+const composeEnhancers = process.env.NODE_ENV !== 'development' ? compose : composeWithDevTools({
   // options like actionSanitizer, stateSanitizer
 })
 

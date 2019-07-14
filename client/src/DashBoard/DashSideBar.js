@@ -89,7 +89,7 @@ class DashSideBar extends React.Component {
           {/* <CardTitle style={{fontFamily:'Fira Sans, sans-serif'}}>{new Date().toLocaleDateString()}</CardTitle> */}
 
           <FontAwesomeIcon icon="bars" className='d-sm-block d-md-none mx-auto' onClick={this.toggleNavbar} size={'2x'} />
-          <Collapse isOpen={!this.state.collapsed} navbar>
+          <Collapse isOpen={!this.state.collapsed}>
           <div className='nav-links'>
             <NavItem active={this.props.currentTab === 'overview'}>
               <Link style={{textDecoration:'none'}} to="/dashboard/overview">
