@@ -130,8 +130,6 @@ class NumbersOnlyEntry extends Component {
   render() {
     const { value, onUpdate, ...rest } = this.props
 
-    console.log(value, onUpdate, rest)
-
     return [
       <input
         { ...rest }
@@ -285,7 +283,11 @@ class NutritionDash extends Component {
   addProduct = (product) => {
     // Add the selected product to the list of products
     let newProducts = [...this.state.products]
-    newProducts.unshift(product)
+
+    // HACK: instead of using unshift, append the product right before the total array.
+    // This makes it so that the rowIndex remains preserved on the current row.
+    // If you prepend a product row, what will happen is that the rowIndex remains the same.
+    newProducts.splice(-1, 0, product)
 
     console.log('addProduct', product, newProducts)
     this.setState({products: newProducts}, () => {
@@ -925,7 +927,7 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" md="10" style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
+      <Col className="bg-light" md="10">
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>
