@@ -700,7 +700,7 @@ class NutritionDash extends Component {
           columns={columns}
           rowClasses={this.rowClasses}
           classes={
-            this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH === true
+            this.props.windowWidth < FULL_LAYOUT_WIDTH === true
               ? 'table-mobile bg-light'
               : 'bg-light'
           }
