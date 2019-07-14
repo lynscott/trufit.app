@@ -384,7 +384,7 @@ class Dashboard extends Component {
         className="bg-white"
         style={{ // backgroundColor: '#b3b3b3' 
           padding: '10px',
-          overflow: 'hidden',
+          overflow: 'auto',
           height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null
         }}
         md="10"
