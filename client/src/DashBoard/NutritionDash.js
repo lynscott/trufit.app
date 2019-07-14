@@ -172,6 +172,7 @@ class NutritionDash extends Component {
       showMealsFor: null,
       deletePlan: null,
       submitPlanDisabled: true,
+      sidebarWidth:0
     }
   }
 
@@ -196,6 +197,9 @@ class NutritionDash extends Component {
     if (prevProps.windowWidth !== this.props.windowWidth) {
       this.forceUpdate()
     }
+
+    if (this.state.sidebarWidth !== document.getElementById('dash-sidebar').offsetWidth)
+      this.setState({sidebarWidth:document.getElementById('dash-sidebar').offsetWidth})
 
     
     //Check if a day, name and all meal times are set before enabling plan submission
@@ -810,7 +814,7 @@ class NutritionDash extends Component {
       if(this.props.userNutritionPlans.length === 0)
         return (
           <ListGroupItem>
-            <ListGroupItemHeading className='text-center'>No nutrition plans created. Create one!</ListGroupItemHeading>
+            <ListGroupItemHeading className='text-center'>No nutrition plan created. Create one!</ListGroupItemHeading>
           </ListGroupItem>
         )
 
@@ -872,7 +876,7 @@ class NutritionDash extends Component {
 
     return(
       <>
-        <h1>Plans</h1>
+        <h2 className='text-center'>Active Plan</h2>
         <Card className='bg-secondary'>
           <CardBody>
 
@@ -880,8 +884,10 @@ class NutritionDash extends Component {
               {plans()}
             </ListGroup>
 
+            {this.props.userNutritionPlans.length > 1 ? //quick HACK: to force single nutrition plans for now
             <Button color={'dark'} className='text-center' block style={{display:'block'}}
               onClick={()=>this.setState({makeNewPlan:!this.state.makeNewPlan})} >Create New Plan+</Button>
+              : null}
 
             <Collapse isOpen={this.state.makeNewPlan}>
               <ListGroup className='m-3'>
@@ -927,7 +933,8 @@ class NutritionDash extends Component {
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-light" md="10">
+      <Col className="bg-light" md="10" style={{marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0,
+      height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>
@@ -938,7 +945,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Plan Builder
+              Plan Builder <FontAwesomeIcon icon="tools" size={'1x'} />
             </NavLink>
           </NavItem>
           <NavItem>
@@ -949,7 +956,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Meal Builder
+              Meal Builder <FontAwesomeIcon icon="wrench" size={'1x'} />
             </NavLink>
           </NavItem>
         </Nav>
@@ -985,7 +992,7 @@ class NutritionDash extends Component {
 
                     <Button color={'danger'} outline={this.state.deleteMeals ? false:true} className='my-3' 
                       onClick={()=>this.setState({deleteMeals:!this.state.deleteMeals})} >
-                      <FontAwesomeIcon icon="trash-alt" size={'1x'} /></Button>
+                      <FontAwesomeIcon icon="trash-alt" size={'1x'} /> Manage Meals </Button>
                     {this.renderMealSchedule()}
                   </Collapse>
 
@@ -1117,7 +1124,8 @@ const mapStateToProps = state => {
     foodSelected: state.nutrition.foodSelected,
     profile: state.auth.userProfile,
     userMeals: state.nutrition.userMeals,
-    userNutritionPlans: state.nutrition.userNutritionPlans
+    userNutritionPlans: state.nutrition.userNutritionPlans,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 

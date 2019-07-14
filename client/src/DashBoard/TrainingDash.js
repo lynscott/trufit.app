@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import * as actions from '../actions'
 // import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
-// import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import './TrainingDash.scss'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
+import windowSize from 'react-window-size'
 import Calendar from 'react-calendar'
 import {
   Col,
@@ -193,7 +194,10 @@ class TrainingDash extends Component {
   render() {
     // console.log(this.props,this.state)
     return (
-      <Col md="10">
+      <Col md="10"
+        style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
+        marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
+      >
         <Jumbotron>
 
           {this.props.profile ? this.planWall() : null}
@@ -208,11 +212,13 @@ function mapStateToProps(state) {
   return {
     user: state.auth.user,
     plans: state.plans.planTemps,
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 
-export default connect(
+export default windowSize(
+   connect(
   mapStateToProps,
   actions
-)(TrainingDash)
+)(TrainingDash))
