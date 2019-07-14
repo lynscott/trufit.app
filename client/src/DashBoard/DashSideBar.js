@@ -21,7 +21,7 @@ import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SlackFeedback,  { themes } from 'react-slack-feedback'
 import keys from '../config/keys'
-import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
 
 class DashSideBar extends React.Component {
   constructor(props) {
@@ -85,7 +85,7 @@ class DashSideBar extends React.Component {
 
   render() {
     return (
-        <Nav vertical navbar id='dash-sidebar' className={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? 
+        <Nav vertical navbar id='dash-sidebar' className={this.props.windowWidth < FULL_LAYOUT_WIDTH ? 
           'sticky-top sidebar-col col-md-2 bg-dark': 'desktop sidebar-col col-md-2 bg-dark'} >
           <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h4">
            {/* <img src={' https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/tf1.png	'}/>  */}

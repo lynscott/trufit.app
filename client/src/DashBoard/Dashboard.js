@@ -137,7 +137,7 @@ class Dashboard extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(this.props.userNutritionPlans !== prevProps.userNutritionPlans) {
+    if(this.props.userNutritionPlans !== prevProps.userNutritionPlans && this.props.userNutritionPlans[0]) {
       this.setState({
         userLogs: this.props.userNutritionPlans[0].log,
         userMeals: this.props.userNutritionPlans[0].scheduleData
@@ -274,16 +274,17 @@ class Dashboard extends Component {
   }
 
   renderOverviewWall = () => {
+    console.log(this.props.profile.nutritionCalories)
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
 
         <Card  style={{ color: '#333', borderColor: '#cc370a', paddingBottom:'15px' }}>
-          <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
-            Current Goal & Training Plan
+          <CardHeader style={{ marginTop: 0, backgroundColor: '#cc370a', color:'white' }}>
+            Current Goal
           </CardHeader>
           <CardText style={{ margin: 0, color:'black' }}>
-            {this.props.profile ? this.props.profile.currentGoal.text : null}
+            {this.props.profile ? <p className='mt-3'>{this.props.profile.currentGoal.text}</p> : null}
           </CardText>
           <CardText style={{ padding: '15px', fontSize:'15px', color:'black' }}>
             {this.props.profile.currentGoal.text === 'Weight Loss'
@@ -338,13 +339,16 @@ class Dashboard extends Component {
         
 
         <Card>
-          <CardHeader >Weight Check-ins</CardHeader>
+          <CardHeader >Weight Check-Ins</CardHeader>
           <Stats />
         </Card>
 
 
         <Card >
           <CardHeader>Daily Caloric Intake Tracking</CardHeader>
+          { !this.props.profile.nutritionCalories ? 
+            <p className='p-4 text-muted'>This is where your daily calories will be tracked. 
+              Set a nutrition plan to get started.</p>:  null}
           <BarChart
             display={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? false : true}
             calories={this.props.profile.calories}
