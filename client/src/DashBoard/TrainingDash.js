@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 // import { Pie, Line } from 'react-chartjs-2'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import BigCalendar from 'react-big-calendar'
+// import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-// import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
+// import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
 import './TrainingDash.scss'
+import Calendar from 'react-calendar'
 import {
   Col,
   Row,
@@ -25,8 +26,8 @@ import {
   CardSubtitle, CardBody
 } from 'reactstrap'
 
-const localizer = BigCalendar.momentLocalizer(moment)
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+// const localizer = momentLocalizer(moment)
+const days = {'Monday':1, 'Tuesday':2, 'Wednesday':3, 'Thursday':4, 'Friday':5, 'Saturday':6, 'Sunday':0}
 
 class TrainingDash extends Component {
   constructor(props) {
@@ -35,7 +36,35 @@ class TrainingDash extends Component {
     this.state = {
       activeIndex: 0,
       collapse: false,
-      daysSelected: []
+      daysSelected: [],
+      initPlanDays: [],
+      result:[]
+    }
+  }
+
+  componentDidMount() {
+    this.props.fetchPlanTemps()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    
+    if (this.state.daysSelected.length !== prevState.daysSelected.length) {
+      console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
+      let result = []
+      this.state.daysSelected.map(dayKey=>{
+        let start = moment('2019-07-15'), // July. 15th
+        end   = moment('2019-09-13'), // Sept. 13th
+        day   = dayKey                    // Monday
+  
+        console.log(dayKey, 'KEY')
+        let current = start.clone()
+  
+        while (current.day(7 + day).isBefore(end)) {
+          result.push({title:day,start: new Date(current.clone()), 
+            allDay:true, end: new Date(current.day(0+day))})
+        }
+      })
+      this.setState({result:result})
     }
   }
 
@@ -47,18 +76,33 @@ class TrainingDash extends Component {
   }
 
   renderCalendar = () => {
+
+    
+    // let oldState = this.state.daysSelected
+    // console.log(oldState)
+   
+    
+    
+
+    // console.log(result.map(m => m.start.format('LLLL')))
+    // console.log(result)
     return (
-      <BigCalendar
-        localizer={localizer}
-        events={this.props.plan ? this.formatDate(): []}
-        startAccessor="start"
-        endAccessor="end"
-        style={{display:'none'}}
-        // components={{
-        //   event: this.eventCard,
-        // }}
-        // date={new Date()}
-      />
+      <Col md={12}>
+        <Calendar
+          // onChange={this.onChange}
+          style={{width:'100%'}}
+          minDetail={'month'}
+          value={new Date()}
+          tileContent={({ date, view }) => {
+            for (let day of this.state.result) {
+              if (date.getDay() === day.start.getDay()) {
+                return <p>Training</p>
+              }
+              else return null
+            }
+          }}
+        />
+      </Col>
     )
   }
 
@@ -72,12 +116,24 @@ class TrainingDash extends Component {
             <Label >
               What days can you workout?
             </Label>
-              {days.map((day,i)=>{
+              {Object.keys(days).map((day,i)=>{
                 return (
                       <Col key={i}>
                         <Label size="lg" >{day}</Label>
                         <Input type="checkbox" onChange={(e)=>{
-                                this.state.daysSelected.push(day) }}  
+                                // let arr = this.state.daysSelected
+                                // arr.push(days[day])
+                                console.log(e.target.value, 'BEFORE') 
+                                if (!this.state.daysSelected.includes(day)) {
+                                  this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
+                                }
+                                else {
+                                  let newArr = this.state.daysSelected
+                                  let index = newArr.indexOf(days[day])
+                                  newArr.splice(index,1)
+                                  this.setState({daysSelected:newArr})
+                                }
+                              }}  
                                 name={day} bsSize="lg"  />
                       </Col>
                       )
@@ -99,8 +155,10 @@ class TrainingDash extends Component {
             <Label for="exampleSelect">When do you want to start?</Label>
             <Input type="date" name="date" id="exampleSelect" />
           </Row> */}
+          {this.renderCalendar()}
 
-          <Button className='m-4' type={'submit'}>Set Training Plan</Button>
+
+          <Button className='m-4' color={'dark'}> Set Training Plan</Button>
         </Form>
       </Collapse>
     )
@@ -117,7 +175,7 @@ class TrainingDash extends Component {
         <CardBody onClick={()=> this.toggle(i)}>
           <CardTitle>{plan.planName}</CardTitle>
           <CardSubtitle>{plan.category}</CardSubtitle>
-          <CardText>Description</CardText>
+          <CardText>8 Week Plan</CardText>
           {/* <Button>Button</Button> */}
         </CardBody>
       </Card>
@@ -133,13 +191,11 @@ class TrainingDash extends Component {
   }
 
   render() {
+    // console.log(this.props,this.state)
     return (
       <Col md="10">
         <Jumbotron>
-          {/* <h1 className="display-3">Hello, world!</h1>
-                    <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
-                    <hr className="my-2" />
-                    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
+
           {this.props.profile ? this.planWall() : null}
           {this.renderPlanInit()}
         </Jumbotron>
