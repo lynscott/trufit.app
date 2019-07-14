@@ -85,7 +85,8 @@ class NextMeal extends Component {
           
 
         return (
-          <Button color="dark" className="m-2"
+          <Button color='dark'
+            style={{maxWidth: '100%', margin: '10px 0', textOverflow: 'ellipsis', overflow: 'hidden'}}
             // disabled={()=>}
             onClick={async () => {
               await this.props.logMealComplete({
@@ -107,7 +108,7 @@ class NextMeal extends Component {
 
       return (
         <>
-          <Col md="12">
+          <Col md="12" style={{padding: 0}}>
           <h6>Next Meal Time: <Moment format="LT">{clock()}</Moment></h6>
             <ListGroup >
               <ListGroupItemHeading>{meals[index].index}</ListGroupItemHeading>
