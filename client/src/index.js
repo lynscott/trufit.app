@@ -19,6 +19,13 @@ import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrash
 
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
+
+// HACK: console.log suppression on production build.
+// WARNING: We need to eject the app in order to do this the RIGHT way!!!! This is not secure.
+if (process.env.NODE_ENV !== 'development') {
+  console.log = () => {}
+}
+
  
 export const history = createBrowserHistory()
 
