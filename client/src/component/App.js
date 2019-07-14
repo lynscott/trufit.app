@@ -107,7 +107,6 @@ class App extends Component {
   }
 
   render() {
-    // console.log(this.props)
     return (
       <div className="container-fluid bg-light">
         <div className="row" id="header">

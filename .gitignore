@@ -2,3 +2,4 @@ node_modules
 dev.js
 .history
 .vscode
+package-lock.json

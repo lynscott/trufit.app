@@ -5,8 +5,10 @@ import * as actions from '../actions'
 import classnames from 'classnames'
 import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
-import PoseNet from '../component/PoseNet'
+// import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
+
 // import CreatePlanForm from './CreatePlanForm'
 import {
   Button,
@@ -30,7 +32,7 @@ import {
   DropdownMenu,
   DropdownItem,
   CardColumns,
-  CardImg,
+  CardImg, Spinner,
   CardSubtitle
 } from 'reactstrap'
 import './Sidebar.scss'
@@ -39,7 +41,7 @@ import { Pie, Bar } from 'react-chartjs-2'
 import ViewPlan from './ViewPlan'
 import windowSize from 'react-window-size'
 
-const BarChart = ({ display, calories, planned }) => {
+const BarChart = ({ display, calories, planned, todaysIntake }) => {
   return (
     <Col md="12" className="p-2">
       <Bar
@@ -48,12 +50,12 @@ const BarChart = ({ display, calories, planned }) => {
           datasets: [
             {
               label: 'Intake',
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: 'rgba(0,0,0,0.6)',
               borderColor: 'rgba(130, 128, 128,1)',
               borderWidth: 1,
-              hoverBackgroundColor: 'rgba(130, 128, 128,0.4)',
-              hoverBorderColor: 'rgba(255,99,132,1)',
-              data: [ planned, 592, -800]
+              hoverBackgroundColor: ' rgba(117, 200, 171, 0.4)', //'rgba(130, 128, 128,0.4)',
+              hoverBorderColor: 'rgba(117, 200, 171, 1)',
+              data: [ planned, todaysIntake, Math.abs(planned-todaysIntake)]
             }
           ]
         }}
@@ -66,28 +68,28 @@ const BarChart = ({ display, calories, planned }) => {
             yAxes: [
               {
                 ticks: {
-                  fontColor: '#ffffff',
+                  fontColor: 'black',
                   fontSize: 12,
                   display: display
                 },
                 scaleLabel: {
                   display: true,
                   labelString: 'Calories',
-                  fontColor: 'white'
+                  fontColor: 'black'
                 }
               }
             ],
             xAxes: [
               {
                 ticks: {
-                  fontColor: '#ffffff',
+                  fontColor: 'black',
                   fontSize: 12,
                   display: display
                 },
                 scaleLabel: {
                   display: true,
-                  labelString: 'Average Intake',
-                  fontColor: 'white'
+                  labelString: 'Today',
+                  fontColor: 'black'
                 }
               }
             ]
@@ -98,6 +100,7 @@ const BarChart = ({ display, calories, planned }) => {
   )
 }
 
+//TODO: Move to const folder
 const WL =
   'Focus primarily on weight loss, which will reduce muscle as well as fat.'
 const WG =
@@ -119,12 +122,32 @@ class Dashboard extends Component {
       currentGoal: 'No Goal Selected',
       updateMessage: 'Testing',
       update: false,
-      assessment: false
+      assessment: false,
+      todaysCalories: 0,
+      userLogs: [],
+      userMeals: [],
+      sidebarWidth: 0
     }
   }
 
   componentDidMount = async () => {
     await this.props.fetchProfile()
+    await this.props.fetchNutritionPlans()
+    await this.props.setSideBarWidth()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(this.props.userNutritionPlans !== prevProps.userNutritionPlans) {
+      this.setState({
+        userLogs: this.props.userNutritionPlans[0].log,
+        userMeals: this.props.userNutritionPlans[0].scheduleData
+      }, this.calculateTodaysIntake())
+      
+    }
+
+
+    if (this.props.sidebarWidth !== document.getElementById('dash-sidebar').offsetWidth)
+      this.props.setSideBarWidth(document.getElementById('dash-sidebar').offsetWidth)
   }
 
   toggle(tab) {
@@ -144,21 +167,16 @@ class Dashboard extends Component {
   affirmationChange = () => {
     if (this.state.update === false) {
       return (
-        <p
-          className="lead affirmation"
-          style={{ fontSize: '1.2rem' }}
-          onDoubleClick={() => this.setState({ update: true })}
-        >
-          {this.props.profile
-            ? this.props.profile.affirmation !== ''
-              ? this.props.profile.affirmation
-              : 'Tap to fill out'
-            : ''}
+        <p className="lead affirmation" style={{ fontSize: '1.2rem' }}
+          onDoubleClick={() => this.setState({ update: true })} >
+          {this.props.profile ? this.props.profile.affirmation !== ''
+            ? this.props.profile.affirmation : 'Tap to fill out' : ''}
         </p>
       )
     } else {
       return (
         <React.Fragment>
+
           <Form className="row">
             <Input
               type="text"
@@ -172,9 +190,8 @@ class Dashboard extends Component {
               }
             />
           </Form>
-          <Button
-            className="m-3"
-            color="info"
+
+          <Button className="m-3" color="info"
             onClick={async () => {
               await this.props.updateProfile({
                 keys: ['affirmation'],
@@ -185,15 +202,12 @@ class Dashboard extends Component {
           >
             Update Affirmation
           </Button>{' '}
-          <Button
-            className="m-3"
-            color="secondary"
-            onClick={() => {
-              this.setState({ update: false })
-            }}
-          >
+
+          <Button className="m-3" color="dark"
+            onClick={() => this.setState({ update: false })} >
             Cancel
           </Button>{' '}
+
         </React.Fragment>
       )
     }
@@ -205,8 +219,9 @@ class Dashboard extends Component {
         isOpen={this.state.dropOpen}
         direction={'right'}
         toggle={this.toggleDrop}
+        // color='dark'
       >
-        <DropdownToggle caret>Change Goal</DropdownToggle>
+        <DropdownToggle color='dark' caret>Change Goal</DropdownToggle>
         <DropdownMenu>
           <DropdownItem
             onClick={() =>
@@ -243,20 +258,48 @@ class Dashboard extends Component {
     )
   }
 
+
+  calculateTodaysIntake = () => {
+    let cal = 0
+    this.state.userLogs.forEach(log=> {
+      if (new Date(log.timestamp).toDateString() === new Date().toDateString()) {
+        this.state.userMeals.find((data)=> data.meal._id === log.id).meal.items.map((item)=>{
+          cal = cal + parseInt(item.calories)
+        })
+      }
+    })
+
+    // console.log(cal, 'TOTAL CAL')
+    this.setState({todaysCalories:cal})
+  }
+
   renderOverviewWall = () => {
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
-      
-      {this.state.assessment?
-        <Card inverse color="primary">
-          <CardHeader>Assessment</CardHeader>
-           <PoseNet/>
+
+        <Card  style={{ color: '#333', borderColor: '#cc370a', paddingBottom:'15px' }}>
+          <CardHeader style={{ margin: 0, backgroundColor: '#cc370a', color:'white' }}>
+            Current Goal & Training Plan
+          </CardHeader>
+          <CardText style={{ margin: 0, color:'black' }}>
+            {this.props.profile ? this.props.profile.currentGoal.text : null}
+          </CardText>
+          <CardText style={{ padding: '15px', fontSize:'15px', color:'black' }}>
+            {this.props.profile.currentGoal.text === 'Weight Loss'
+              ? WL
+              : this.props.profile.currentGoal.text === 'Weight Gain'
+              ? WG
+              : this.props.profile.currentGoal.text === 'Recomposition'
+              ? BR
+              : null}
+          </CardText>
+          {this.dropDownToggle()}
+          
         </Card>
-        : null}
-        
+
         <Card>
-          <CardHeader>Recommended Macros</CardHeader>
+          <CardHeader >Recommended Macros</CardHeader>
           <CardSubtitle className="pt-2">
             {parseInt(this.props.profile.calories) + this.props.profile.currentGoal.value}cal
           </CardSubtitle>
@@ -276,61 +319,15 @@ class Dashboard extends Component {
           </CardBody>
         </Card>
 
-        <Card inverse color="primary">
-          <CardHeader>Weight Check-ins</CardHeader>
-          <Stats />
-        </Card>
-
-        <Card inverse style={{ backgroundColor: '#333', borderColor: 'white' }}>
-          <CardHeader style={{ margin: 0 }}>
-            Current Goal & Training Plan
-          </CardHeader>
-          <CardText style={{ margin: 0 }}>
-            {this.props.profile ? this.props.profile.currentGoal.text : null}
-          </CardText>
-          <CardText style={{ padding: '15px', fontSize:'15px' }}>
-            {this.props.profile.currentGoal.text === 'Weight Loss'
-              ? WL
-              : this.props.profile.currentGoal.text === 'Weight Gain'
-              ? WG
-              : this.props.profile.currentGoal.text === 'Recomposition'
-              ? BR
-              : null}
-          </CardText>
-          {this.dropDownToggle()}
-          <CardSubtitle
-            style={{
-              textAlign: 'left',
-              paddingLeft: '15px',
-              marginTop: '10px'
-            }}
-          >
-            Completion
-          </CardSubtitle>
-          <Progress color="info" className="mx-3 mb-3" value={30}>
-            0%
-          </Progress>
-        </Card>
-
-        <Card inverse color="danger">
-          <CardHeader>Caloric Intake Tracking</CardHeader>
-
-          <BarChart
-            display={this.props.windowWidth < 500 ? false : true}
-            calories={this.props.profile.calories}
-            planned={this.props.profile.nutritionCalories}
-            />
-        </Card>
-
         <Card>
-          <CardHeader>Nutrition Schedule</CardHeader>
+          <CardHeader >Nutrition Schedule</CardHeader>
           <CardBody>
             <NutritionTable />
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>Training Schedule</CardHeader>
+          <CardHeader >Training Schedule</CardHeader>
           <CardBody>
             {/* <CardTitle>Training Schedule</CardTitle> */}
             {/* <DashCalendar /> */}
@@ -338,6 +335,24 @@ class Dashboard extends Component {
 
           </CardBody>
         </Card>
+        
+
+        <Card>
+          <CardHeader >Weight Check-ins</CardHeader>
+          <Stats />
+        </Card>
+
+
+        <Card >
+          <CardHeader>Daily Caloric Intake Tracking</CardHeader>
+          <BarChart
+            display={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? false : true}
+            calories={this.props.profile.calories}
+            planned={this.props.profile.nutritionCalories}
+            todaysIntake={this.state.todaysCalories}
+            />
+        </Card>
+
       </CardColumns>
     )
   }
@@ -345,44 +360,39 @@ class Dashboard extends Component {
 
   renderDashTopStats = () => {
     return (
-      // <Row style={{ padding: 0, marginBottom: '10px' }}>
-      // {/* {this.affirmationChange()} */}
+
       <Jumbotron className="text-left" style={{ width: '100%' }}>
-        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
-        {/* <h1 className="display-3">Hello, world!</h1> */}
         {this.affirmationChange()}
         <hr className="my-2" />
-        {/* <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
-        {/* <p className="lead">
-          <Button color="primary">Learn More</Button>
-        </p> */}
+
+        {this.props.plans.length > 0 ?
         <Row>
-          <Col>
-           {/* {this.props.user.isAdmin?  */}
-           <Button onClick={()=> this.setState({assessment:true})}>Start Initial Assessment</Button>
-           {/* : null} */}
-          </Col>
-          <Col>
-           {/* {this.props.user.isAdmin?  */}
-           <Button color='info' onClick={()=> this.setState({assessment:false})}>End Assessment</Button>
-           {/* : null} */}
+          <Col md='4'>
+            <CardSubtitle style={{ textAlign: 'left', paddingLeft: '15px', marginTop: '10px'}}>
+              Plan Completion
+            </CardSubtitle>
+            <Progress color="dark" className="mx-3" value={30}>
+              0%
+            </Progress>
           </Col>
         </Row>
+        : null}
       </Jumbotron>
-      // </Row>
     )
   }
 
+
   render() {
-    // console.log(this.props.profile)
+    // console.log(this.props, 'full layout')
+
     return (
       <Col
-        className="bg-dark"
-        style={{
-          paddingTop: '10px',
-          maxHeight: this.props.windowWidth < 500 ? '80vh' : null,
-          overflowY: 'scroll',
-          height: '100vh'
+        className="bg-white"
+        style={{ // backgroundColor: '#b3b3b3' 
+          padding: '10px',
+          overflow: 'auto',
+          height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
+          marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0
         }}
         md="10"
       >
@@ -400,8 +410,10 @@ class Dashboard extends Component {
 function mapStateToProps(state, { auth }) {
   return {
     user: state.auth.user,
-    plans: state.plans.planTemps,
-    profile: state.auth.userProfile
+    plans: state.plans.userPlans,
+    profile: state.auth.userProfile,
+    userNutritionPlans: state.nutrition.userNutritionPlans,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 
