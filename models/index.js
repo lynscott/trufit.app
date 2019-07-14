@@ -1,7 +1,14 @@
-// var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird')
 // mongoose.set('debug', true);
-// // mongoose.connect('mongodb://localhost/lsphysique');
-//
-// mongoose.Promise = Promise;
-//
-// module.exports.User = require("./users");
+
+
+
+module.exports.User = require("./User");
+module.exports.Plans = require("./Plans");
+module.exports.Exercises = require("./Exercises");
+module.exports.UserProfile = require("./UserProfile");
+module.exports.Workouts = require("./Workouts");
+module.exports.Meals = require("./Meals");
+module.exports.NutritionPlan = require("./NutritionPlan");
+module.exports.PlanTemplates = require("./PlanTemplates");

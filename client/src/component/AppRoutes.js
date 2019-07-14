@@ -1,7 +1,7 @@
 import React, { Component, Suspense, lazy } from 'react'
 import { Route, withRouter, Switch, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import '../index.css'
+import '../index.css' //TODO: Clean this old css file and make .scss
 // import App from './App'
 // import About from './About'
 // import Dashboard from '../DashBoard/Dashboard'
@@ -21,12 +21,12 @@ import { Container, Row, Fade, Spinner } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import Loadable from 'react-loadable'
+import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import windowSize from 'react-window-size'
 
-// const LoadableComponent = Loadable({
-//   loader: () => import('./my-component'),
-//   loading: Loading,
-//   timeout: 5000
-// })
+
+//TODO: Clean up file
+
 const loaderCircle = (props) => {
   if (props.error) {
       console.log(props)
@@ -44,10 +44,14 @@ const loadFromPath = (loaderCallBack) => Loadable({
 
 const Home = loadFromPath(() => import('./App'))
 const About = lazy(() => import('./About'))
-const SideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
+const DashSideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
 const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
 const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
+const TrainingDash = loadFromPath(() => import('../DashBoard/TrainingDash'))
+const ReactAdminDash = loadFromPath(() => import('./Admin/ReactAdmin')) 
+
+
 
 
 class AppRoutes extends Component {
@@ -56,14 +60,20 @@ class AppRoutes extends Component {
 
     this.state = {
       scroll: window.pageYOffset,
+      sidebarWidth: 0
     }
 
    
   }
   componentDidMount() {
     // console.log(isMobileSafari, isSafari, isIOS)
+
+    // This also performs authentication!!!!
     this.props.fetchUser()
-    
+
+    let bar = document.getElementById('dash-sidebar') 
+    if (bar)
+      this.setState({sidebarWidth:document.getElementById('dash-sidebar').offsetWidth})
     
     window.addEventListener('scroll', this.handleScroll)
 
@@ -82,100 +92,101 @@ class AppRoutes extends Component {
   }
 
   handleScroll = (event) => {
-    // let scrollTop = event.srcElement.body.scrollTop,
-    //     itemTranslate = Math.min(0, scrollTop/3 - 60)
 
     this.setState({
       scroll: window.pageYOffset
     })
-}
+  }
 
-  testENV = () => {
-    if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
-      //this.props.currentUser ? console.log(keys.preAccessList.includes(this.props.currentUser.email)) : 'null'
-      return this.renderOverview()
-    } else {
-      return (
-        <div className="jumbotron" style={{ marginTop: '90px' }}>
-          <h1> New Dashboard Coming Soon!</h1>
-        </div>
-      )
+  //DEPRECATED:
+  // testENV = () => {
+  //   if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
+  //     //this.props.currentUser ? console.log(keys.preAccessList.includes(this.props.currentUser.email)) : 'null'
+  //     return this.renderOverview()
+  //   } else {
+  //     return (
+  //       <div className="jumbotron" style={{ marginTop: '90px' }}>
+  //         <h1> New Dashboard Coming Soon!</h1>
+  //       </div>
+  //     )
+  //   }
+  // }
+
+  /**
+   * Check to see whether or not the user is authenticated. If so render the component appropriately.
+   * Perform all authentication checks here.
+   * Otherwises redirect to root.
+   * Must return a function as this is expected from routes.
+   */
+  authCheckOrRedirect = componentRendererFunc => {
+    // Required for asynchronous authentication.
+    // You must handle the authentication race condition on direct routes.
+    if(this.props.isAuthenticating){
+      return () => <Spinner  color='dark' />
     }
+
+    if(this.props.currentUser && !this.props.isAuthenticating) {
+      return () => componentRendererFunc()
+    }
+
+    return () => <Redirect to="/" />
   }
 
   renderDash = matchProps => {
-    if (
-      window.localStorage.getItem('token') !== null ||
-      this.props.currentUser !== null
-    ) {
-      return this.renderOverview()
-    }
-
-    return <Redirect to="/" />
+    return this.renderOverview()
   }
 
   renderNutrition = () => {
-    return (
-      
-        <NutritionDash/>
-    )
+        return <NutritionDash/>
   }
 
   renderPlans = () => {
-    return (
-      // <DeviceOverview/>
-
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        // {/* <TrainingDash/>  */}
-        // {/* TODO:Finish Component */}
-        <div className='col-md-10 bg-light'>
-        <h3 className='my-5'>This area is under construction, come back soon!</h3>
-          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div>
-      // </Row>
-    )
+    return <TrainingDash/> 
   }
 
   renderAccountSettings = () => {
     return (
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
-          <h3 className='my-5'>This area is under construction, come back soon!</h3>
-          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div>
-      // </Row>
+        <Redirect to="/" /> //TODO: Complete settings dash
+        // <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
+        //   <h3 className='my-5'>This area is under construction, come back soon!</h3>
+        //   <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+        // </div>
     )
   }
 
   renderOverview = () => {
-    return (
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <Dash />
-     // {/* </Row> */}
-    )
+    return  <Dash />
+ 
   }
 
   renderAdmin = () => {
-    if ( this.props.userProfile.isAdmin)
-      return (
-     //   <Row>
-     //     <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-          <Admin />
-      //  </Row>
-      )
+    if ( this.props.userProfile.isAdmin) {
+      return <Admin />
+    }
     else return (
-          // <Row>
-          // <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
             <h3 className='my-5'>Forbidden Area. Back Away Slowly.</h3>
             <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
           </div>
-        // {/* </Row> */}
         )
   }
+
+  /**
+   * Anything related to sidebar logic.
+   */
+  renderSidebar = () => {
+    return <DashSideBar profile={this.props.userProfile} user={this.props.currentUser} />
+  }
+
+  /**
+   * Anything related to home navigation logic.
+   */
+  renderHomeNavigation = () => {
+    return <Fade in={this.state.scroll > 50} > 
+          <Nav className="navbar" />
+        </Fade>
+  }
+
 
   returnRoute = () => {
     if (this.props.userProfile.isAdmin)
@@ -190,43 +201,40 @@ class AppRoutes extends Component {
   }
 
   render() {
-    // console.log(this.props)
     return (
-      <Container fluid>
-        { window.location.pathname.includes('dashboard') === false?
-        <Fade in={this.state.scroll > 50 ? true: false} > 
-          <Nav className="navbar" />
-        </Fade>
-        : null}
-        <Row style={{margin:0}}>
-        { window.location.pathname.includes('dashboard') ? 
-        <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        : null}
-        
+      <Container className='main-container' fluid>
+        <Route exact path="/" render={this.renderHomeNavigation} />
+        <Route exact path="/dashboard" render={() => <Redirect to="/dashboard/overview"/> }/>
+
+        <Row className={'main-row bg-white'} style={{margin:0}}>
+        <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
-            {/* <Route exact path="/about" component={About} /> */}
-            {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
-            {/* <Route path="/training" component={OnlineTraining} /> */}
             <Route
               exact
               path="/dashboard/:userid/plan/:id"
               component={ShowPlan}
             />
 
-            <Route exact path="/dashboard/overview" render={this.renderDash} />
-            {/* <Route exact path='/n/admin/dashboard' render={this.renderDashboard} /> */}
-            <Route exact path="/dashboard/plans" render={this.renderPlans} />
+            <Route exact path="/dashboard/overview" render={this.authCheckOrRedirect(this.renderDash)} />
+
+            <Route exact path="/dashboard/plans" render={this.authCheckOrRedirect(this.renderPlans)} />
 
             <Route
               exact
               path="/dashboard/nutrition"
-              render={this.renderNutrition}
+              render={this.authCheckOrRedirect(this.renderNutrition)}
+            />
+
+            <Route
+              exact
+              path="/admin"
+              render={this.authCheckOrRedirect(ReactAdminDash)}
             />
 
             <Route
               exact
               path="/dashboard/settings"
-              render={this.renderAccountSettings}
+              render={this.authCheckOrRedirect(this.renderAccountSettings)}
             />
 
             {this.props.userProfile ?
@@ -244,6 +252,7 @@ class AppRoutes extends Component {
 const mapStateToProps = state => {
   return {
     currentUser: state.auth.user,
+    isAuthenticating: state.auth.isAuthenticating,
     userProfile: state.auth.userProfile
   }
 }

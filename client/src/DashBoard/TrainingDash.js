@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 // import { Pie, Line } from 'react-chartjs-2'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
-import BigCalendar from 'react-big-calendar'
+// import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
-
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-// import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
+import './TrainingDash.scss'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
+import windowSize from 'react-window-size'
+import Calendar from 'react-calendar'
 import {
   Col,
   Row,
@@ -21,11 +23,12 @@ import {
   Input,
   Button,
   Media,
-  Jumbotron
+  Jumbotron, Card, CardImg, CardTitle, CardText, CardColumns,
+  CardSubtitle, CardBody
 } from 'reactstrap'
 
-const localizer = BigCalendar.momentLocalizer(moment)
-const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
+// const localizer = momentLocalizer(moment)
+const days = {'Monday':1, 'Tuesday':2, 'Wednesday':3, 'Thursday':4, 'Friday':5, 'Saturday':6, 'Sunday':0}
 
 class TrainingDash extends Component {
   constructor(props) {
@@ -34,109 +37,171 @@ class TrainingDash extends Component {
     this.state = {
       activeIndex: 0,
       collapse: false,
-      daysSelected: []
+      daysSelected: [],
+      initPlanDays: [],
+      result:[]
     }
   }
 
-  toggle = () => {
+  componentDidMount() {
+    this.props.fetchPlanTemps()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    
+    if (this.state.daysSelected.length !== prevState.daysSelected.length) {
+      console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
+      let result = []
+      this.state.daysSelected.map(dayKey=>{
+        let start = moment('2019-07-15'), // July. 15th
+        end   = moment('2019-09-13'), // Sept. 13th
+        day   = dayKey                    // Monday
+  
+        console.log(dayKey, 'KEY')
+        let current = start.clone()
+  
+        while (current.day(7 + day).isBefore(end)) {
+          result.push({title:day,start: new Date(current.clone()), 
+            allDay:true, end: new Date(current.day(0+day))})
+        }
+      })
+      this.setState({result:result})
+    }
+  }
+
+  toggle = (index) => {
     this.setState(prevState => ({
-      collapse: !prevState.collapse
+      collapse: !prevState.collapse,
+      index:index
     }))
   }
 
   renderCalendar = () => {
+
+    
+    // let oldState = this.state.daysSelected
+    // console.log(oldState)
+   
+    
+    
+
+    // console.log(result.map(m => m.start.format('LLLL')))
+    // console.log(result)
     return (
-      <BigCalendar
-        localizer={localizer}
-        events={this.props.plan ? this.formatDate(): []}
-        startAccessor="start"
-        endAccessor="end"
-        style={{display:'none'}}
-        // components={{
-        //   event: this.eventCard,
-        // }}
-        // date={new Date()}
-      />
+      <Col md={12}>
+        <Calendar
+          // onChange={this.onChange}
+          style={{width:'100%'}}
+          minDetail={'month'}
+          value={new Date()}
+          tileContent={({ date, view }) => {
+            for (let day of this.state.result) {
+              if (date.getDay() === day.start.getDay()) {
+                return <p>Training</p>
+              }
+              else return null
+            }
+          }}
+        />
+      </Col>
     )
   }
 
-  renderPlans = () => {
-    console.log(this.state.daysSelected)
-    return (
-      <>
-        <Media onClick={this.toggle}>
-          <Media left href="#">
-            {/* <Media object data-src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/Resize_main.JPG" alt="Generic placeholder image" /> */}
-            <img
-              style={{ height: '200px', width: '200px' }}
-              src="https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/Resize_main.JPG"
-            />
-          </Media>
-          <Media body>
-            <Media heading>Weight Loss</Media>
-            <p>
-              Keep your intensity and focus high! Be sure to warm up properly
-              and keep your form strict. 60s rest break between sets. Great
-              cardio can be treadmill, stairmaster, a jog/running something to
-              keep your body moving at a steady pace for the alloted time.
-            </p>
-          </Media>
-        </Media>
-        <Collapse isOpen={this.state.collapse}>
-          <Form style={{width:'50%', minWidth:'50%'}}>
-            <FormGroup check>
-              <Label >
-                What days can you workout?
-              </Label>
-              <Row>
-                <Col>
-                  <Input type="checkbox" onChange={(e)=>{
-                    console.log(e.target.value)
-                    this.state.daysSelected.push('mon')
-                    }} name="radio1" >
-                    {this.state.daysSelected.includes('mon') ? <Input type="time" name="mon_time"/> : null}
-                  </Input>Monday<br/> 
-                  <Input type="checkbox" name="radio2" />Tuesday<br/>
-                  <Input type="checkbox" name="radio2" />Wednesday<br/>
-                  <Input type="checkbox" name="radio2" />Thursday<br/>
-                </Col>
-                <Col>
-                  <Input type="checkbox" name="radio1" />Friday<br/> 
-                  <Input type="checkbox" name="radio2" />Saturday<br/>
-                  <Input type="checkbox" name="radio2" />Sunday<br/>
-                  {/* <Input type="radio" name="radio2" />Thursday<br/> */}
-                </Col> 
-              </Row>
-            </FormGroup>
 
-            <FormGroup>
-              <Label for="examplePassword">What time?</Label>
-              <Input
-                type="time"
-                name="time"
-                id="examplePassword"
-                placeholder="password placeholder"
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label for="exampleSelect">When do you want to start?</Label>
-              <Input type="date" name="date" id="exampleSelect" />
-            </FormGroup>
-          </Form>
-        </Collapse>
-      </>
+  renderPlanInit = () => {
+
+    return(
+      <Collapse isOpen={this.state.collapse}>
+        <Form >
+            <Row>
+            <Label >
+              What days can you workout?
+            </Label>
+              {Object.keys(days).map((day,i)=>{
+                return (
+                      <Col key={i}>
+                        <Label size="lg" >{day}</Label>
+                        <Input type="checkbox" onChange={(e)=>{
+                                // let arr = this.state.daysSelected
+                                // arr.push(days[day])
+                                console.log(e.target.value, 'BEFORE') 
+                                if (!this.state.daysSelected.includes(day)) {
+                                  this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
+                                }
+                                else {
+                                  let newArr = this.state.daysSelected
+                                  let index = newArr.indexOf(days[day])
+                                  newArr.splice(index,1)
+                                  this.setState({daysSelected:newArr})
+                                }
+                              }}  
+                                name={day} bsSize="lg"  />
+                      </Col>
+                      )
+              })}
+            </Row>
+          
+          {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
+          {/* <Row>
+            <Label for="examplePassword">What time?</Label>
+            <Input
+              type="time"
+              name="time"
+              // id="examplePassword"
+              placeholder="time"
+            />
+          </Row>
+
+          <Row>
+            <Label for="exampleSelect">When do you want to start?</Label>
+            <Input type="date" name="date" id="exampleSelect" />
+          </Row> */}
+          {this.renderCalendar()}
+
+
+          <Button className='m-4' color={'dark'}> Set Training Plan</Button>
+        </Form>
+      </Collapse>
     )
+  }
+
+ 
+
+  planWall = () => {
+    let plans = []
+    this.props.plans.map((plan,i)=>{
+      plans.push(
+        <Card key={i} className={i === this.state.index? 'active':null}>
+        { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
+        <CardBody onClick={()=> this.toggle(i)}>
+          <CardTitle>{plan.planName}</CardTitle>
+          <CardSubtitle>{plan.category}</CardSubtitle>
+          <CardText>8 Week Plan</CardText>
+          {/* <Button>Button</Button> */}
+        </CardBody>
+      </Card>
+      )
+    })
+
+    return (
+      <CardColumns className='plan-wall bg-dark p-3'>
+        {plans}
+      </CardColumns>
+    )
+
   }
 
   render() {
+    // console.log(this.props,this.state)
     return (
-      <Col md="10">
+      <Col md="10"
+        style={{height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
+        marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
+      >
         <Jumbotron>
-          {/* <h1 className="display-3">Hello, world!</h1>
-                    <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
-                    <hr className="my-2" />
-                    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> */}
-          {this.props.profile ? this.renderPlans() : null}
+
+          {this.props.profile ? this.planWall() : null}
+          {this.renderPlanInit()}
         </Jumbotron>
       </Col>
     )
@@ -147,11 +212,13 @@ function mapStateToProps(state) {
   return {
     user: state.auth.user,
     plans: state.plans.planTemps,
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 
-export default connect(
+export default windowSize(
+   connect(
   mapStateToProps,
   actions
-)(TrainingDash)
+)(TrainingDash))
