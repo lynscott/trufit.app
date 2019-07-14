@@ -300,8 +300,7 @@ app.get('/api/fetch_workouts', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
-  const workoutList = await Workout.find().select('-_id')
-  // console.log(workoutList, 'Workouts')
+  const workoutList = await Workout.find()
   res.send(workoutList)
 })
 
@@ -406,17 +405,19 @@ app.post('/api/new_plan_template', async (req, res) => {
   }
   
   let { plan, workouts } = req.body
-  console.log(workouts)
-  // let plan_template = new models.PlanTemplates({
-  //   name: plan.title,
-  //   category: plan.category,
-  //   logo: plan.logo,
-  //   created_date: Date.now(),
-  //   creator: req.user.id,
-  //   // description:plan.description,
-  //   workouts: workouts,
-  // })
-  // await plan_template.save()
+  // console.log(workouts)
+  let plan_template = new models.PlanTemplates({
+    name: plan.title,
+    category: plan.category,
+    created_date: Date.now(),
+    creator: req.user.id,
+    workouts: workouts,
+    workoutData: plan.data
+  })
+  plan.logo ? plan_template.logo = plan.logo : null
+  plan.description ? plan_template.description = plan.description : null
+
+  await plan_template.save()
 
   res.status(200).send('Success')
 })

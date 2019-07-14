@@ -22,8 +22,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import Loadable from 'react-loadable'
 
-import ReactAdmin from './Admin/ReactAdmin'
-
 //TODO: Clean up file
 
 const loaderCircle = (props) => {
@@ -48,6 +46,8 @@ const Dash = loadFromPath(() => import('../DashBoard/Dashboard'))
 const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
 const TrainingDash = loadFromPath(() => import('../DashBoard/TrainingDash'))
+const ReactAdminDash = loadFromPath(() => import('./Admin/ReactAdmin')) 
+
 
 
 
@@ -84,26 +84,25 @@ class AppRoutes extends Component {
   }
 
   handleScroll = (event) => {
-    // let scrollTop = event.srcElement.body.scrollTop,
-    //     itemTranslate = Math.min(0, scrollTop/3 - 60)
 
     this.setState({
       scroll: window.pageYOffset
     })
-}
-
-  testENV = () => {
-    if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
-      //this.props.currentUser ? console.log(keys.preAccessList.includes(this.props.currentUser.email)) : 'null'
-      return this.renderOverview()
-    } else {
-      return (
-        <div className="jumbotron" style={{ marginTop: '90px' }}>
-          <h1> New Dashboard Coming Soon!</h1>
-        </div>
-      )
-    }
   }
+
+  //DEPRECATED:
+  // testENV = () => {
+  //   if (process.env.NODE_ENV === 'development' || keys.preAccessList.includes(this.props.currentUser.email)) {
+  //     //this.props.currentUser ? console.log(keys.preAccessList.includes(this.props.currentUser.email)) : 'null'
+  //     return this.renderOverview()
+  //   } else {
+  //     return (
+  //       <div className="jumbotron" style={{ marginTop: '90px' }}>
+  //         <h1> New Dashboard Coming Soon!</h1>
+  //       </div>
+  //     )
+  //   }
+  // }
 
   /**
    * Check to see whether or not the user is authenticated. If so render the component appropriately.
@@ -115,7 +114,7 @@ class AppRoutes extends Component {
     // Required for asynchronous authentication.
     // You must handle the authentication race condition on direct routes.
     if(this.props.isAuthenticating){
-      return () => <div>Loading...</div>
+      return () => <Spinner  color='dark' />
     }
 
     if(this.props.currentUser && !this.props.isAuthenticating) {
@@ -134,58 +133,33 @@ class AppRoutes extends Component {
   }
 
   renderPlans = () => {
-    return (
-
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <TrainingDash/> 
-        // {/* TODO:Finish Component */}
-        // <div className='col-md-10 bg-light'>
-        // <h3 className='my-5'>This area is under construction, come back soon!</h3>
-        //   <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        // </div>
-      // </Row>
-    )
+    return <TrainingDash/> 
   }
 
   renderAccountSettings = () => {
     return (
-      // <Row>
-      //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-        <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
-          <h3 className='my-5'>This area is under construction, come back soon!</h3>
-          <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
-        </div>
-      // </Row>
+        <Redirect to="/" /> //TODO: Complete settings dash
+        // <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
+        //   <h3 className='my-5'>This area is under construction, come back soon!</h3>
+        //   <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
+        // </div>
     )
   }
 
   renderOverview = () => {
-    return (
-          // <Row>
-          //   <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-            <Dash />
-        // {/* </Row> */}
-        )
+    return  <Dash />
+ 
   }
 
   renderAdmin = () => {
     if ( this.props.userProfile.isAdmin) {
-      return (
-     //   <Row>
-     //     <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
-          <Admin />
-      //  </Row>
-      )
+      return <Admin />
     }
     else return (
-          // <Row>
-          // <SideBar profile={this.props.userProfile} user={this.props.currentUser} />
           <div className='col-md-10 ' style={{ backgroundColor: 'white' }}>
             <h3 className='my-5'>Forbidden Area. Back Away Slowly.</h3>
             <FontAwesomeIcon className='mb-4' icon={'tools'} size={'6x'} />
           </div>
-        // {/* </Row> */}
         )
   }
 
@@ -219,7 +193,6 @@ class AppRoutes extends Component {
   }
 
   render() {
-    // console.log(this.props)
     return (
       <Container className='main-container' fluid>
         <Route exact path="/" render={this.renderHomeNavigation} />
@@ -228,9 +201,6 @@ class AppRoutes extends Component {
         <Row className='main-row' style={{margin:0}}>
         <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
-            {/* <Route exact path="/about" component={About} /> */}
-            {/* <Route exact path="/dashboard" render={this.renderDash} /> */}
-            {/* <Route path="/training" component={OnlineTraining} /> */}
             <Route
               exact
               path="/dashboard/:userid/plan/:id"
@@ -238,7 +208,7 @@ class AppRoutes extends Component {
             />
 
             <Route exact path="/dashboard/overview" render={this.authCheckOrRedirect(this.renderDash)} />
-            {/* <Route exact path='/n/admin/dashboard' render={this.renderDashboard} /> */}
+
             <Route exact path="/dashboard/plans" render={this.authCheckOrRedirect(this.renderPlans)} />
 
             <Route
@@ -250,7 +220,7 @@ class AppRoutes extends Component {
             <Route
               exact
               path="/admin"
-              render={this.authCheckOrRedirect(ReactAdmin)}
+              render={this.authCheckOrRedirect(ReactAdminDash)}
             />
 
             <Route

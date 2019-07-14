@@ -7,6 +7,7 @@ const planTemplateSchema = new Schema({
   category: String,
   logo: String,
   workouts: [{ type: Schema.Types.ObjectId, ref: 'Workouts' }],
+  workoutData: [Schema.Types.Mixed],
   pdf: String,
   creator: String,
   created_date: Date,
