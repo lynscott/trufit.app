@@ -25,7 +25,7 @@ class NextMeal extends Component {
 
     this.state = {
       activePlan: null,
-      mealIndex: 0,//deprecated
+      todaysLog: [],
     }
   }
 
@@ -41,7 +41,7 @@ class NextMeal extends Component {
 
     if (this.props.userNutritionPlans.length > 0) {
 
-      console.log(this.props)
+      // console.log(this.props)
 
       meals.sort((a, b) =>
         Math.abs(formatMealTime(a.time, false) - new Date()) > Math.abs(formatMealTime(b.time, false) - new Date())
@@ -74,6 +74,9 @@ class NextMeal extends Component {
         let day = new Date()
         for (let log of  this.props.userNutritionPlans[0].log) {
           if (new Date(log.timestamp).toDateString() === day.toDateString() && log.id === meals[index].meal._id) {
+              // let todaysLog = this.state.todaysLog
+              // todaysLog.push(log)
+              // this.setState({todaysLog:todaysLog})
               return <FontAwesomeIcon style={{color:'limegreen', marginTop:'10px'}} icon="check-circle" size={'3x'} />
           } 
 
@@ -82,6 +85,7 @@ class NextMeal extends Component {
 
         return (
           <Button color="dark" className="m-2"
+            // disabled={()=>}
             onClick={async () => {
               await this.props.logMealComplete({
                 log:{id:meals[index].meal._id, timestamp:new Date()},
@@ -137,6 +141,7 @@ class NextMeal extends Component {
   }
 
   render() {
+    console.log(this.state)
     return this.props.userNutritionPlans.length > 0 ? this.renderNextMeal() : null
   }
 }
