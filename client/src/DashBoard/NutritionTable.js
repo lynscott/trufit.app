@@ -35,13 +35,14 @@ class NextMeal extends Component {
 
 
   renderNextMeal = () => {
-  
-    let meals = this.props.userNutritionPlans[0].scheduleData //HACK: Set to first plan for developing
-    let index = 0
-
+    console.log(this.props)
+    
     if (this.props.userNutritionPlans.length > 0) {
 
-      // console.log(this.props)
+      let meals = this.props.userNutritionPlans[0].scheduleData //HACK: Set to first plan for developing
+      let index = 0
+
+      
 
       meals.sort((a, b) =>
         Math.abs(formatMealTime(a.time, false) - new Date()) > Math.abs(formatMealTime(b.time, false) - new Date())
@@ -142,7 +143,7 @@ class NextMeal extends Component {
 
   render() {
     console.log(this.state)
-    return this.props.userNutritionPlans.length > 0 ? this.renderNextMeal() : null
+    return  this.renderNextMeal()
   }
 }
 
