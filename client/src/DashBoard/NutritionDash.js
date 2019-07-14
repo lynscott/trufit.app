@@ -854,7 +854,7 @@ class NutritionDash extends Component {
                     <ListGroupItemText className='text-center text-black'>{meal.index} - Time: {formatMealTime(meal.time)}</ListGroupItemText>
                     {meal.meal.items.map((item,i)=>{
                       return(
-                        <ListGroupItemText className='text-center bg-white text-black' key={i}>
+                        <ListGroupItemText className='text-center text-black' key={i}>
                           {item.name + ' - Serving(oz): '+ item.serving +' - Total Calories: '+ item.calories}
                         </ListGroupItemText>
                       )
