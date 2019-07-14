@@ -43,7 +43,7 @@ const EMPTY_FOOD_ENTRY = {
   calories: 0,
   fats: 0,
   protein: 0,
-  carb: 0
+  carb: 0lertlertlertlertlertlertlertlertlert
 }
 
 const TOTAL_EMPTY_ENTRY = {
@@ -634,9 +634,6 @@ class NutritionDash extends Component {
       },
       {
         dataField: 'serving',
-        events: {
-          onDoubleClick: (e, column, columnIndex, row, rowIndex) => { alert('hey')},
-        },
         text: 'Amount(oz)',
         editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
           if(row.name === 'Total') return null
