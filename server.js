@@ -10,11 +10,7 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local')
 const cookieParser = require('cookie-parser')
-require('./models/User')
-require('./models/Plans')
-require('./models/UserProfile')
-require('./models/Workouts')
-require('./models/Exercises')
+const models = require('./models/index')
 const cookieSession = require('cookie-session')
 const requireLogin = require('./middlewares/requireLogin')
 const fs = require('fs')
@@ -22,6 +18,7 @@ const pdf = require('html-pdf')
 const sgMail = require('@sendgrid/mail')
 const stripe = require('stripe')(keys.stripeSecret)
 const mongoose = require('mongoose')
+const cors = require('cors');
 const jwt = require('jwt-simple')
 const emailTemplate = require('./services/emailTemplate')
 const freePlanTemplate = require('./services/freePlanTemplate')
@@ -33,15 +30,14 @@ const app = express()
 mongoose.Promise = require('bluebird')
 // mongoose.connect('mongodb://localhost:27017')
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
-// mongoose.model('exercises', new mongoose.Schema())
-
 sgMail.setApiKey(keys.sendGridKey)
 
-const User = mongoose.model('users')
-const Plan = mongoose.model('plans')
-const Exercises = mongoose.model('exercises')
-const UserProfile = mongoose.model('profile')
-const Workout = mongoose.model('workouts')
+//TODO: Replace const in code with model calls
+const User = models.User
+const Plan = models.Plan
+const Exercises = models.Exercises
+const UserProfile = models.UserProfile
+const Workout = models.Workouts 
 
 const localLogin = new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   User.findOne({ email: email }, (err, user) => {
@@ -174,6 +170,7 @@ app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [/\/insecure
 app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
+app.use(cors({exposedHeaders:['Content-Range', 'Content-Length']}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -198,10 +195,26 @@ app.get('/api/plans', async (req, res) => {
   res.send(userPlans)
 })
 
+app.get('/api/meals', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  const userMeals = await models.Meals.find({ creator: req.user.id }).select('-creator')
+  res.send(userMeals)
+})
+
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
-  const allPlans = await Plan.find().select('-_id')
+  const allPlans = await models.PlanTemplates.find().select('-_id')
+  res.send(allPlans)
+})
+
+
+app.get('/api/nutrition_plans', async (req, res, next) => {
+  requireLogin(req, res, next)
+
+  const allPlans = await models.NutritionPlan.find({creator:req.user.id}).select('-creator')
   res.send(allPlans)
 })
 
@@ -213,12 +226,81 @@ app.get('/api/exercises', async (req, res) => {
   res.send(exerciseList)
 })
 
+//// BEGIN APIS FOR ADMIN PANEL ////////
+const objMapper = (obj) => {
+  let ret  = []
+  obj.map((p,i)=>{
+    let prof = {
+      id:p._id,
+      ...p._doc
+    }
+    ret.push(prof)
+  })
+  return ret
+}
+
+app.get('/api/users', async (req, res, next) => {
+  requireLogin(req, res, next)
+  const users = await User.find().select('-password -v')
+
+  res.set('Content-Range', 'users' +' '+users.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.send(objMapper(users))
+})
+
+app.get('/api/profiles', async (req, res, next) => {
+  requireLogin(req, res, next)
+  const profiles = await UserProfile.find()
+  res.set('Content-Range', 'profiles' +' '+profiles.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.send(objMapper(profiles))
+})
+
+app.get('/api/all_plans', async (req, res, next) => {
+  requireLogin(req, res, next)
+  const plans = await Plan.find()
+
+  res.set('Content-Range', 'plans' +' '+plans.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.send(objMapper(plans))
+})
+
+
+app.get('/api/all_workouts', async (req, res, next) => {
+  requireLogin(req, res, next)
+  const workouts = await Workout.find()
+
+  res.set('Content-Range', 'workouts' +' '+workouts.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.send(objMapper(workouts))
+})
+
+
+app.get('/api/admin_exercises', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  const exerciseList = await Exercises.find()
+  res.set('Content-Range', 'exercises' +' '+exerciseList.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.send(objMapper(exerciseList))
+})
+
+app.use('/api/profiles/:id', async (req, res) => {
+  // console.log('Request Id:', req.params.id);
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  res.send(req.profiles)
+})
+
+//// END ////////
+
 app.get('/api/fetch_workouts', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
-  const workoutList = await Workout.find().select('-_id')
-  // console.log(workoutList, 'Workouts')
+  const workoutList = await Workout.find()
   res.send(workoutList)
 })
 
@@ -318,23 +400,142 @@ app.post('/api/signin', passport.authenticate('local', { session: true }), async
 })
 
 app.post('/api/new_plan_template', async (req, res) => {
-  // if (!req.user && ) {
-  //   return res.status(401).send({ error: 'You must log in!' });
-  // }
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  
   let { plan, workouts } = req.body
-  let plan_template = new Plan({
-    planName: plan.title,
+  // console.log(workouts)
+  let plan_template = new models.PlanTemplates({
+    name: plan.title,
     category: plan.category,
-    logo: plan.logo,
-    template: plan,
+    created_date: Date.now(),
+    creator: req.user.id,
     workouts: workouts,
+    workoutData: plan.data
   })
-  plan_template = await plan_template.save()
-  // req.user.plans.push(plan.id);
-  // const user = await req.user.save();
+  plan.logo ? plan_template.logo = plan.logo : null
+  plan.description ? plan_template.description = plan.description : null
+
+  await plan_template.save()
+
   res.status(200).send('Success')
 })
 
+
+app.post('/api/delete_meal', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id } = req.body
+  await models.Meals.deleteOne({_id:id})
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/delete_nutrition_plan', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id } = req.body
+  await models.NutritionPlan.deleteOne({_id:id})
+
+  res.status(200).send('Success')
+})
+
+app.post('/api/new_user_plan', async (req, res) => {
+  if (!req.user  ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { plan, template } = req.body
+  let user_plan = new models.PlanTemplates({
+    end_date,
+    start_date,
+    template,
+    days,
+    active: true
+  })
+  await user_plan.save()
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/nutrition_plan', async (req, res) => {
+  if (!req.user ) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { items, day, name } = req.body
+  let itemIds = items.map((item)=> item.meal._id)
+  // console.log(itemIds)
+  let nutrition_plan = new models.NutritionPlan({
+    scheduleData: items,
+    creator: req.user.id,
+    items: itemIds
+  })
+  day ? nutrition_plan.day = day : null
+  name ? nutrition_plan.name = name : null
+  await nutrition_plan.save()
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/new_meal', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { items, calories } = req.body
+  let meal = new models.Meals({
+    items: items,
+    // time: time,
+    calories: calories,
+    creator: req.user.id
+  })
+  await meal.save()
+  res.status(200).send('Success')
+})
+
+
+
+app.post('/api/log_meal', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+  let { id, log  } = req.body
+  await models.NutritionPlan.findOne({_id:id}, (err, plan) => {
+    // console.log(meal.completions, meal)
+    if (err) {
+      return err
+    }
+
+    if (plan) {
+      let arr = [...plan.log]
+      arr.push(log)
+      plan.log = arr
+      plan.save()
+      console.log(plan.log)
+      res.status(200).send('Success')
+    }
+
+  })
+  // await models.Meals.findOne({_id:id}, (err, meal) => {
+  //   // console.log(meal.completions, meal)
+  //   if (err) {
+  //     return err
+  //   }
+
+  //   if (meal) {
+  //     let arr = meal.completions
+  //     arr.push(new Date(timestamp))
+  //     meal.completions = arr
+  //     meal.save()
+  //     res.status(200).send('Success')
+  //   }
+
+  // })
+})
 
 app.post('/api/new_workout', async (req, res) => {
   if (!req.user ) {
@@ -371,6 +572,7 @@ app.post('/api/update_profile', async (req, res, next) => {
   })
 })
 
+//DEPRECATED
 app.post('/api/update_food_item', async (req, res, next) => {
   requireLogin(req, res, next)
 

@@ -7,8 +7,14 @@ td, .truncate {
     max-width: fit-content;
 }
 
+.truncate-meal {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .selected-row{
-    background-color: #008ed6 !important;
+    background-color: rgba(196, 16, 10, 0.7) !important;
     color:white;
 }
 
@@ -30,11 +36,21 @@ td, .truncate {
     }
 }
 
-.schedule-col{
-    .meal-card{
-        border-radius: 10px;
-    }
+// .schedule-col{
+.meal-card{
+    // border-radius: 10px;
+    background-color: #cecbcba1;
 }
+
+.card{
+    border: none;
+}
+.selected{
+    // box-shadow: 0 0 50px;
+    // transition: 0.3s blue;
+    // border: 3px solid linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+}
+// }
 
 .no-meals-badge{
     .badge{
@@ -59,5 +75,27 @@ td, .truncate {
         h5{
             margin:0;
         }
+    }
+}
+
+.nutrition-btn{
+    background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+}
+
+.tab-nav {
+    .nav-link {
+        // background-image: linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1));
+    }
+}
+
+.list-group {
+    .meal-item {
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .plan-name-input{
+        border-top-left-radius: 5px !important;
+        border-bottom-left-radius: 5px !important;
     }
 }

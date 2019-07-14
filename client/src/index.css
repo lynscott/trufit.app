@@ -12,6 +12,15 @@ html {
   /* overflow-x: hidden; */
 }
 
+#root, .main-row, .main-container{
+  /* height: 100%; Do not use this, sticky will mess up */
+}
+
+.main-row{
+  overflow-x: hidden;
+}
+
+
 body.modal-open-noscroll
 {
     margin-right: 0!important;

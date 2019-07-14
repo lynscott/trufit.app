@@ -8,4 +8,4 @@ const workoutSchema = new Schema({
   workoutID: String,
 });
 
-mongoose.model('workouts', workoutSchema);
+module.exports = mongoose.model('workouts', workoutSchema);

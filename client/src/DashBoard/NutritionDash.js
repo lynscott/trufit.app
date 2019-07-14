@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import BootstrapTable from 'react-bootstrap-table-next'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import {
@@ -18,10 +19,10 @@ import {
   ListGroup,
   ListGroupItem,
   Card,
-  CardTitle,
-  CardText,
-  CardGroup,
-  Collapse
+  CardTitle, 
+  CardText, ListGroupItemHeading, ListGroupItemText,
+  CardGroup, Label, InputGroupAddon,
+  Collapse, CardBody, InputGroup
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
@@ -33,6 +34,29 @@ import classnames from 'classnames'
 import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {FULL_LAYOUT_WIDTH, COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+
+const EMPTY_FOOD_ENTRY = {
+  name: '',
+  serving: '',
+  calories: 0,
+  fats: 0,
+  protein: 0,
+  carb: 0
+}
+
+const TOTAL_EMPTY_ENTRY = {
+  name: 'Total',
+  serving: '',
+  serving_label: '',
+  calories: 0,
+  fats: 0,
+  protein: 0,
+  carb: 0
+}
+
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const barOptions = {
   legend: {
@@ -47,7 +71,7 @@ const barOptions = {
       {
         ticks: {
           //  beginAtZero:true,
-          fontColor: 'white',
+          fontColor: 'black',
           fontSize: 15,
           min: 0
         }
@@ -56,7 +80,7 @@ const barOptions = {
     xAxes: [
       {
         ticks: {
-          fontColor: 'white',
+          fontColor: 'black',
           fontSize: 15
         }
       }
@@ -64,18 +88,59 @@ const barOptions = {
   }
 }
 
-export const formatMealTime = (mealTime) => {
-  let hr = parseInt(mealTime.split(':')[0])
-  let min = parseInt(mealTime.split(':')[1])
-  let now = new Date()
-  now.setHours(hr, min)
-  if (hr > 12) {
-    hr = hr - 1
+export const formatMealTime = (mealTime, reformat=true) => {
+  if (mealTime) {
+    let hr = parseInt(mealTime.split(':')[0])
+    let min = parseInt(mealTime.split(':')[1])
+    let now = new Date()
+    now.setHours(hr, min)
+    if (hr > 12) {
+      hr = hr - 1
+    }
+
+    if( !reformat) return now
+    else return now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+  else return 'No Time Set.'
+
+
+}
+
+/**
+ * Used for a custom cell edit in NutritionDash.
+ * Only allow integer entries into the cell.
+ */
+class NumbersOnlyEntry extends Component {
+  static propTypes = {
+    value: PropTypes.number,
+    onUpdate: PropTypes.func.isRequired
   }
 
-  return now
+  static defaultProps = {
+    value: 0
+  }
 
+  getValue() {
+    return parseFloat(this.text.value)
+  }
 
+  render() {
+    const { value, onUpdate, ...rest } = this.props
+
+    return [
+      <input
+        { ...rest }
+        style={{textAlign: 'center', width: '100%', height: '100%'}}
+        key="text"
+        ref={ node => this.text = node }
+        min={0}
+        type="number"
+      />,
+    ]
+  }
 }
 
 class NutritionDash extends Component {
@@ -89,41 +154,32 @@ class NutritionDash extends Component {
       nutritionCals: 0,
       
       activeTab: '1',
-      products: [
-        {
-          name: 'Total',
-          serving: '',
-          serving_label: '',
-          calories: 0,
-          fats: 0,
-          protein: 0,
-          carb: 0
-        }
-      ],
-      resetProducts: [
-        {
-          name: 'Total',
-          serving: '',
-          serving_label: '',
-          calories: 0,
-          fats: 0,
-          protein: 0,
-          carb: 0
-        }
-      ],
+      products: [ TOTAL_EMPTY_ENTRY ],
+      resetProducts: [ TOTAL_EMPTY_ENTRY ],
       planProtein:0,
       planCarb:0,
       planFats:0,
       items: [],
       openMeals: true,
-      selected: [],
+      mealsSelected: [],
+      newPlan: {day:null, name:null},
       time: null,
-      barData: [0,0,0]
+      barData: [0,0,0],
+      manualEntry: false,
+      manualItem: {},
+      deleteMeals: false,
+      makeNewPlan: false,
+      showMealsFor: null,
+      deletePlan: null,
+      submitPlanDisabled: true,
+      sidebarWidth:0
     }
   }
 
   componentDidMount = async () => {
     await this.props.fetchProfile()
+    await this.props.fetchMeals()
+    await this.props.fetchNutritionPlans()
     this.calculateTotals()
   }
 
@@ -141,36 +197,64 @@ class NutritionDash extends Component {
     if (prevProps.windowWidth !== this.props.windowWidth) {
       this.forceUpdate()
     }
+
+    if (this.state.sidebarWidth !== document.getElementById('dash-sidebar').offsetWidth)
+      this.setState({sidebarWidth:document.getElementById('dash-sidebar').offsetWidth})
+
+    
+    //Check if a day, name and all meal times are set before enabling plan submission
+    if ( this.state.newPlan.day && this.state.newPlan.name  && this.state.mealsSelected.length > 0 && this.state.submitPlanDisabled) {
+        let allTimesSet = true
+        for (let meal of this.state.mealsSelected) {
+          console.log(meal)
+          if (!meal.time) {
+            allTimesSet = false
+          }
+        }
+        if (allTimesSet) {
+          this.setState({submitPlanDisabled:false})
+        }
+        
+    }
+
+    //Recheck submit conditions if a meal is added or removed from the plan
+    if (prevState.mealsSelected.length !== this.state.mealsSelected.length) {
+      this.setState({submitPlanDisabled:true})
+    }
+    
+
   }
 
   /****************************************
    * HELPER FUNCTIONS *********************
    ****************************************/
+  /**
+   * Calculate the total macros by iterating through the products.
+   */
   calculateTotals = () => {
- 
-    this.state.products.splice(-1)
+    // Remove the total row
+
+    let newProducts = [...this.state.products]
+    newProducts.splice(-1)
+
     let carbs = 0
     let prot = 0
     let fats = 0
     let cals = 0
     let nutritionCals = 0
-    for (let i = 0; i < this.props.profile.nutritionSchedule.length; i++) {
-      this.props.profile.nutritionSchedule[i].items.map(item=>{
-        // fats = Number(item.fats) + Number(fats)
-        // carbs = Number(item.carb) + Number(carbs)
-        // prot = Number(item.protein) + Number(prot)
+    for (let i = 0; i < this.props.userMeals.length; i++) {
+      this.props.userMeals[i].items.map(item=>{
         nutritionCals = Number(item.calories) + Number(nutritionCals)
       })
     }
 
-    for (let i = 0; i < this.state.products.length; i++) {
+    for (let i = 0; i < newProducts.length; i++) {
       // console.log(this.state.products[i])
-      fats = Number(this.state.products[i].fats) + Number(fats)
-      carbs = Number(this.state.products[i].carb) + Number(carbs)
-      prot = Number(this.state.products[i].protein) + Number(prot)
+      fats = Number(newProducts[i].fats) + Number(fats)
+      carbs = Number(newProducts[i].carb) + Number(carbs)
+      prot = Number(newProducts[i].protein) + Number(prot)
       cals =
-        Number(this.state.products[i].calories) + Number(cals)
-      
+        Number(newProducts[i].calories) + Number(cals)
     }
 
     //TODO: Add recommended macros to user macros
@@ -182,7 +266,8 @@ class NutritionDash extends Component {
 
     // console.log('ACTIVE', fats, carbs, prot, cals, this.state.products)
     
-    this.state.products.push({
+    // Replace the total row with the new calculations
+    newProducts.push({
       name: 'Total',
       serving: '',
       serving_label: '',
@@ -191,28 +276,55 @@ class NutritionDash extends Component {
       protein: Math.round(prot),
       carb: Math.round(carbs)
     })
-    this.setState({nutritionCals:Math.round(nutritionCals)})
-    // this.forceUpdate()
+
+    this.setState({products: newProducts, nutritionCals:Math.round(nutritionCals)})
+  }
+
+  /**
+   * Add a product into a table and perform necessary updates. Or any other
+   * side-effect logic.
+   */
+  addProduct = (product) => {
+    // Add the selected product to the list of products
+    let newProducts = [...this.state.products]
+
+    // HACK: instead of using unshift, append the product right before the total array.
+    // This makes it so that the rowIndex remains preserved on the current row.
+    // If you prepend a product row, what will happen is that the rowIndex remains the same.
+    newProducts.splice(-1, 0, product)
+
+    console.log('addProduct', product, newProducts)
+    this.setState({products: newProducts}, () => {
+      this.calculateTotals()
+    })
+  }
+
+
+  /**
+   * Check to see if the product already exists.
+   * This is a SHALLOW check against only the name
+   */
+   isOkayToAddProduct = (product) => {
+    //console.log('isOkayToAddProduct', product)
+    if(!product) return false
+
+    // Existence check
+    for(let p of this.state.products){
+      if(p.name === product.name) return false
+    }
+
+    return true
   }
 
   addItemButton = () => {
     return (
       <Button
-        className="my-2"
-        color={'primary'}
-        disabled={this.props.foodSelected ? false : true}
+        className="my-2 nutrition-btn"
+        disabled={!this.isOkayToAddProduct(this.props.foodSelected)}
         onClick={async () => {
-          // await this.props.updateProfile({
-          //   keys: ['nutritionItems'],
-          //   nutritionItems: this.props.foodSelected
-          // })
-          this.setState(() => {
-            this.state.products.unshift(this.props.foodSelected)
-            this.calculateTotals()
-          })
-          console.log(this.state.products)
-          // this.forceUpdate()
-        }}
+          this.addProduct(this.props.foodSelected)
+        }
+      }
       >
         Add Food Item
       </Button>
@@ -236,52 +348,94 @@ class NutritionDash extends Component {
             this.props.foodSearch(value)
           }}
         />
-        <h6 className="text-white">
+        <h6 className="text-black">
           Nutrition Data Provided by the USDA Food Database
         </h6>
       </React.Fragment>
     )
   }
 
+  /**
+   * Validate any manual entry appropriately.
+   * Name should be alphanumeric
+   * Numbers should only be floats.
+   */
+  manualEntryIsInvalid = (key, value) => {
+    //console.log('manualEntryValidate', key, value, typeof(value))
+    if(value == undefined || value == null || value === '') return true
+    if(key != 'name' && isNaN(value)) return true
+
+    return false
+  }
+
   manualEntryButton = () => {
-    let emtpyItem = {
-      name: 'Enter a name for the item',
-      serving_label: 'Enter a serving',
-      serving: 0,
-      calories: 0,
-      fats: 0,
-      carb: 0,
-      protein: 0,
-      id: 'manual'
+    return (
+      <Button className="my-2 nutrition-btn"
+        onClick={async () => this.setState({manualEntry:!this.state.manualEntry})}
+      >Manual Entry
+      </Button>
+    )
+  }
+
+  manualItemEditor = () => {
+    let fields = []
+
+    // Create input form from empty item keys
+    Object.keys(EMPTY_FOOD_ENTRY).map((key,i)=>{
+      fields.push(
+        <>
+          {this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? <Label>{key}</Label> : null}
+
+          <Input key={i} invalid={this.manualEntryIsInvalid(key, this.state.manualItem[key])} value={this.state.manualEntry ? this.state.manualItem[key] : ''}
+            onChange={(e)=>addKey(e, key)} placeholder={key} type={key != 'name' ? 'number' : null} min={0} name={key} />
+        </>
+          )
+    })
+
+    // Update object key in state
+    let addKey = (e,key) => {
+      // Do not allow alphabet for non-name entries
+      if(key != 'name' && isNaN(e.target.value)) return
+
+      // Update the item.
+      let newItem = this.state.manualItem
+
+      if(key == 'name') newItem[key] = e.target.value
+      else newItem[key] = parseFloat(e.target.value)
+      this.setState({manualItem:newItem})
     }
 
     return (
-      <Button
-        className="my-2"
-        color="danger"
-        onClick={async () => {
-          await this.props.updateProfile({
-            keys: ['nutritionItems'],
-            nutritionItems: emtpyItem
-          })
-          // this.forceUpdate()
-        }}
-      >
-        Manual Entry
-      </Button>
+      <>
+        <InputGroup className='m-2'>{fields}</InputGroup>
+        <Button onClick={()=>{
+          let manualItem = this.state.manualItem
+          manualItem.manualEntry = true
+          this.addProduct(manualItem)
+          this.setState({manualEntry:false, manualItem:{}})
+        }} color='dark'
+         disabled={Object.keys(this.state.manualItem).length != 6 || !this.isOkayToAddProduct(this.state.manualItem)} 
+         className='mb-2'>Add To Table</Button>
+      </>
     )
   }
 
   removeItemButton = () => {
     return (
       <Button
-        className="my-2"
-        color="warning"
+        className="my-2 nutrition-btn"
+        // color="warning"
         disabled={!this.state.rowSelected}
         onClick={async () => {
           await this.props.updateFoodItem({ index: this.state.index })
-          this.calculateTotals()
-          this.setState({ rowSelected: false })
+
+          // Remove the product.
+          let newProducts = [...this.state.products]
+          newProducts.splice(this.state.index, 1)
+
+          this.setState({ products: newProducts, rowSelected: false }, () => {
+            this.calculateTotals()
+          })
         }}
       >
         Remove Item
@@ -289,25 +443,30 @@ class NutritionDash extends Component {
     )
   }
 
+  /**
+   * Button to save meal to user data
+   *
+   * @memberof NutritionDash
+   */
   addMealButton = () => {
     return (
       <Button
-        className="my-2"
-        color="success"
+        className="my-2 "
+        color="dark"
         size="lg" block
-        disabled={this.state.time && this.state.products.length > 1? false: true}
+        disabled={this.state.products.length > 1? false: true}
         onClick={async () => {
+          // Remove the total empty entry from the list of products
           this.state.products.splice(-1)
-          await this.props.updateProfile({
-            keys: ['nutritionSchedule'],
-            nutritionSchedule: {items:this.state.products, time:this.state.time}
+          await this.props.createNewMeal({items:this.state.products})
+ 
+          this.setState({ products: [ TOTAL_EMPTY_ENTRY ], time:null }, () => {
+            // Update the list of meals.
+            this.props.fetchMeals()
           })
-          // await this.props.updateFoodItem({ index: this.state.index })
-          // this.calculateTotals()
-          this.setState({ products: this.state.resetProducts, time:null })
         }}
       >
-        Add Meal
+        Create Meal
       </Button>
     )
   }
@@ -325,34 +484,30 @@ class NutritionDash extends Component {
    * UPDATE MACROS  *
    ******************/
 
-  updateMacros = async newValue => {
-    let i = this.state.index
-    let newRow = this.state.products[i]
+   /**
+    * Update the macro for the state.
+    */
+  updateMacros = (newValue, rowIndex) => {
+    let i = rowIndex
+    let newProducts = [...this.state.products]
 
-    console.log('correct', newValue)
-    newRow.fats = (
-      this.state.products[i].baseFats *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.carb = (
-      this.state.products[i].baseCarb *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.protein = (
-      this.state.products[i].baseProtein *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.calories = (
-      this.state.products[i].baseCal *
-      (Number(newValue) / 3.5)
-    ).toFixed(2)
-    newRow.serving = newValue
+    if(newProducts[i].manualEntry)
+      return //No updates for manual items
 
-    this.setState({ rowSelected: false })
-    this.calculateTotals()
+    newProducts[i].fats = ( newProducts[i].baseFats * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].carb = ( newProducts[i].baseCarb * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].protein = ( newProducts[i].baseProtein * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].calories = ( newProducts[i].baseCal * (Number(newValue) / 3.5)).toFixed(2)
+    newProducts[i].serving = newValue
+
+    console.log('updateMacros', newValue, rowIndex, newProducts[i])
+
+    this.setState({ products: newProducts, rowSelected: false }, () => {
+      this.calculateTotals()
+    })
   }
 
-
+  //TODO: Fix hacky setstate call
   updateBar = (fats, carb, protein) => {
     this.setState({},() => {
       this.state.planProtein = this.state.planProtein + protein
@@ -368,7 +523,7 @@ class NutritionDash extends Component {
     let carb = 0
     let fats = 0
 
-    this.props.profile.nutritionSchedule.map(meal=>{ 
+    this.props.userMeals.map(meal=>{ 
       meal.items.map(item=>{
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -391,7 +546,8 @@ class NutritionDash extends Component {
   renderMealSchedule = () => {
 
     let removeMeal = async i => {
-      await this.props.updateFoodItem({ removeSchedule: i })
+      await this.props.deleteMeal({ id: i })
+      await this.props.fetchMeals()
     }
 
 
@@ -404,20 +560,7 @@ class NutritionDash extends Component {
 
       //Parse macro info from meals
       meal.items.forEach((item, i) => {
-        meals.push(
-          <CardText key={i} className="row justify-content-center">
-            <React.Fragment>
-              <Col md="6"className="truncate text-center">
-                <Badge color="light">{item.name}</Badge>
-              </Col>
-              <Col md="6" className="text-center">
-                <Badge color="warning">
-                  {item.serving + 'oz'}
-                </Badge>
-              </Col>
-            </React.Fragment>
-          </CardText>
-        )
+        meals.push(<ListGroupItem className='meal-item truncate-meal' key={i}>{item.name + ' ' +item.serving + ' OZ'}</ListGroupItem>)
 
         //Count up macros through each iter
         cals = cals+parseInt(item.calories)
@@ -426,77 +569,49 @@ class NutritionDash extends Component {
         fats = fats + parseInt(item.fats)
       })
 
-      // //Update state
-      // // this.updateBar(fats, carb, protein)
-      // this.setState((prevState, props) => {
-      //   // console.log(props, 'WTF IS PROPS?')
-      //   if (prevState.planProtein !== this.state.planProtein) {
-      //     return {
-      //       planProtein: prevState.planProtein + protein,
-      //       planCarb: prevState.planCarb + carb,
-      //       planFats: prevState.planFats + fats
-      //     }
-      //   }
-      // })
-
       //Add calories to meal card
-      meals.push(
-          <CardText className="row justify-content-center" >
-            <Col md='6' className="truncate text-center text-dark">Total Calories:</Col>
-            <Col md='6' className="truncate text-center text-dark">{cals}</Col>
-          </CardText>
-        )
+      meals.push( <ListGroupItem className='meal-item '>Total Calories: {cals}</ListGroupItem>)
       
-      return meals
+      return <ListGroup>{meals}</ListGroup>
     }
 
     return (
-      <Row>
-        <Col md="12" className="text-left schedule-col">
-          <Collapse isOpen={this.state.openMeals}>
-            <CardGroup>
-             { this.props.profile.nutritionSchedule.map((meal , index) => {
-              //  console.log(meal, 'TWO')
+              <Row>
+                {this.props.userMeals.map((meal , index) => {
                     return (
-                      <Card
-                        body
-                        key={index}
-                        className="m-1 meal-card"
-                        inverse
-                        color="light"
-                      >
-                        <CardTitle
-                          style={{
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            color: 'black'
-                          }}  
-                        >
-                        
-                        {/* Needs times */}
-                          {formatMealTime(meal.time).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                          {/* {meal.time} */}
-                        </CardTitle>
-                        {parseMeals(meal)}
+                      <Col md='6'>
+                        <Card body key={index} outline color="dark"
+                          className={'m-1 meal-card '}>
 
-                        <Button
-                          color="primary"
-                          onClick={() => removeMeal(index)}
-                          className="m-2"
-                        >
-                          Remove Meal
-                        </Button>
-                      </Card>
+                          <CardTitle
+                            style={{ fontWeight: 'bold', textAlign: 'center', color: 'black'}} >
+                            <span> Meal {index+1}</span>
+                            {/* {formatMealTime(meal.time)} */}
+                          </CardTitle>
+
+                          {parseMeals(meal)}
+
+                          <Collapse className='text-center' isOpen={this.state.deleteMeals} >
+                            <Button color="danger" outline size='sm'
+                              onClick={() => removeMeal(meal._id)}
+                              className="m-2"> Delete Meal
+                            </Button>
+                          </Collapse>
+
+                          <Collapse isOpen={this.state.makeNewPlan}> 
+                            <Button color="success" outline size='sm'
+                              onClick={() => this.setState({mealsSelected:[...this.state.mealsSelected,{meal, index:'Meal '+ (index+1)}] })}
+                              className="m-2"
+                            >Add to Plan
+                            </Button>
+                          </Collapse>
+
+                        </Card>
+                      </Col>
                     )
                   })
                 }
-            </CardGroup>
-          </Collapse>
-        </Col>
-      </Row>
+              </Row>
     )
   }
 
@@ -516,6 +631,7 @@ class NutritionDash extends Component {
       {
         dataField: 'name',
         text: 'Food Item',
+        editor: Type.TEXT,
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(cell, colIndex)
           if (row.name === 'Total') {
@@ -524,28 +640,19 @@ class NutritionDash extends Component {
           return true
         }
       },
-      // {
-      //   dataField: 'serving_label',
-      //   text: 'Serving',
-      //   editable: (cell, row, rowIndex, colIndex) => {
-      //     if (rowIndex === this.row.name === 'Total'.length) {
-      //       return false
-      //     }
-      //     return true
-      //   }
-      // },
       {
         dataField: 'serving',
         text: 'Amount(oz)',
-        editor: {
-          type: Type.SELECT,
-          options: makeArray()
+        editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
+          if(row.name === 'Total') return null
+          else return <NumbersOnlyEntry { ...editorProps } value={ value } onUpdate={() => {}}/>
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
-          if (row.name === 'Total') {
+          if (row.name === 'Total' || row.manualEntry) {
             return false
           }
+  
           return true
         }
       },
@@ -553,7 +660,6 @@ class NutritionDash extends Component {
         dataField: 'calories',
         text: 'Calories',
         editable: (cell, row, rowIndex, colIndex) => {
-          // console.log(cell, row)
           if (row.id === 'manual') {
             return true
           }
@@ -594,29 +700,28 @@ class NutritionDash extends Component {
           columns={columns}
           rowClasses={this.rowClasses}
           classes={
-            this.props.windowWidth < 500 === true
+            this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH === true
               ? 'table-mobile bg-light'
               : 'bg-light'
           }
-          cellEdit={cellEditFactory({
+          cellEdit={
+            cellEditFactory({
             mode: 'dbclick',
             blurToSave: true,
             autoSelectText: true,
-            beforeSaveCell: async (oldValue, newValue, row, column) => {
-              // console.log(newValue, row, 'before save log')
+            beforeSaveCell: (oldValue, newValue, row, column) => {
+              console.log('beforeSaveCell', oldValue, newValue, row, column, 'before save log')
 
-
-              if (!isNaN(newValue) && newValue !== ' ') {
-                this.updateMacros(newValue)
-              } else {
-                // console.log('send to save')
-                await this.props.updateFoodItem({
-                  index: this.state.index,
-                  replace: row
-                })
-              }
+              // User did not select any value, preserve the old value.
+              if(newValue === '') newValue = oldValue
+              if(column.dataField === 'serving' && !isNaN(newValue)) this.updateMacros(newValue, this.state.index)
+ 
+            },
+             afterSaveCell: (oldValue, newValue, row, column) => {
+               console.log('afterSaveEdit', row)
             },
             onStartEdit: (row, column, rowIndex, columnIndex) => { 
+              console.log('onStartEdit', row, rowIndex)
               if (rowIndex !== this.state.index) {
                 this.setState({index:rowIndex})
               }
@@ -627,6 +732,9 @@ class NutritionDash extends Component {
       )
   }
 
+  /**
+   * Builds the corresponding CSS class name for the selected row.
+   */
   rowClasses = (row, rowIndex) => {
     if (
       rowIndex === this.state.index &&
@@ -637,6 +745,9 @@ class NutritionDash extends Component {
     }
   }
 
+  /**
+   * Dictates the behavior of a row when it has been selected.
+   */
   selectRow = {
     mode: 'checkbox',
     clickToSelect: true,
@@ -648,12 +759,14 @@ class NutritionDash extends Component {
     onSelect: (row, isSelect, rowIndex, e) => {
       console.log(rowIndex, 'INDEX')
       if (row.name !== 'Total') {
-        this.rowClasses(rowIndex)
         this.setState({ index: rowIndex, rowSelected: true })
       }
     }
   }
 
+  /**
+   * Not currently being used.
+   */
   rowEvents = {
     onClick: (e, row, rowIndex) => {
       // console.log(rowIndex, 'selected')
@@ -662,15 +775,168 @@ class NutritionDash extends Component {
     }
   }
 
+  removeMealFromPlan = (i) => {
+    let fullArr = this.state.mealsSelected
+    fullArr.splice(i,1)
+    this.setState({ mealsSelected:
+      [...fullArr]
+    })
+  }
 
+  /**
+   *Renders and creates nutrition plans from meals 
+   *
+   * @memberof NutritionDash
+   */
+  renderNutritionPlans = () => {
+    let setTime = (e, i) => {
+      let newMeal = this.state.mealsSelected[i]
+      let newArr = this.state.mealsSelected
+      newMeal.time = e.target.value
+      newArr[i] = newMeal
+      return newArr
+
+    }
+
+    let setValue = (e,key) => {
+      let plan = this.state.newPlan
+      plan[key] = e.target.value
+      this.setState({newPlan:plan})
+    }
+
+    let setPlanForDeletion = (i) => {
+
+    }
+
+
+    let plans = () => {
+      //Initial state
+      if(this.props.userNutritionPlans.length === 0)
+        return (
+          <ListGroupItem>
+            <ListGroupItemHeading className='text-center'>No nutrition plan created. Create one!</ListGroupItemHeading>
+          </ListGroupItem>
+        )
+
+      let plans = []
+      this.props.userNutritionPlans.map((plan,i)=>{
+        plans.push(
+          <ListGroupItem key={i}>
+
+            <Collapse isOpen={this.props.profile.activeNutritionPlan === plan._id}>
+              <FontAwesomeIcon icon="star" size={'1x'} />
+            </Collapse>
+
+            <ListGroupItemHeading className='text-center'>{plan.name} - {plan.day? plan.day: 'N/A'}</ListGroupItemHeading>
+
+            <ButtonGroup size="sm" style={{display:'block', textAlign:'center', marginBottom:'10px'}}>
+
+            {/* TODO: Finish option <Button className='text-center' color={'dark'}>Set as active plan</Button> */}
+
+              <Button className='text-center' onClick={()=>{
+                this.state.showMealsFor !==null ? this.setState({showMealsFor:null}):
+                this.setState({showMealsFor:i})}} >Show Meals</Button>
+
+              <Button onClick={()=>{
+                this.setState({deletePlan: this.state.deletePlan === null ? i : this.state.deletePlan !== i ? i : null})
+                }} color='warning'> <FontAwesomeIcon icon="trash-alt" size={'1x'} /></Button>
+            </ButtonGroup>
+
+            <Collapse className='text-center' isOpen={this.state.deletePlan !== null && this.state.deletePlan===i}>
+              <Button onClick={async ()=>{
+                await this.props.deleteNutritionPlan({id:plan._id})
+                this.props.fetchNutritionPlans()
+                }} className='my-2' size='sm' color='danger'>Delete Plan</Button>
+            </Collapse>
+
+            <Collapse isOpen={this.state.showMealsFor === i}>
+              {plan.scheduleData.map((meal,i)=>{
+                return( 
+                  <div key={i} style={{border:'1px solid black', borderRadius:'5px', fontSize:'smaller'}}>
+                    <ListGroupItemText className='text-center text-black'>{meal.index} - Time: {formatMealTime(meal.time)}</ListGroupItemText>
+                    {meal.meal.items.map((item,i)=>{
+                      return(
+                        <ListGroupItemText className='text-center bg-white text-black' key={i}>
+                          {item.name + ' - Serving(oz): '+ item.serving +' - Total Calories: '+ item.calories}
+                        </ListGroupItemText>
+                      )
+                    })}
+                    
+                  </div>
+                )
+              })}
+            </Collapse>
+
+          </ListGroupItem>
+        )
+      })
+      return plans
+      
+    }
+
+    return(
+      <>
+        <h2 className='text-center'>Active Plan</h2>
+        <Card className='bg-secondary'>
+          <CardBody>
+
+            <ListGroup className='m-3'>
+              {plans()}
+            </ListGroup>
+
+            {this.props.userNutritionPlans.length > 1 ? //quick HACK: to force single nutrition plans for now
+            <Button color={'dark'} className='text-center' block style={{display:'block'}}
+              onClick={()=>this.setState({makeNewPlan:!this.state.makeNewPlan})} >Create New Plan+</Button>
+              : null}
+
+            <Collapse isOpen={this.state.makeNewPlan}>
+              <ListGroup className='m-3'>
+                <InputGroup className='mb-3'>
+                  {/* <Label className='text-white'>Name & Day for Plan (optional)</Label>  */}
+                  <Input className='plan-name-input' value={this.state.newPlan.name} onChange={(e)=>setValue(e, 'name')} name={'name'} placeholder='Plan Name*' type='text' />
+                  <Input name='day' placeholder='Plan Day' value={this.state.newPlan.day} onChange={(e)=>setValue(e, 'day')} type='select' >
+                    <option value={null} >Select a day</option>
+                    <option>Daily</option>
+                    {days.map((day,i)=>{
+                      return <option key={i}>{day}</option>
+                    })}
+                  </Input>
+                </InputGroup>
+                {this.state.mealsSelected.map((meal,i) => {
+                  return <ListGroupItem><ListGroupItemHeading className='text-center' >{meal.index } </ListGroupItemHeading>
+                    <ListGroupItemText>
+                      <InputGroup>
+                      <Label>Set a time:*</Label> 
+                      <Input onChange={(e)=>{this.setState({mealsSelected:setTime(e,i)})}} type='time' />
+                        <InputGroupAddon addonType="append">
+                          <Button color="danger" onClick={()=>this.removeMealFromPlan(i)}>Remove</Button>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </ListGroupItemText>
+                  </ListGroupItem>
+                })}
+              </ListGroup>
+              <Button className='text-center d-block mt-3 mx-auto' onClick={async()=>{
+                await this.props.createNutritionPlan({items:this.state.mealsSelected, ...this.state.newPlan})
+                this.setState({newPlan:{}, mealsSelected:[], makeNewPlan:false, submitPlanDisabled:true},
+                  ()=>this.props.fetchNutritionPlans())
+              }} color='dark' disabled={this.state.submitPlanDisabled} size='lg'>Save Nutrition Plan</Button>
+            </Collapse>
+
+          </CardBody>
+        </Card>
+
+      </>
+    )
+  }
 
 
   renderNutritionTabs = () => {
     return (
-      <Col className="bg-dark" style={{ paddingTop: '10px', maxHeight: this.props.windowWidth < 500 ? '80vh' : '100vh',
-      overflowY: 'scroll' }} md="10">
+      <Col className="bg-light" md="10" style={{marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0,
+      height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
         {this.displayMacros()}
-        <Nav tabs>
+        <Nav tabs className='tab-nav'>
           <NavItem>
             <NavLink
               className={classnames({ active: this.state.activeTab === '1' })}
@@ -679,7 +945,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Schedule
+              Plan Builder <FontAwesomeIcon icon="tools" size={'1x'} />
             </NavLink>
           </NavItem>
           <NavItem>
@@ -690,7 +956,7 @@ class NutritionDash extends Component {
               }}
               style={{ textTransform: 'none' }}
             >
-              Nutrition Plan
+              Meal Builder <FontAwesomeIcon icon="wrench" size={'1x'} />
             </NavLink>
           </NavItem>
         </Nav>
@@ -704,32 +970,42 @@ class NutritionDash extends Component {
                 <Col md="3">{this.addItemButton()}</Col>
                 <Col md="3">{this.manualEntryButton()}</Col>
                 <Col md="3">{this.removeItemButton()}</Col>
-                <Col md='3'><h6 className='text-white mb-0'>Set a meal time</h6>
-                  <Input style={{marginBottom:'15px'}} onChange={e => {
-                  this.setState({ time: e.target.value })
-                  }} placeholder="Set Time" type="time"/>
-                </Col>
               </Row>
+              <Collapse isOpen={this.state.manualEntry}>
+                <Row className="align-items-center justify-content-center">
+                  {this.manualItemEditor()}
+                </Row>
+              </Collapse>
             </Col>
             {this.renderTable()}
             {this.addMealButton()}
           </TabPane>
-          <TabPane tabId="1">
-            {this.props.profile.nutritionSchedule.length > 0 ? (
+          <TabPane tabId="1" className='text-left'>
+            {this.props.userMeals.length > 0 || this.props.userNutritionPlans.length > 0 ? (
               <React.Fragment>
-                <Row className="my-3">
-                  <Col md="12">{this.renderMealSchedule()}</Col>
+               <Button color={'dark'} className='mt-4' onClick={()=>this.setState({openMeals:!this.state.openMeals})}
+                  >{this.state.openMeals ? 'Hide Meals':'Show Meals'}</Button>
+
+                <Row className="my-3 justify-content-center">
+                
+                  <Collapse className='col-md-6 text-center' isOpen={this.state.openMeals}>
+
+                    <Button color={'danger'} outline={this.state.deleteMeals ? false:true} className='my-3' 
+                      onClick={()=>this.setState({deleteMeals:!this.state.deleteMeals})} >
+                      <FontAwesomeIcon icon="trash-alt" size={'1x'} /> Manage Meals </Button>
+                    {this.renderMealSchedule()}
+                  </Collapse>
+
+                  <Col className='plan-side' md='6'>{this.renderNutritionPlans()}</Col>
                 </Row>
-                <Row>
-                  {/* <Col md="12">{this.makeSchedule()}</Col> */}
-                </Row>
+                
               </React.Fragment>
             ) : (
               <Row className="my-3">
                 <Col md="12">
                   <h1 className='no-meals-badge'>
-                    <Badge color="info">
-                      Create a nutrition plan to schedule some meals!
+                    <Badge color="dark">
+                      Build some meals to create a nutrition plan!
                     </Badge>
                   </h1>
                 </Col>
@@ -743,7 +1019,7 @@ class NutritionDash extends Component {
 
   displayMacros = () => {
     return (
-      <Row className="justify-content-center py-2">
+      <Row className="justify-content-center py-2 bg-white">
         {/* <Col md="6" className="align-self-center text-white my-2">
   
           <CardText style={{margin:0}}>
@@ -804,13 +1080,13 @@ class NutritionDash extends Component {
             </ButtonGroup>
           </ButtonToolbar>
         </Col> */}
-        <Col md="8" className=" my-2 text-white">
+        <Col md="6" className=" my-2 text-black bg-white">
           <h5 style={{fontFamily:'Fira Sans, sans-serif'}}>
           Recommended Daily Intake:{' '}
                     {(
                       Number(this.props.profile.calories) +
                       this.props.profile.currentGoal.value
-                    ).toFixed()+'cal'} // 
+                    ).toFixed()+'cal'} <br/> 
           Your Planned Daily Intake: {this.state.nutritionCals}cal</h5>
           <Bar
             legend={{ position: 'bottom' }}
@@ -819,7 +1095,7 @@ class NutritionDash extends Component {
                 datasets: [
                   {
                     data: this.getMealMacros(),
-                    backgroundColor: 'rgb(122, 212, 234, 0.4)', //'rgba(255,99,132,0.2)',
+                    backgroundColor: 'rgb(0, 0, 0, 0.4)', //'rgba(255,99,132,0.2)',
                     borderColor: 'rgba(255,255,255,1)',
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(255,99,132,0.2)',
@@ -837,7 +1113,7 @@ class NutritionDash extends Component {
 
 
   render() {
-    console.log(this.props.profile)
+    // console.log(this.state)
     return this.props.profile ? this.renderNutritionTabs() : null
   }
 }
@@ -846,7 +1122,10 @@ const mapStateToProps = state => {
   return {
     terms: state.nutrition.searchList,
     foodSelected: state.nutrition.foodSelected,
-    profile: state.auth.userProfile
+    profile: state.auth.userProfile,
+    userMeals: state.nutrition.userMeals,
+    userNutritionPlans: state.nutrition.userNutritionPlans,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 

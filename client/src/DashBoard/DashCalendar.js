@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BigCalendar from 'react-big-calendar'
+import {Calendar, momentLocalizer} from 'react-big-calendar'
 import moment from 'moment'
 
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
@@ -7,7 +7,9 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap'
 
-const localizer = BigCalendar.momentLocalizer(moment)
+// const localizer = BigCalendar.momentLocalizer(moment)
+const localizer = momentLocalizer(moment)
+
 const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
 
 class DashCalendar extends Component {
@@ -88,7 +90,7 @@ class DashCalendar extends Component {
     return (
       <React.Fragment>
         {/* <Col md='4'> */}
-          <BigCalendar
+          <Calendar
             localizer={localizer}
             events={this.props.plan ? this.formatDate(): []}
             startAccessor="start"
@@ -101,7 +103,7 @@ class DashCalendar extends Component {
           />
         {/* </Col> */}
         {/* <Col md='4' className='align-self-center'> */}
-        <Button className='m-3' color='info'>Edit Workout Schedule</Button>
+        <Button className='m-3' color='dark'>Edit Workout Schedule</Button>
           {this.state.nextWorkout? this.nextWorkoutCard() : null}
         {/* </Col> */}
       </React.Fragment>
