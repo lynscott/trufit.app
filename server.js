@@ -47,7 +47,6 @@ const localLogin = new LocalStrategy({ usernameField: 'email' }, (email, passwor
     if (!user) {
       return done(null, false)
     }
-    // console.log(user.password)
 
     user.comparePassword(password, user.password, (err, isMatch) => {
       if (err) {
