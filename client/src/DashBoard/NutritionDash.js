@@ -700,9 +700,7 @@ class NutritionDash extends Component {
           columns={columns}
           rowClasses={this.rowClasses}
           classes={
-            this.props.windowWidth < FULL_LAYOUT_WIDTH === true
-              ? 'table-mobile bg-light'
-              : 'bg-light'
+            this.props.windowWidth > FULL_LAYOUT_WIDTH ? 'table-mobile bg-light' : 'bg-light'
           }
           cellEdit={
             cellEditFactory({
@@ -852,7 +850,7 @@ class NutritionDash extends Component {
             <Collapse isOpen={this.state.showMealsFor === i}>
               {plan.scheduleData.map((meal,i)=>{
                 return( 
-                  <div key={i} style={{border:'1px solid black', borderRadius:'5px', fontSize:'smaller'}}>
+                  <div key={i} style={{border:'1px solid black', borderRadius:'5px', fontSize:'smaller', marginBottom: '10px'}}>
                     <ListGroupItemText className='text-center text-black'>{meal.index} - Time: {formatMealTime(meal.time)}</ListGroupItemText>
                     {meal.meal.items.map((item,i)=>{
                       return(
@@ -936,7 +934,7 @@ class NutritionDash extends Component {
   renderNutritionTabs = () => {
     return (
       <Col className="bg-light" md="10" style={{marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0,
-      height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
+      minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null}}>
         {this.displayMacros()}
         <Nav tabs className='tab-nav'>
           <NavItem>
