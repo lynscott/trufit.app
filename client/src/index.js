@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import rootReducer from './reducers/index.js'
@@ -35,7 +35,7 @@ history.listen(_ => {
  
 library.add(faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle )
 
-const composeEnhancers = composeWithDevTools({
+const composeEnhancers = process.env.NODE_ENV !== 'development' ? compose : composeWithDevTools({
   // options like actionSanitizer, stateSanitizer
 })
 
