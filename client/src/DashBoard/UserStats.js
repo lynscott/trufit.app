@@ -92,6 +92,7 @@ class Stats extends Component {
 
       return (
             <Col md="12" className='p-2'>
+              {this.renderCheckInModal()}
               <p>Your first weight check in! Click below to get started.</p>
               {this.renderButton()}
             </Col>
