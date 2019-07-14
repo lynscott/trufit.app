@@ -196,6 +196,7 @@ class TrainingDash extends Component {
     return (
       <Col md="10"
         style={{minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
+        padding: '10px',
         marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
       >
         <Jumbotron>

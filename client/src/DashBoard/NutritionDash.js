@@ -850,7 +850,7 @@ class NutritionDash extends Component {
             <Collapse isOpen={this.state.showMealsFor === i}>
               {plan.scheduleData.map((meal,i)=>{
                 return( 
-                  <div key={i} style={{border:'1px solid black', borderRadius:'5px', fontSize:'smaller'}}>
+                  <div key={i} style={{border:'1px solid black', borderRadius:'5px', fontSize:'smaller', marginBottom: '10px'}}>
                     <ListGroupItemText className='text-center text-black'>{meal.index} - Time: {formatMealTime(meal.time)}</ListGroupItemText>
                     {meal.meal.items.map((item,i)=>{
                       return(
