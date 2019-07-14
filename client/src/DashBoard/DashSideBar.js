@@ -53,6 +53,10 @@ class DashSideBar extends React.Component {
             
           })
     }
+
+
+    if (this.props.sidebarWidth !== document.getElementById('dash-sidebar').offsetWidth)
+      this.props.setSideBarWidth(document.getElementById('dash-sidebar').offsetWidth)
   }
 
 
@@ -81,8 +85,9 @@ class DashSideBar extends React.Component {
 
   render() {
     return (
-        <Nav vertical navbar className="sidebar-col col-md-2 bg-dark" >
-          <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h3">
+        <Nav vertical navbar id='dash-sidebar' className={this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH ? 
+          'sticky-top sidebar-col col-md-2 bg-dark': 'desktop sidebar-col col-md-2 bg-dark'} >
+          <CardHeader style={{backgroundColor:'transparent', fontFamily:'Fira Sans, sans-serif'}} tag="h4">
            {/* <img src={' https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/tf1.png	'}/>  */}
            {this.props.user ? this.props.user.name : ''}
           </CardHeader>
@@ -219,7 +224,8 @@ const tabSelectorFromRoute = (pathname) => {
 
 const mapStateToProps = state => {
   return {
-    currentTab: tabSelectorFromRoute(state.router.location.pathname)
+    currentTab: tabSelectorFromRoute(state.router.location.pathname),
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 

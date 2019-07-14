@@ -1,7 +1,7 @@
 import React, { Component, Suspense, lazy } from 'react'
 import { Route, withRouter, Switch, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import '../index.css'
+import '../index.css' //TODO: Clean this old css file and make .scss
 // import App from './App'
 // import About from './About'
 // import Dashboard from '../DashBoard/Dashboard'
@@ -21,6 +21,9 @@ import { Container, Row, Fade, Spinner } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import Loadable from 'react-loadable'
+import {COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import windowSize from 'react-window-size'
+
 
 //TODO: Clean up file
 
@@ -57,6 +60,7 @@ class AppRoutes extends Component {
 
     this.state = {
       scroll: window.pageYOffset,
+      sidebarWidth: 0
     }
 
    
@@ -66,6 +70,10 @@ class AppRoutes extends Component {
 
     // This also performs authentication!!!!
     this.props.fetchUser()
+
+    let bar = document.getElementById('dash-sidebar') 
+    if (bar)
+      this.setState({sidebarWidth:document.getElementById('dash-sidebar').offsetWidth})
     
     window.addEventListener('scroll', this.handleScroll)
 
@@ -198,7 +206,7 @@ class AppRoutes extends Component {
         <Route exact path="/" render={this.renderHomeNavigation} />
         <Route exact path="/dashboard" render={() => <Redirect to="/dashboard/overview"/> }/>
 
-        <Row className='main-row' style={{margin:0}}>
+        <Row className={'main-row bg-white'} style={{margin:0}}>
         <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
             <Route

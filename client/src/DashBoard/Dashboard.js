@@ -32,7 +32,7 @@ import {
   DropdownMenu,
   DropdownItem,
   CardColumns,
-  CardImg,
+  CardImg, Spinner,
   CardSubtitle
 } from 'reactstrap'
 import './Sidebar.scss'
@@ -125,13 +125,15 @@ class Dashboard extends Component {
       assessment: false,
       todaysCalories: 0,
       userLogs: [],
-      userMeals: []
+      userMeals: [],
+      sidebarWidth: 0
     }
   }
 
   componentDidMount = async () => {
     await this.props.fetchProfile()
     await this.props.fetchNutritionPlans()
+    await this.props.setSideBarWidth()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -142,6 +144,10 @@ class Dashboard extends Component {
       }, this.calculateTodaysIntake())
       
     }
+
+
+    if (this.props.sidebarWidth !== document.getElementById('dash-sidebar').offsetWidth)
+      this.props.setSideBarWidth(document.getElementById('dash-sidebar').offsetWidth)
   }
 
   toggle(tab) {
@@ -377,7 +383,7 @@ class Dashboard extends Component {
 
 
   render() {
-    // console.log(this.props.profile)
+    // console.log(this.props, 'full layout')
 
     return (
       <Col
@@ -385,7 +391,8 @@ class Dashboard extends Component {
         style={{ // backgroundColor: '#b3b3b3' 
           padding: '10px',
           overflow: 'auto',
-          height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null
+          height: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
+          marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0
         }}
         md="10"
       >
@@ -405,7 +412,8 @@ function mapStateToProps(state, { auth }) {
     user: state.auth.user,
     plans: state.plans.userPlans,
     profile: state.auth.userProfile,
-    userNutritionPlans: state.nutrition.userNutritionPlans
+    userNutritionPlans: state.nutrition.userNutritionPlans,
+    sidebarWidth: state.layout.sideBarWidth
   }
 }
 

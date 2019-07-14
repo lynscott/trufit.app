@@ -40,6 +40,8 @@ export const FETCH_NUTRITION_PLANS = 'FETCH_NUTRITION_PLANS'
 export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
 export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
 
+export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
+
 
 
 
@@ -354,7 +356,7 @@ export const foodSelect = (foodID) => async dispatch => {
     foodItem.active = false
     foodItem.id = item.desc.ndbno
 
-    //Conversion form gram to oz
+    //Conversion from gram to oz
  
     return foodItem
   }
@@ -399,4 +401,11 @@ export const fetchWorkouts = () => async dispatch => {
   let res = await axios.get('/api/fetch_workouts')
 
   dispatch({ type: FETCH_WORKOUTS, payload:res.data })
+}
+
+export const setSideBarWidth = (width) => async dispatch => {
+  // let width = await document.getElementById('sidebar-dash')
+
+  if (width !== undefined)
+    dispatch({type:SET_SIDEBAR_WIDTH, payload:width})
 }

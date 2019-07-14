@@ -15,7 +15,9 @@ import { routerMiddleware } from 'connected-react-router'
 import createRootReducer from './reducers'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+//TODO: export/import to const file for icons
+import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle, faSquare,
+  faCheckSquare, faWrench, faToolbox } from '@fortawesome/free-solid-svg-icons'
 
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
@@ -33,7 +35,8 @@ history.listen(_ => {
   window.scrollTo(0, 0)  
 })
  
-library.add(faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle )
+library.add(faUserCircle, faUserPlus, faInfoCircle, faSquare, faCheckSquare,
+  faTools, faMinusCircle, faTrashAlt, faPlus, faStar, faCheckCircle, faWrench, faToolbox )
 
 const composeEnhancers = process.env.NODE_ENV !== 'development' ? compose : composeWithDevTools({
   // options like actionSanitizer, stateSanitizer

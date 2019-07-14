@@ -3,14 +3,19 @@
  Slack Feedback CSS Override.
 */
 
+//Temp HACK: for fixed sidebar on desktop view, probably a better way to do this
+.desktop{
+  position: fixed !important;
+  height: 100vh;
+}
 
 .sidebar-col{
   // .list-group-item{
   //   width: 100%;
   // }
   padding: 8px;
-  position: -webkit-sticky;
-  position: sticky;
+  // position: -webkit-sticky;
+  // position: sticky;
   top: 0;
   z-index: 1000;
 
