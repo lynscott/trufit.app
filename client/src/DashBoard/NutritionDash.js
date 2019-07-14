@@ -874,6 +874,8 @@ class NutritionDash extends Component {
       
     }
 
+    console.log(this.props.userNutritionPlans.length, 'LENGTH')
+
     return(
       <>
         <h2 className='text-center'>Active Plan</h2>
@@ -884,7 +886,7 @@ class NutritionDash extends Component {
               {plans()}
             </ListGroup>
 
-            {this.props.userNutritionPlans.length > 1 ? //quick HACK: to force single nutrition plans for now
+            {this.props.userNutritionPlans.length === 0 ? //quick HACK: to force single nutrition plans for now
             <Button color={'dark'} className='text-center' block style={{display:'block'}}
               onClick={()=>this.setState({makeNewPlan:!this.state.makeNewPlan})} >Create New Plan+</Button>
               : null}
@@ -894,13 +896,13 @@ class NutritionDash extends Component {
                 <InputGroup className='mb-3'>
                   {/* <Label className='text-white'>Name & Day for Plan (optional)</Label>  */}
                   <Input className='plan-name-input' value={this.state.newPlan.name} onChange={(e)=>setValue(e, 'name')} name={'name'} placeholder='Plan Name*' type='text' />
-                  <Input name='day' placeholder='Plan Day' value={this.state.newPlan.day} onChange={(e)=>setValue(e, 'day')} type='select' >
+                  {/* <Input name='day' placeholder='Plan Day' value={this.state.newPlan.day} onChange={(e)=>setValue(e, 'day')} type='select' >
                     <option value={null} >Select a day</option>
                     <option>Daily</option>
                     {days.map((day,i)=>{
                       return <option key={i}>{day}</option>
                     })}
-                  </Input>
+                  </Input> TODO: Plan*/}
                 </InputGroup>
                 {this.state.mealsSelected.map((meal,i) => {
                   return <ListGroupItem><ListGroupItemHeading className='text-center' >{meal.index } </ListGroupItemHeading>
