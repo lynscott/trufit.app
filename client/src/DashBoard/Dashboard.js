@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import * as actions from '../actions'
 import classnames from 'classnames'
 import Stats from './UserStats'
@@ -32,7 +32,7 @@ import {
   DropdownMenu,
   DropdownItem,
   CardColumns,
-  CardImg, Spinner,
+  CardImg, Spinner, ListGroup, ListGroupItem,
   CardSubtitle
 } from 'reactstrap'
 import './Sidebar.scss'
@@ -134,6 +134,7 @@ class Dashboard extends Component {
     await this.props.fetchProfile()
     await this.props.fetchNutritionPlans()
     await this.props.setSideBarWidth()
+    await this.props.fetchActiveTrainingPlan()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -332,7 +333,25 @@ class Dashboard extends Component {
           <CardBody>
             {/* <CardTitle>Training Schedule</CardTitle> */}
             {/* <DashCalendar /> */}
-            <CardText>No workouts scheduled! Select a plan and create a schedule.</CardText>
+            { this.props.activePlan ? 
+            <>
+              <CardText>
+              Active Training Plan: {this.props.activePlan.templateData.name}
+              </CardText>
+              <CardText> Training Days </CardText>
+              <ListGroup >
+                {Object.keys(this.props.activePlan.days[0]).map((key,i)=>{
+                  if (this.props.activePlan.days[0][key]) {
+                    return <ListGroupItem color={'dark'} key={i}>{key}</ListGroupItem>
+                  }
+                })}
+              </ListGroup>
+            </>
+            :
+            <>
+              <CardText>No plans active? Select a training plan!</CardText>
+              <Link to='/dashboard/plans'><Button color={'dark'}>Training Dash</Button></Link>
+            </>}
 
           </CardBody>
         </Card>
@@ -417,7 +436,8 @@ function mapStateToProps(state, { auth }) {
     plans: state.plans.userPlans,
     profile: state.auth.userProfile,
     userNutritionPlans: state.nutrition.userNutritionPlans,
-    sidebarWidth: state.layout.sideBarWidth
+    sidebarWidth: state.layout.sideBarWidth,
+    activePlan: state.activePlan
   }
 }
 
