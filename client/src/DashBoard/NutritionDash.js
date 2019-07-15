@@ -203,7 +203,7 @@ class NutritionDash extends Component {
 
     
     //Check if a day, name and all meal times are set before enabling plan submission
-    if ( this.state.newPlan.day && this.state.newPlan.name  && this.state.mealsSelected.length > 0 && this.state.submitPlanDisabled) {
+    if ( this.state.newPlan.name  && this.state.mealsSelected.length > 0 && this.state.submitPlanDisabled) {
         let allTimesSet = true
         for (let meal of this.state.mealsSelected) {
           console.log(meal)
@@ -576,7 +576,7 @@ class NutritionDash extends Component {
     }
 
     return (
-              <Row>
+              <Row className='meal-row'>
                 {this.props.userMeals.map((meal , index) => {
                     return (
                       <Col md='6'>
@@ -700,7 +700,7 @@ class NutritionDash extends Component {
           columns={columns}
           rowClasses={this.rowClasses}
           classes={
-            this.props.windowWidth > FULL_LAYOUT_WIDTH ? 'table-mobile bg-light' : 'bg-light'
+            this.props.windowWidth < FULL_LAYOUT_WIDTH ? 'table-mobile bg-light' : 'bg-light'
           }
           cellEdit={
             cellEditFactory({
@@ -825,7 +825,7 @@ class NutritionDash extends Component {
               <FontAwesomeIcon icon="star" size={'1x'} />
             </Collapse>
 
-            <ListGroupItemHeading className='text-center'>{plan.name} - {plan.day? plan.day: 'N/A'}</ListGroupItemHeading>
+            <ListGroupItemHeading className='text-center'>{plan.name} </ListGroupItemHeading>
 
             <ButtonGroup size="sm" style={{display:'block', textAlign:'center', marginBottom:'10px'}}>
 
@@ -872,7 +872,7 @@ class NutritionDash extends Component {
       
     }
 
-    console.log(this.props.userNutritionPlans.length, 'LENGTH')
+    // console.log(this.props.userNutritionPlans.length, 'LENGTH')
 
     return(
       <>

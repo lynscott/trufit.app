@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 var today = new Date();
 var year = today.getFullYear();
-
+//TODO: Redo component, very old
 class Footer extends Component {
   render() {
     return (
@@ -17,24 +17,24 @@ class Footer extends Component {
                 <li className="nav-item" id="ig">
                   <a
                     className="nav-link"
-                    href="#"
+                    href="https://www.instagram.com/trufit.ai/"
                   >
                     <i className="fab fa-instagram" />
                   </a>
                 </li>
-                <li className="nav-item" id="fb">
+                {/* <li className="nav-item" id="fb">
                   <a
                     className="nav-link"
                     href="#"
                   >
                     <i className="fab fa-facebook-square" />
                   </a>
-                </li>
-                <li className="nav-item" id="tw">
+                </li> */}
+                {/* <li className="nav-item" id="tw">
                   <a className="nav-link" href="#">
                     <i className="fab fa-twitter" />
                   </a>
-                </li> 
+                </li>  */}
               </ul>
             </div>
           </div>

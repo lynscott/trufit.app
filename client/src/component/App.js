@@ -60,7 +60,7 @@ class App extends Component {
     // }
   }
 
-  sendEmail(name, email, text) {
+  sendEmail(name, email, text) {//DEPRECATED
     fetch('/email', {
       method: 'post',
       headers: new Headers({
@@ -85,7 +85,6 @@ class App extends Component {
               </h1>
               <div className="arrow bounce"><a className="fa fa-arrow-down fa-2x"></a></div>
               <Button className='mb-3 MainButton' color="info" onClick={this.signup}>GET STARTED</Button>
-              {/* <Button className='my-3' color="secondary" onClick={this.toggle}>Sign In</Button> */}
             </Fade>
             <div className='row pt-3' >
               <Fade top delay={1000}>
@@ -95,7 +94,6 @@ class App extends Component {
                     <SignUpForm closeForm={this.signup}/>
                   </ModalBody>
                   <ModalFooter style={{padding:'0.5rem'}}>
-                    {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
                     <Button color="secondary" onClick={this.signup}>Cancel</Button>
                   </ModalFooter>
                 </Modal>   
@@ -107,7 +105,6 @@ class App extends Component {
                     <LoginForm closeForm={this.toggle}/>
                   </ModalBody>
                   <ModalFooter style={{padding:'0.5rem'}}>
-                    {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
                     <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                   </ModalFooter>
                 </Modal>

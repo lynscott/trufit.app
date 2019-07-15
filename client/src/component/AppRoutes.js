@@ -159,6 +159,12 @@ class AppRoutes extends Component {
  
   }
 
+
+  renderReactAdmin = () => {
+    return  <ReactAdminDash />
+ 
+  }
+
   renderAdmin = () => {
     if ( this.props.userProfile.isAdmin) {
       return <Admin />
@@ -228,7 +234,7 @@ class AppRoutes extends Component {
             <Route
               exact
               path="/admin"
-              render={this.authCheckOrRedirect(ReactAdminDash)}
+              render={this.authCheckOrRedirect(this.renderReactAdmin)}
             />
 
             <Route
