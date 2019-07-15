@@ -211,8 +211,9 @@ app.get('/api/plan_templates', async (req, res, next) => {
 
 app.get('/api/active_training_plan', async (req, res, next) => {
   requireLogin(req, res, next)
-  let prof = await UserProfile.findOne({ user: req.user.id })
-  let activePlan = await models.PlanTemplates.findOne({_id:prof.activePlan})
+  let prof = await UserProfile.findOne({ _user: req.user.id }) 
+  let activePlan = await models.Plans.findOne({_id:prof.activePlan})
+
   res.send(activePlan)
 })
 
@@ -461,11 +462,14 @@ app.post('/api/new_user_plan', async (req, res) => {
     days,
   })
   await user_plan.save()
+
+  // Now store the plan into the user profile to keep trac of it.
   UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
     if (err) {
       return err
     }
 
+    // If the user has a profile set the plan accordingly.
     if (profile) {
       profile.activePlan = user_plan._id
       let arr = [...profile.trainingPlans]
