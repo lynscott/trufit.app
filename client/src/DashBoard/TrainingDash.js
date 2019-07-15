@@ -253,8 +253,9 @@ class TrainingDash extends Component {
         { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
         <CardBody onClick={()=> {
 
+          // Reset
           if(i === this.state.activeIndex){
-            this.setState({activeIndex: -1, planningStage: 0})
+            this.setState({activeIndex: -1, planningStage: 0, daysSelected: SELECTED_DAYS_INIT, anyDaySelected: false, numDaysSelected: 0})
           }
           else{
             this.setState({activeIndex: i, planningStage: 1})
