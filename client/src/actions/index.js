@@ -237,8 +237,10 @@ export const initTrainingPlan = (values) => async dispatch => {
   try {
     await axios.post('/api/new_user_plan', values)
     dispatch({type: INIT_NEW_USER_TRAINING_PLAN})
+    alert('Your training plan was saved!')
   } catch (error) {
     dispatch({type: INIT_NEW_USER_TRAINING_PLAN_FAILED, payload:'Error Occured'+ error})
+    alert('An error occurred when trying to save the plan.')
   }
 
 }
@@ -247,7 +249,7 @@ export const initTrainingPlan = (values) => async dispatch => {
 export const fetchActiveTrainingPlan = () => async dispatch => {
   const res = await axios.get('/api/active_training_plan')
 
-  dispatch({ type: FETCH_NUTRITION_PLANS, payload: res.data })
+  dispatch({ type: PLAN_SELECTED, payload: res.data })
 }
 
 export const createNewMeal = (values) => async dispatch => {

@@ -159,6 +159,12 @@ class AppRoutes extends Component {
  
   }
 
+
+  renderReactAdmin = () => {
+    return  <ReactAdminDash />
+ 
+  }
+
   renderAdmin = () => {
     if ( this.props.userProfile.isAdmin) {
       return <Admin />
@@ -182,7 +188,7 @@ class AppRoutes extends Component {
    * Anything related to home navigation logic.
    */
   renderHomeNavigation = () => {
-    return <Fade in={this.state.scroll > 50} > 
+    return <Fade in={this.state.scroll >= 0} > 
           <Nav className="navbar" />
         </Fade>
   }
@@ -228,7 +234,7 @@ class AppRoutes extends Component {
             <Route
               exact
               path="/admin"
-              render={this.authCheckOrRedirect(ReactAdminDash)}
+              render={this.authCheckOrRedirect(this.renderReactAdmin)}
             />
 
             <Route
