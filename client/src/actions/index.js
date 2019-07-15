@@ -41,10 +41,13 @@ export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
 export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
 
 export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
+export const INIT_NEW_USER_TRAINING_PLAN = 'INIT_NEW_USER_TRAINING_PLAN'
+export const INIT_NEW_USER_TRAINING_PLAN_FAILED = 'INIT_NEW_USER_TRAINING_PLAN_FAILED'
 
 
 
 
+//Remove form prod
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
 export function selectType(type) {
@@ -229,6 +232,23 @@ export const createNewPlan = (values) => async dispatch => {
 
 }
 
+export const initTrainingPlan = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/new_user_plan', values)
+    dispatch({type: INIT_NEW_USER_TRAINING_PLAN})
+  } catch (error) {
+    dispatch({type: INIT_NEW_USER_TRAINING_PLAN_FAILED, payload:'Error Occured'+ error})
+  }
+
+}
+
+
+export const fetchActiveTrainingPlan = () => async dispatch => {
+  const res = await axios.get('/api/active_training_plan')
+
+  dispatch({ type: FETCH_NUTRITION_PLANS, payload: res.data })
+}
 
 export const createNewMeal = (values) => async dispatch => {
 
