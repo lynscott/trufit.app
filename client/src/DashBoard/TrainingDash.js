@@ -74,6 +74,18 @@ class TrainingDash extends Component {
       this._SUPER_HACK_RE_RENDER_CALENDAR()
     }
 
+    // State restoration from user profile
+    if(prevProps.activePlan !== this.props.activePlan){
+      // TODO: Change the backend to not return an array.
+      let activeIndex = this.getActiveIndexFromObjectId(this.props.activePlan.template)
+      let daysSelected = this.props.activePlan.days[0]
+      let numDaysSelected = this.getNumberOfDaysSelected(daysSelected)
+      let lastDaySelected = (() => {for(let i = 0; i < 7; i++) if(daysSelected[DAYS_ENUM[i]]) return DAYS_ENUM[i]})() // lol. HACK
+      let planningStage = 3
+
+      this.setState({daysSelected, numDaysSelected, planningStage, activeIndex, lastDaySelected})
+    }
+
     /*
     if (this.state.daysSelected.length !== prevState.daysSelected.length) {
       console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
@@ -97,12 +109,27 @@ class TrainingDash extends Component {
   }
 
   /**
+   * Given a mongoose objectId, get the activeIndex
+   */
+  getActiveIndexFromObjectId = (objectId) => {
+    for(let i = 0; i < this.props.plans.length; i++){
+      let plan = this.props.plans[i]
+
+      if(plan._id === objectId){
+        return i
+      } 
+    }
+
+    return -1
+  }
+
+  /**
    * Get a value of the number of days selected within the object.
    */
-  getNumberOfDaysSelected = () => {
+  getNumberOfDaysSelected = (daysSelected) => {
     let count = 0
-    for(let key in Object.keys(this.state.daysSelected)){
-      if(this.state.daysSelected[key])
+    for(let key of Object.keys(daysSelected)){
+      if(daysSelected[key])
         count++
     }
 
@@ -474,6 +501,7 @@ function mapStateToProps(state) {
   return {
     user: state.auth.user,
     plans: onlyValidTrainingPlans(state.plans.planTemps),
+    activePlan: state.activePlan,
     profile: state.auth.userProfile,
     sidebarWidth: state.layout.sideBarWidth
   }
