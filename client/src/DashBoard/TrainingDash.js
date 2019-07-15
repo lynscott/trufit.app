@@ -108,8 +108,6 @@ class TrainingDash extends Component {
     else
       nextStage = 1
 
-    console.log(numDaysSelected)
-
     this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false})
   }
 
@@ -134,13 +132,6 @@ class TrainingDash extends Component {
 
     this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
 
-  }
-
-  /**
-   * Set the current stage of the training plan. This is for collapsibility behavior
-   */
-  setTrainingPlanningStage = (stage) => {
-    this.setState({planningStage: stage})
   }
 
   /**
@@ -260,7 +251,14 @@ class TrainingDash extends Component {
       plans.push(
         <Card key={i} className={i === this.state.activeIndex? 'active': null}>
         { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
-        <CardBody onClick={()=> {this.setState({activeIndex: i}, () => { this.setTrainingPlanningStage(1)})}} >
+        <CardBody onClick={()=> {
+
+          if(i === this.state.activeIndex){
+            this.setState({activeIndex: -1, planningStage: 0})
+          }
+          else{
+            this.setState({activeIndex: i, planningStage: 1})
+          } }} >
           <CardTitle>{plan.planName}</CardTitle>
           <CardSubtitle>{plan.category}</CardSubtitle>
           <CardText>8 Week Plan</CardText>
