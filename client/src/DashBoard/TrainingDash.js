@@ -9,6 +9,7 @@ import './TrainingDash.scss'
 import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
 import windowSize from 'react-window-size'
 import Calendar from 'react-calendar'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   Col,
   Row,
@@ -22,7 +23,7 @@ import {
   Collapse,
   Input,
   Button,
-  Media,
+  Media, ButtonGroup,
   Jumbotron, Card, CardImg, CardTitle, CardText, CardColumns,
   CardSubtitle, CardBody
 } from 'reactstrap'
@@ -113,32 +114,38 @@ class TrainingDash extends Component {
     return(
       <Collapse isOpen={this.state.collapse}>
         <Form >
-            <Row>
-            <Label >
+            <Row className='justify-content-center'>
+            <Label size='lg' >
               What days can you workout?
             </Label>
+            <ButtonGroup size={'lg'} className='m-3'
+              vertical={this.props.windowWidth > FULL_LAYOUT_WIDTH ? false:true}>
               {Object.keys(days).map((day,i)=>{
                 return (
-                      <Col key={i}>
-                        <Label size="lg" >{day}</Label>
-                        <Input type="checkbox" onChange={(e)=>{
-                                // let arr = this.state.daysSelected
-                                // arr.push(days[day])
-                                console.log(e.target.value, 'BEFORE') 
-                                if (!this.state.daysSelected.includes(day)) {
-                                  this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
-                                }
-                                else {
-                                  let newArr = this.state.daysSelected
-                                  let index = newArr.indexOf(days[day])
-                                  newArr.splice(index,1)
-                                  this.setState({daysSelected:newArr})
-                                }
-                              }}  
-                                name={day} bsSize="lg"  />
-                      </Col>
+                      // <Col key={i}>
+                        <>
+                        {/* <Label >{day}</Label> */}
+                        <Button color={'dark'}>{day}</Button>
+                        </>
+                        //  {/* <Input type="checkbox" onChange={(e)=>{
+                        //         // let arr = this.state.daysSelected
+                        //         // arr.push(days[day])
+                        //         console.log(e.target.value, 'BEFORE') 
+                        //         if (!this.state.daysSelected.includes(day)) {
+                        //           this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
+                        //         }
+                        //         else {
+                        //           let newArr = this.state.daysSelected
+                        //           let index = newArr.indexOf(days[day])
+                        //           newArr.splice(index,1)
+                        //           this.setState({daysSelected:newArr})
+                        //         }
+                        //       }}  
+                                // name={day} bsSize="lg"  /> */}
+                      //  </Col>
                       )
               })}
+              </ButtonGroup>
             </Row>
           
           {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
@@ -184,7 +191,7 @@ class TrainingDash extends Component {
     })
 
     return (
-      <CardColumns className='plan-wall bg-dark p-3'>
+      <CardColumns className='plan-wall bg-black p-3'>
         {plans}
       </CardColumns>
     )

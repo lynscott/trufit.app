@@ -1,4 +1,8 @@
 .plan-wall{
+    overflow-y: scroll;
+    max-height: 200px;
+    border-radius: 20px;
+
     .active{
         border: 3px solid red ;
     }
