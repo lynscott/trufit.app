@@ -237,8 +237,10 @@ export const initTrainingPlan = (values) => async dispatch => {
   try {
     await axios.post('/api/new_user_plan', values)
     dispatch({type: INIT_NEW_USER_TRAINING_PLAN})
+    alert('Your training plan was saved!')
   } catch (error) {
     dispatch({type: INIT_NEW_USER_TRAINING_PLAN_FAILED, payload:'Error Occured'+ error})
+    alert('An error occurred when trying to save the plan.')
   }
 
 }

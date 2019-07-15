@@ -34,7 +34,7 @@ sgMail.setApiKey(keys.sendGridKey)
 
 //TODO: Replace const in code with model calls
 const User = models.User
-const Plan = models.Plan
+const Plans = models.Plans
 const Exercises = models.Exercises
 const UserProfile = models.UserProfile
 const Workout = models.Workouts 
@@ -205,7 +205,7 @@ app.get('/api/meals', async (req, res) => {
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
-  const allPlans = await models.PlanTemplates.find().select('-_id')
+  const allPlans = await models.PlanTemplates.find()
   res.send(allPlans)
 })
 
@@ -454,7 +454,7 @@ app.post('/api/new_user_plan', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   let { template, start_date, end_date, days } = req.body
-  let user_plan = new models.Plan({
+  let user_plan = new models.Plans({
     end_date,
     start_date,
     template,
