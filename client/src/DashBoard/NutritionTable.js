@@ -110,13 +110,13 @@ class NextMeal extends Component {
         <>
           <Col md="12" style={{padding: 0}}>
           <h6>Next Meal Time: <Moment format="LT">{clock()}</Moment></h6>
-            <ListGroup >
+            <ListGroup flush >
               <ListGroupItemHeading>{meals[index].index}</ListGroupItemHeading>
               {sortedMeals[index].meal.items.map((item, i) => {
                 return (
-                  <ListGroupItem key={i} style={{fontSize:'15px', padding:'10px', marginBottom:0}}>
-                    <ListGroupItemText className='mb-0'>
-                      {item.serving}oz of {item.name}
+                  <ListGroupItem color={'dark'} key={i} style={{fontSize:'16px', padding:'10px', borderRadius:'10px' , marginBottom:'10px'}}>
+                    <ListGroupItemText className='mb-0 justify-content-between'>
+                      {item.name} <Badge pill color='light'>{item.serving}oz</Badge> 
                     </ListGroupItemText>
                   </ListGroupItem>
                 )
