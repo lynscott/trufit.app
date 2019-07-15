@@ -182,7 +182,7 @@ class AppRoutes extends Component {
    * Anything related to home navigation logic.
    */
   renderHomeNavigation = () => {
-    return <Fade in={this.state.scroll > 50} > 
+    return <Fade in={this.state.scroll >= 0} > 
           <Nav className="navbar" />
         </Fade>
   }

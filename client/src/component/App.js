@@ -19,42 +19,6 @@ import './App2.scss'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 
-const PriceBlock = ({ title, listItems, price }) => {
-  return (
-    <Fade top>
-      <div className="col-md-3 col-lg-4 m-3 align-self-start">
-        <div className="card">
-          <div className="card-body">
-            <h4
-              className="card-title p-3 bg-info text-white" >
-              {title}
-            </h4>
-            <h5 className="card-subtitle mb-2 text-light">{price}</h5>
-            <Fade top cascade delay={500}>
-              <ul className="list-group list-group-flush text-white">
-                {listItems.map((item, index) => {
-                  return <li key={index} className="list-group-item">{item}</li>
-                })}
-              </ul>
-            </Fade>
-          </div>
-        </div>
-      </div>
-    </Fade>
-  )
-}
-
-const IconBlock = ({ text, iconClass }) => {
-  return (
-    <Fade bottom delay={500}>
-      <div className="col-md-4 mb-4 text-center">
-        <i className={iconClass} id="icons" />
-        <p>{text}</p>
-      </div>
-    </Fade>
-  )
-}
-
 class App extends Component {
   constructor(props) {
     super(props)
@@ -110,16 +74,17 @@ class App extends Component {
     return (
       <div className="container-fluid bg-light">
         <div className="row" id="header">
-          <div className="col d-none d-md-block">
+          <div className="col d-md-block">
             <Fade top>
               <h1
                 className="main-header p-2"
                 id="title-line"
-                style={{ marginTop: '50vh', textDecoration: 'none' }}
+                style={{ marginTop: '10vh', textDecoration: 'none' }}
               >
-                One Day At A Time
+                <img src={require("./images/FT1-01-T.png")} style={{maxWidth:300,minWidth:10,marginBottom:0}} />
               </h1>
-              <Button className='mb-3' color="info" onClick={this.signup}>Get Started</Button>
+              <div className="arrow bounce"><a className="fa fa-arrow-down fa-2x"></a></div>
+              <Button className='mb-3 MainButton' color="info" onClick={this.signup}>GET STARTED</Button>
               {/* <Button className='my-3' color="secondary" onClick={this.toggle}>Sign In</Button> */}
             </Fade>
             <div className='row pt-3' >
@@ -151,124 +116,16 @@ class App extends Component {
               </div>
           </div>
         </div>
-        <div className='row justify-content-center p-3' id="test-div">
-          <div
-            style={{ borderTop: '#008ed6 3px solid' }}
-            id="demo-block"
-            className="row justify-content-center p-2 align-items-center text-white section-row"
-          >
-            <div className="col-md-8 align-middle">
-              <Fade bottom>
-                <h1 className="section-header">Virtual Training</h1>
-                <p>
-                  Complete virtual training environment equipped to help you
-                  manage your workout & achieve your goals.
-                </p>
-              </Fade>
-              <Fade left>
-                <img
-                  className="d-block w-100 img-fluid rounded"
-                  src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/dash_prev.webp'}
-                  alt="img of dash"
-                />
-              </Fade>
-            </div>
-          </div>
-          <div
-            id="icon-block"
-            className="row p-3 text-dark section-row align-items-center"
-          >
-            <IconBlock
-              text={
-                'Train smarter with custom plans that factor in your body fat, BMR, and activity level instantly.'
-              }
-              iconClass={'fas fa-heartbeat py-2'}
-            />
-            <IconBlock
-              text={
-                'Manage your nutrition plan and tailor it to your food preferences and goals. Complimentary with each training program.'
-              }
-              iconClass={'fas fa-utensils py-2'}
-            />
-            <IconBlock
-              text={
-                'Track your progress, map out your training schedule, and put in the work! Let the system handle the light lifting while you do the heavy lifting.'
-              }
-              iconClass={'fas fa-calendar-check py-2'}
-            />
-          </div>
-        </div>
-        <div className="row p-3 bg-light justify-content-center quote-section section-row align-items-center">
-          <div className="col-md-6">
-            <Fade bottom>
-              <blockquote className="blockquote">
-                <p className="mb-0 font-italic text-dark" style={{fontSize:'medium'}}>
-                  Based on over 10 years of training experience each plan is
-                  crafted with some of my favorite exercises, and techniques I've
-                  found to be most effective in building quality muscle and burning fat.
-                  <br />
-                  {/* <br/> */}
-                  {/* Not just for myself but for my clients as well. */}
-                </p>{' '}
-                - Lyn
-              </blockquote>
-            </Fade>
-            <Fade bottom delay={1000}>
-              <ClientRoll />
-            </Fade>
-          </div>
-        </div>
-        <div id='price-block' className='row p-3 justify-content-center'>
-          <div style={{backgroundColor:'transparent', width:'100%'}}
-                className="row justify-content-center text-white p-4 text-white align-items-end">
-            <Fade bottom>
-              <div className="col-md-12">
-                <h1 className="section-header">Pricing</h1>
-                {/* <p>Complete virtual training environment equipped to <br/> help you manage your workout & achieve your goals.</p> */}
-              </div>
-            </Fade>
-          </div>
-          <div style={{backgroundColor:'transparent'}} 
-                className="row justify-content-around pricing-section text-white align-items-center">
-              <PriceBlock
-                listItems={[
-                  'Start/Stop Any Plan Anytime',
-                  'Training & Nutrition Tracking',
-                  'Excludes Downloads'
-                ]}
-                title={'Self Training'}
-                price={'$8/month'}
-              />
-              <PriceBlock
-                listItems={[
-                  'Virtual Personal Training',
-                  'Weekly Check-ins',
-                  'Excludes Downloads'
-                ]}
-                title={'Personal Training'}
-                price={'$18/month'}
-              />
-              <PriceBlock
-                listItems={['PDF Download', 'Excludes Online System', 'One Time Payment']}
-                title={'Training Plan'}
-                price={'$30'}
-              />
-          </div>
-          <div style={{backgroundColor:'transparent', width:'100%'}}
-            className="row justify-content-center p-4 text-white align-items-start">
-            <Fade bottom delay={500}>
-              <div className="col">
-              <Button color="info" onClick={this.signup}>Get Started</Button>
-              </div>
-            </Fade>
-          </div>
-        </div>
-        <div className="row justify-content-center  bg-dark">
-          <div className="col">
+
+       
+       
+        <div className="row justify-content-center">
+          <div className="col footer">
             <Footer />
           </div>
         </div>
       </div>
+
     )
   }
 }
