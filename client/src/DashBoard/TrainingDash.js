@@ -154,25 +154,6 @@ class TrainingDash extends Component {
     this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
 
   }
-
-  /**
-   * Generate a training split message.
-   * Each workout is set to specific split. Like a 3-day split requires at leasts 3 days selected etc...
-   */
-  buildTrainingSplitMessage = (activePlanIndex) => {
-    // Sanity check
-    if (activePlanIndex < 0)
-      return <span></span>
-
-    let trainingPlan = this.props.plans[activePlanIndex]
-
-    let category = trainingPlan['category']
-    let name = trainingPlan['name']
-    let numWorkouts = trainingPlan['workoutData'].length
-    
-    return <span>{`${name} is a training plan that requires at least `} <b> {`${numWorkouts} days`} </b> per week.</span>
-  }
-
   /**
    * Check to see whether or not a certain date should be disabled.
    * This is based off the selection of available workout days.
@@ -235,8 +216,49 @@ class TrainingDash extends Component {
 
   }
 
+  /**
+   * Generate a training split message.
+   * Each workout is set to specific split. Like a 3-day split requires at leasts 3 days selected etc...
+   */
+  buildTrainingSplitMessage = (activePlanIndex) => {
+    // Sanity check
+    if (activePlanIndex < 0)
+      return <span></span>
+
+    let trainingPlan = this.props.plans[activePlanIndex]
+
+    let category = trainingPlan['category']
+    let name = trainingPlan['name']
+    let numWorkouts = trainingPlan['workoutData'].length
+    
+    return <span>{`${name} is a training plan that requires `} <b> {`${numWorkouts} days`} </b> per week.</span>
+  }
+
+  /**
+   * Generate a training split message.
+   * Each workout is set to specific split. Like a 3-day split requires at leasts 3 days selected etc...
+   */
+  buildTrainingSplitMessage = (activePlanIndex) => {
+    // Sanity check
+    if (activePlanIndex < 0)
+      return <span></span>
+
+    let trainingPlan = this.props.plans[activePlanIndex]
+
+    let category = trainingPlan['category']
+    let name = trainingPlan['name']
+    let numWorkouts = trainingPlan['workoutData'].length
+    
+    return <>
+    <span>{`${name} is a training plan that requires `} <b> {`${numWorkouts} days`} </b> per week.</span><br/>
+      <span>{`Select ${numWorkouts} days to workout on.`}</span>
+    </>
+  }
 
   renderAvailableDays = () => {
+    // Sanity check
+    if(this.state.activeIndex < 0 || !this.props.plans) return
+
     let daySplitMessage = this.buildTrainingSplitMessage(this.state.activeIndex)
 
     return (
@@ -244,14 +266,20 @@ class TrainingDash extends Component {
         {this.renderWorkouts()}
         <Row className='justify-content-center'>
         <Label size='lg' >
-          {daySplitMessage}<br/>
-          What days can you workout?
+          {daySplitMessage}
         </Label>
         <ButtonGroup size={'lg'} className='m-3'
           vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
-          <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button>
+
+          {/* NOT IN USE <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button> */}
           {Object.keys(SELECTED_DAYS_INIT).map((day,i)=>{
-            return ( <Button active={this.state.daysSelected[day]} color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>) })}
+            return <Button 
+              active={this.state.daysSelected[day]} 
+              disabled={this.state.daysSelected[day] === false && this.state.numDaysSelected === this.props.plans[this.state.activeIndex]['workoutData'].length} 
+              color={'dark'} 
+              onClick={() => this.toggleSelectedDay(day)}>{day}
+            </Button>
+            })}
           </ButtonGroup>
         </Row>
       </Collapse>
@@ -260,7 +288,7 @@ class TrainingDash extends Component {
 
   renderTrainingPlanSchedule = () => {
     return(
-      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 1 }>
+      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
         
         {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
         {/* <Row>
@@ -277,9 +305,19 @@ class TrainingDash extends Component {
           <Label for="exampleSelect">When do you want to start?</Label>
           <Input type="date" name="date" id="exampleSelect" />
         </Row> */}
+        <Label size='lg' >
+          This will be your training plan schedule.
+        </Label>
         {this.state.SUPER_HACK_CALENDAR_RERENDER_STATE ? null : this.renderCalendar()}
 
-        <Button active={this.state.planningStage >= 2} className='m-4' color={'dark'}> Set Training Plan</Button>
+        <Button 
+          disabled={this.state.planningStage < 2} 
+          color='dark' 
+          style={{marginTop: '10px'}}
+          onClick={() => {
+          }}>
+            Set Training Plan
+        </Button>
       </Collapse>
     )
   }
