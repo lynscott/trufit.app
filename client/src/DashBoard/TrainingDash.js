@@ -70,9 +70,13 @@ class TrainingDash extends Component {
     }
   }
 
-  toggle = (index) => {
+  /**
+   * Show the schedule for the specified plan.
+   */
+  showSchedule = (index) => {
+    // HACK: Really only need to collapse once.
     this.setState(prevState => ({
-      collapse: !prevState.collapse,
+      collapse: prevState.collapse ? true : true,
       index:index
     }))
   }
@@ -180,7 +184,7 @@ class TrainingDash extends Component {
       plans.push(
         <Card key={i} className={i === this.state.index? 'active':null}>
         { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
-        <CardBody onClick={()=> this.toggle(i)}>
+        <CardBody onClick={()=> this.showSchedule(i)}>
           <CardTitle>{plan.planName}</CardTitle>
           <CardSubtitle>{plan.category}</CardSubtitle>
           <CardText>8 Week Plan</CardText>
@@ -191,9 +195,14 @@ class TrainingDash extends Component {
     })
 
     return (
-      <CardColumns className='plan-wall bg-black p-3'>
-        {plans}
-      </CardColumns>
+      <>
+        <Label size='lg' >
+          Select a training plan.
+        </Label>
+        <CardColumns className='plan-wall bg-black p-3'>
+          {plans}
+        </CardColumns>
+      </>
     )
 
   }
