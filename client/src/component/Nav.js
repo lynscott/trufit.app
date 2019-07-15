@@ -119,26 +119,26 @@ class Nav extends Component {
     // console.log(this.props)
     return (
       <div className="row" >
-        <nav className="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+        <nav className="navbar fixed-top navbar-expand-sm navbar-dark mainNavbar">
           <Link
-            className="navbar-brand mx-auto d-none d-md-block"
-            style={{ width: 150, padding:0 }}
+            className="navbar-brand d-md-block main-logo"
             id="title"
             to="/"
           >
             <img
-              src={'https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/logo2_edit.png'}
+              src={require('./images/FT1-01.png')}
               className="d-inline-block align-top "
-              width="100"
-              height="50"
+              width="48"
+              height="48"
               alt="logo"
+              style={{borderRadius:18,marginLeft:5}}
             />
           </Link>
 
           {/* {this.renderContent()} */}
 
           <button
-            className="navbar-toggler"
+            className="navbar-toggler nav-button"
             type="button"
             data-toggle="collapse"
             data-target="#navbarSupportedContent"

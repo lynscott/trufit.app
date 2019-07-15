@@ -34,7 +34,7 @@ sgMail.setApiKey(keys.sendGridKey)
 
 //TODO: Replace const in code with model calls
 const User = models.User
-const Plan = models.Plan
+const Plans = models.Plans
 const Exercises = models.Exercises
 const UserProfile = models.UserProfile
 const Workout = models.Workouts 
@@ -205,15 +205,19 @@ app.get('/api/meals', async (req, res) => {
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
-  const allPlans = await models.PlanTemplates.find().select('-_id')
+  const allPlans = await models.PlanTemplates.find()
   res.send(allPlans)
 })
 
+//TODO: Refactor for less queries
 app.get('/api/active_training_plan', async (req, res, next) => {
   requireLogin(req, res, next)
-  let prof = await UserProfile.findOne({ user: req.user.id })
-  let activePlan = await models.PlanTemplates.findOne({_id:prof.activePlan})
-  res.send(activePlan)
+  let prof = await UserProfile.findOne({ _user: req.user.id }) 
+  let activePlan = await models.Plans.findOne({_id:prof.activePlan})
+  let template = await models.PlanTemplates.findOne({_id:activePlan.template})
+  console.log(template)
+
+  res.send({...activePlan._doc, templateData:template})
 })
 
 app.get('/api/nutrition_plans', async (req, res, next) => {
@@ -229,6 +233,13 @@ app.get('/api/exercises', async (req, res) => {
   }
   const exerciseList = await Exercises.find().select('-_id')
   res.send(exerciseList)
+})
+
+app.param('prof_id', async (req, res, next, id) => {
+  const userProf = await UserProfile.findOne({ _id: id })
+  req.plan = userProf
+
+  next()
 })
 
 //// BEGIN APIS FOR ADMIN PANEL ////////
@@ -291,7 +302,7 @@ app.get('/api/admin_exercises', async (req, res) => {
   res.send(objMapper(exerciseList))
 })
 
-app.use('/api/profiles/:id', async (req, res) => {
+app.get('/api/profiles/:prof_id', async (req, res) => {
   // console.log('Request Id:', req.params.id);
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
@@ -410,7 +421,7 @@ app.post('/api/new_plan_template', async (req, res) => {
   }
   
   let { plan, workouts, data } = req.body
-  console.log(workouts)
+  // console.log(workouts)
   let plan_template = new models.PlanTemplates({
     name: plan.title,
     category: plan.category,
@@ -454,18 +465,21 @@ app.post('/api/new_user_plan', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' });
   }
   let { template, start_date, end_date, days } = req.body
-  let user_plan = new models.Plan({
+  let user_plan = new models.Plans({
     end_date,
     start_date,
     template,
     days,
   })
   await user_plan.save()
+
+  // Now store the plan into the user profile to keep trac of it.
   UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
     if (err) {
       return err
     }
 
+    // If the user has a profile set the plan accordingly.
     if (profile) {
       profile.activePlan = user_plan._id
       let arr = [...profile.trainingPlans]
