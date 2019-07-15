@@ -377,6 +377,7 @@ class TrainingDash extends Component {
           color='dark' 
           style={{marginTop: '10px'}}
           onClick={() => {
+            this.props.initTrainingPlan({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.daysSelected, template: this.props.plans[this.state.activeIndex]._id})
           }}>
             Set Training Plan
         </Button>
