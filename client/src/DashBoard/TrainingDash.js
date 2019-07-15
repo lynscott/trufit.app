@@ -67,9 +67,11 @@ class TrainingDash extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // Super hack to re-render the calendar to update its training days appropriately.
     if(this.state.numDaysSelected !== prevState.numDaysSelected){
       this._SUPER_HACK_RE_RENDER_CALENDAR()
     }
+
     /*
     if (this.state.daysSelected.length !== prevState.daysSelected.length) {
       console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
@@ -123,9 +125,9 @@ class TrainingDash extends Component {
     // Go to the stage 2 if the number of days matches the training plan days
     let nextStage = this.state.planningStage
     if(this.props.plans[this.state.activeIndex]['workoutData'].length <= numDaysSelected)
-      nextStage = 2
+      nextStage = 3
     else
-      nextStage = 1
+      nextStage = 2
 
     this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false}, () => {
       console.log(this.calendar)
@@ -137,7 +139,7 @@ class TrainingDash extends Component {
    */
   toggleAllDays = () => {
     let daysSelected = {...this.state.daysSelected}
-    let planningStage = this.state.anyDaySelected ? 1 : 2 // Go to previous stage or next stage.
+    let planningStage = 2 // this.state.anyDaySelected ? 1 : 2 // Go to previous stage or next stage.
     let numDaysSelected = this.state.anyDaySelected ? 0 : Object.keys(this.state.daysSelected).length
 
     if(this.state.anyDaySelected){
@@ -152,8 +154,8 @@ class TrainingDash extends Component {
     }
 
     this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
-
   }
+
   /**
    * Check to see whether or not a certain date should be disabled.
    * This is based off the selection of available workout days.
@@ -166,7 +168,7 @@ class TrainingDash extends Component {
     /*
     if(this.state.daysSelected[DAYS_ENUM[date.getDay()]] === false){
       console.log('isDateDisabled', date, this.state.daysSelected)
-    }
+    }s
     else{
       console.log('isDateNotDisabled', date, this.state.daysSelected)
     }*/
@@ -175,12 +177,40 @@ class TrainingDash extends Component {
   }
 
   /**
+   * Helper to only get the active selected days.
+   * It generates a mapping from days to workouts
+   */
+  getDaysToTrainingMap = () => {
+    let days = {}
+    let count = 0
+    for(let day of Object.keys(this.state.daysSelected)){
+      if(this.state.daysSelected[day]){
+        days[day] = count
+        count++
+      }
+    }
+
+    return days
+  }
+
+  /**
    * Populate the calendar with training day and rest days
    * Great movie btw, highly recommend: https://www.imdb.com/title/tt0139654/
    */
   renderCalendarTile = ({date, view}) => {
+    // Sanity check
+    if(!this.props.plans || this.state.activeIndex < 0 || this.state.numDaysSelected != this.props.plans[this.state.activeIndex]['workoutData'].length) return null
+
     if(!this.isDateDisabled({date}) && date.getTime() >= MIN_DATE.getTime() && date.getTime() <= MAX_DATE.getTime()){
-      return <p>Training Day</p>
+
+      // Calculate title of date.
+      // WARNING: Subject to change in the future, not efficient.
+      let dayToTrainingMap = this.getDaysToTrainingMap()
+
+      return <p>{this.props.plans[this.state.activeIndex]['workoutData'][dayToTrainingMap[DAYS_ENUM[date.getDay()]]].title}</p>
+    }
+    else if(date.getTime() >= MIN_DATE.getTime() && date.getTime() <= MAX_DATE.getTime()){
+      return <p>Rest Day</p>
     }
 
     return null 
@@ -311,7 +341,7 @@ class TrainingDash extends Component {
         {this.state.SUPER_HACK_CALENDAR_RERENDER_STATE ? null : this.renderCalendar()}
 
         <Button 
-          disabled={this.state.planningStage < 2} 
+          disabled={this.state.planningStage < 3} 
           color='dark' 
           style={{marginTop: '10px'}}
           onClick={() => {
