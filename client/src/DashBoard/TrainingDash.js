@@ -29,16 +29,18 @@ import {
 } from 'reactstrap'
 
 // const localizer = momentLocalizer(moment)
-const days = {'Monday':1, 'Tuesday':2, 'Wednesday':3, 'Thursday':4, 'Friday':5, 'Saturday':6, 'Sunday':0}
+const DAYS_ENUM = {'Monday':1, 'Tuesday':2, 'Wednesday':3, 'Thursday':4, 'Friday':5, 'Saturday':6, 'Sunday':0}
+const SELECTED_DAYS_INIT = {'Monday': false, 'Tuesday': false, 'Wednesday': false, 'Thursday': false, 'Friday': false, 'Saturday': false, 'Sunday': false}
 
 class TrainingDash extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      activeIndex: 0,
-      collapse: false,
-      daysSelected: [],
+      activeIndex: -1, // Allows us to index the plan from the store and get its information. Negative because no plan selected.
+      planningStage: 0, // There are currently 3 stages to create a training plan. Selecting the plan, selecting available days, submitting the plan.
+      daysSelected: SELECTED_DAYS_INIT,
+      numDaysSelected: 0,
       initPlanDays: [],
       result:[]
     }
@@ -49,7 +51,13 @@ class TrainingDash extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // Move to the next stage if the selected number of days is at least the number of days required for a training plan.
+    if(this.props.plans && this.state.activeIndex >= 0 && this.state.numDaysSelected >= this.props.plans[this.state.activeIndex]['workoutData'].length){
+      if(this.state.planningStage != 2)
+        this.setState({planningStage: 2})
+    }
     
+    /*
     if (this.state.daysSelected.length !== prevState.daysSelected.length) {
       console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
       let result = []
@@ -67,31 +75,73 @@ class TrainingDash extends Component {
         }
       })
       this.setState({result:result})
-    }
+    }*/
   }
 
   /**
-   * Show the schedule for the specified plan.
+   * Get a value of the number of days selected within the object.
    */
-  showSchedule = (index) => {
-    // HACK: Really only need to collapse once.
-    this.setState(prevState => ({
-      collapse: prevState.collapse ? true : true,
-      index:index
-    }))
+  getNumberOfDaysSelected = () => {
+    let count = 0
+    for(let key in Object.keys(this.state.daysSelected)){
+      if(this.state.daysSelected[key])
+        count++
+    }
+
+    return count
+  }
+
+  /**
+   * Toggle a selected day.
+   */
+  toggleSelectedDay = (day) => {
+    // Sanity Check
+    if(!(day in SELECTED_DAYS_INIT))
+      return
+
+    let daysSelected = {...this.state.daysSelected}
+    // Keep track of number of selected, count.
+    let numDaysSelected = daysSelected[day] ? this.state.numDaysSelected - 1 : this.state.numDaysSelected + 1
+
+    // Now toggle the day
+    daysSelected[day] = !daysSelected[day]
+
+    // Go to the stage 2 if the number of days matches the training plan days
+    let nextStage = this.state.planningStage
+    if(this.props.plans[this.state.activeIndex]['workoutData'] == numDaysSelected)
+      nextStage = 2
+    else
+      nextStage = 1
+
+    this.setState({daysSelected, numDaysSelected, planningStage: nextStage})
+  }
+
+  /**
+   * Set the current stage of the training plan. This is for collapsibility behavior
+   */
+  setTrainingPlanningStage = (stage) => {
+    this.setState({planningStage: stage})
+  }
+
+  /**
+   * Generate a training split message.
+   * Each workout is set to specific split. Like a 3-day split requires at leasts 3 days selected etc...
+   */
+  buildTrainingSplitMessage = (activePlanIndex) => {
+    // Sanity check
+    if (activePlanIndex < 0)
+      return <span></span>
+
+    let trainingPlan = this.props.plans[activePlanIndex]
+
+    let category = trainingPlan['category']
+    let name = trainingPlan['name']
+    let numWorkouts = trainingPlan['workoutData'].length
+    
+    return <span>{`${name} is a training plan that requires at least `} <b> {`${numWorkouts} days`} </b> per week.</span>
   }
 
   renderCalendar = () => {
-
-    
-    // let oldState = this.state.daysSelected
-    // console.log(oldState)
-   
-    
-    
-
-    // console.log(result.map(m => m.start.format('LLLL')))
-    // console.log(result)
     return (
       <Col md={12}>
         <Calendar
@@ -112,66 +162,72 @@ class TrainingDash extends Component {
     )
   }
 
+  renderAvailableDays = () => {
+    let daySplitMessage = this.buildTrainingSplitMessage(this.state.activeIndex)
 
-  renderPlanInit = () => {
+    return (
+      <Collapse isOpen={this.state.planningStage >= 1}>
+        <Row className='justify-content-center'>
+        <Label size='lg' >
+          {daySplitMessage}<br/>
+          What days can you workout?
+        </Label>
+        <ButtonGroup size={'lg'} className='m-3'
+          vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
+          {Object.keys(DAYS_ENUM).map((day,i)=>{
+            console.log(day)
+            return (
+                  // <Col key={i}>
+                    <>
+                    {/* <Label >{day}</Label> */}
+                    <Button color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>
+                    </>
+                    //  {/* <Input type="checkbox" onChange={(e)=>{
+                    //         // let arr = this.state.daysSelected
+                    //         // arr.push(days[day])
+                    //         console.log(e.target.value, 'BEFORE') 
+                    //         if (!this.state.daysSelected.includes(day)) {
+                    //           this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
+                    //         }
+                    //         else {
+                    //           let newArr = this.state.daysSelected
+                    //           let index = newArr.indexOf(days[day])
+                    //           newArr.splice(index,1)
+                    //           this.setState({daysSelected:newArr})
+                    //         }
+                    //       }}  
+                            // name={day} bsSize="lg"  /> */}
+                  //  </Col>
+                  )
+          })}
+          </ButtonGroup>
+        </Row>
+      </Collapse>
+    )
+  }
 
+  renderTrainingPlanSchedule = () => {
     return(
-      <Collapse isOpen={this.state.collapse}>
-        <Form >
-            <Row className='justify-content-center'>
-            <Label size='lg' >
-              What days can you workout?
-            </Label>
-            <ButtonGroup size={'lg'} className='m-3'
-              vertical={this.props.windowWidth > FULL_LAYOUT_WIDTH ? false:true}>
-              {Object.keys(days).map((day,i)=>{
-                return (
-                      // <Col key={i}>
-                        <>
-                        {/* <Label >{day}</Label> */}
-                        <Button color={'dark'}>{day}</Button>
-                        </>
-                        //  {/* <Input type="checkbox" onChange={(e)=>{
-                        //         // let arr = this.state.daysSelected
-                        //         // arr.push(days[day])
-                        //         console.log(e.target.value, 'BEFORE') 
-                        //         if (!this.state.daysSelected.includes(day)) {
-                        //           this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
-                        //         }
-                        //         else {
-                        //           let newArr = this.state.daysSelected
-                        //           let index = newArr.indexOf(days[day])
-                        //           newArr.splice(index,1)
-                        //           this.setState({daysSelected:newArr})
-                        //         }
-                        //       }}  
-                                // name={day} bsSize="lg"  /> */}
-                      //  </Col>
-                      )
-              })}
-              </ButtonGroup>
-            </Row>
-          
-          {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
-          {/* <Row>
-            <Label for="examplePassword">What time?</Label>
-            <Input
-              type="time"
-              name="time"
-              // id="examplePassword"
-              placeholder="time"
-            />
-          </Row>
+      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2 }>
+        
+        {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
+        {/* <Row>
+          <Label for="examplePassword">What time?</Label>
+          <Input
+            type="time"
+            name="time"
+            // id="examplePassword"
+            placeholder="time"
+          />
+        </Row>
 
-          <Row>
-            <Label for="exampleSelect">When do you want to start?</Label>
-            <Input type="date" name="date" id="exampleSelect" />
-          </Row> */}
-          {this.renderCalendar()}
+        <Row>
+          <Label for="exampleSelect">When do you want to start?</Label>
+          <Input type="date" name="date" id="exampleSelect" />
+        </Row> */}
+        {this.renderCalendar()}
 
-
-          <Button className='m-4' color={'dark'}> Set Training Plan</Button>
-        </Form>
+        <Button className='m-4' color={'dark'}> Set Training Plan</Button>
       </Collapse>
     )
   }
@@ -182,9 +238,9 @@ class TrainingDash extends Component {
     let plans = []
     this.props.plans.map((plan,i)=>{
       plans.push(
-        <Card key={i} className={i === this.state.index? 'active':null}>
+        <Card key={i} className={i === this.state.activeIndex? 'active': null}>
         { plan.image? <CardImg top width="100%" src="" alt="Card image cap" /> : null}
-        <CardBody onClick={()=> this.showSchedule(i)}>
+        <CardBody onClick={()=> {this.setState({activeIndex: i}, () => { this.setTrainingPlanningStage(1)})}} >
           <CardTitle>{plan.planName}</CardTitle>
           <CardSubtitle>{plan.category}</CardSubtitle>
           <CardText>8 Week Plan</CardText>
@@ -218,17 +274,41 @@ class TrainingDash extends Component {
         <Jumbotron>
 
           {this.props.profile ? this.planWall() : null}
-          {this.renderPlanInit()}
+          {this.renderAvailableDays()}
+          {this.renderTrainingPlanSchedule()}
         </Jumbotron>
       </Col>
     )
   }
 }
 
+/**
+ * Quick validator to not render and invalid training plans. If you don't have this then the application will crash, unless you put
+ * a bunch of conditionals around the code to check for appropriate existence of fields like workoutData.
+ */
+const validateTrainingPlan = (trainingPlan) => {
+    if(!trainingPlan || !trainingPlan['workoutData'] || trainingPlan['workoutData'].length === 0 || !trainingPlan['name'] || !trainingPlan['category'])
+      return false
+    return true
+}
+
+/**
+ * Validate all training plans.
+ */
+const onlyValidTrainingPlans = (trainingPlans) => {
+  let validTrainingPlans = []
+  for (let plan of trainingPlans ){
+    if(validateTrainingPlan(plan))
+      validTrainingPlans.push(plan)
+  }
+
+  return validTrainingPlans
+}
+
 function mapStateToProps(state) {
   return {
     user: state.auth.user,
-    plans: state.plans.planTemps,
+    plans: onlyValidTrainingPlans(state.plans.planTemps),
     profile: state.auth.userProfile,
     sidebarWidth: state.layout.sideBarWidth
   }
