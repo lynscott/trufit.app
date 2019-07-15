@@ -64,7 +64,8 @@ class TrainingDash extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchPlanTemps()
+    //this.props.fetchPlanTemps()
+    this.props.fetchActiveTrainingPlan()
   }
 
   componentDidUpdate(prevProps, prevState) {
