@@ -45,6 +45,7 @@ class TrainingDash extends Component {
       planningStage: 0, // There are currently 3 stages to create a training plan. Selecting the plan, selecting available days, submitting the plan.
       daysSelected: SELECTED_DAYS_INIT,
       numDaysSelected: 0,
+      lastDaySelected: null,
       anyDaySelected: false,
       initPlanDays: [],
       result:[],
@@ -129,13 +130,14 @@ class TrainingDash extends Component {
     else
       nextStage = 2
 
-    this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false}, () => {
+    this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false, lastDaySelected: day}, () => {
       console.log(this.calendar)
     })
   }
 
   /**
    * Toggle all days.
+   * DEPRECATED
    */
   toggleAllDays = () => {
     let daysSelected = {...this.state.daysSelected}
@@ -305,9 +307,15 @@ class TrainingDash extends Component {
           {Object.keys(SELECTED_DAYS_INIT).map((day,i)=>{
             return <Button 
               active={this.state.daysSelected[day]} 
-              disabled={this.state.daysSelected[day] === false && this.state.numDaysSelected === this.props.plans[this.state.activeIndex]['workoutData'].length} 
               color={'dark'} 
-              onClick={() => this.toggleSelectedDay(day)}>{day}
+              onClick={() => {
+                if(this.state.numDaysSelected >= this.props.plans[this.state.activeIndex]['workoutData'].length){
+                  this.toggleSelectedDay(this.state.lastDaySelected)
+                }
+                else{
+                  this.toggleSelectedDay(day)
+                }
+              }}>{day}
             </Button>
             })}
           </ButtonGroup>
