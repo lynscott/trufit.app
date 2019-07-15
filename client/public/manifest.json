@@ -1,14 +1,14 @@
 {
-  "short_name": "LS Fitness",
-  "name": "LS Fitness",
+  "short_name": "TruFit.ai",
+  "name": "TruFit.ai",
   "icons": [
     {
-      "src": "logo-192.png",
+      "src": "FT1-01.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo-512.png",
+      "src": "FT1-01.png",
       "type": "image/png",
       "sizes": "512x512"
     }
