@@ -246,6 +246,28 @@ class TrainingDash extends Component {
     let workoutData = this.props.plans[this.state.activeIndex]['workoutData']
     let workouts = []
 
+    for(let workout of workoutData){
+      let exercises = []
+
+      for(let exercise of workout.exercises){
+        exercises.push(
+          <CardText style={{borderTopColor: 'black', fontSize: '12pt'}}> 
+            {exercise.name}: {exercise.sets}x{exercise.reps}<br/>
+            {/* exercise.note */}
+          </CardText>
+        )
+      }
+
+      workouts.push(
+        <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
+          <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+            <CardTitle><h5>{workout.title}</h5></CardTitle>
+            {exercises}
+        </CardBody>
+      </Card>)
+    }
+
+    return workouts
   }
 
   /**
@@ -294,9 +316,12 @@ class TrainingDash extends Component {
     let daySplitMessage = this.buildTrainingSplitMessage(this.state.activeIndex)
 
     return (
-      <Collapse isOpen={this.state.planningStage >= 1}>
-        {this.renderWorkouts()}
+        <>
+        <Label size='lg' >
+          This training plan is comprised of these workouts:
+        </Label>
         <Row className='justify-content-center'>
+        {this.renderWorkouts()}
         <Label size='lg' >
           {daySplitMessage}
         </Label>
@@ -320,14 +345,13 @@ class TrainingDash extends Component {
             })}
           </ButtonGroup>
         </Row>
-      </Collapse>
+        </>
     )
   }
 
   renderTrainingPlanSchedule = () => {
     return(
-      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
-        
+      <>
         {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
         {/* <Row>
           <Label for="examplePassword">What time?</Label>
@@ -356,7 +380,7 @@ class TrainingDash extends Component {
           }}>
             Set Training Plan
         </Button>
-      </Collapse>
+        </>
     )
   }
 
@@ -408,10 +432,13 @@ class TrainingDash extends Component {
         marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
       >
         <Jumbotron>
-
           {this.props.profile ? this.planWall() : null}
-          {this.renderAvailableDays()}
-          {this.renderTrainingPlanSchedule()}
+          <Collapse isOpen={this.state.planningStage >= 1}>
+            {this.renderAvailableDays()}
+          </Collapse>
+          <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
+            {this.renderTrainingPlanSchedule()}
+          </Collapse>
         </Jumbotron>
       </Col>
     )
