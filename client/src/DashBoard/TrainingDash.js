@@ -175,12 +175,11 @@ class TrainingDash extends Component {
         <ButtonGroup size={'lg'} className='m-3'
           vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
           {Object.keys(DAYS_ENUM).map((day,i)=>{
-            console.log(day)
             return (
                   // <Col key={i}>
                     <>
                     {/* <Label >{day}</Label> */}
-                    <Button color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>
+                    <Button active={this.state.daysSelected[day]} color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>
                     </>
                     //  {/* <Input type="checkbox" onChange={(e)=>{
                     //         // let arr = this.state.daysSelected
