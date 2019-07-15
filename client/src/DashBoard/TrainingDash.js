@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as actions from '../actions'
 // import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
-import 'react-big-calendar/lib/css/react-big-calendar.css'
+//import 'react-big-calendar/lib/css/react-big-calendar.css'
 import './TrainingDash.scss'
 import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
 import windowSize from 'react-window-size'
@@ -29,8 +29,12 @@ import {
 } from 'reactstrap'
 
 // const localizer = momentLocalizer(moment)
-const DAYS_ENUM = {'Monday':1, 'Tuesday':2, 'Wednesday':3, 'Thursday':4, 'Friday':5, 'Saturday':6, 'Sunday':0}
+const DAYS_ENUM = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const SELECTED_DAYS_INIT = {'Monday': false, 'Tuesday': false, 'Wednesday': false, 'Thursday': false, 'Friday': false, 'Saturday': false, 'Sunday': false}
+
+// HACK: HARD CODED VALUES JUST FOR BETA LAUNCH!
+const MAX_DATE = new Date(2019, 8, 1)
+const MIN_DATE = new Date(2019, 6, 22)
 
 class TrainingDash extends Component {
   constructor(props) {
@@ -43,8 +47,19 @@ class TrainingDash extends Component {
       numDaysSelected: 0,
       anyDaySelected: false,
       initPlanDays: [],
-      result:[]
+      result:[],
+      SUPER_HACK_CALENDAR_RERENDER_STATE: false
     }
+
+    // Reference to calendar for dumb hacks.
+    this.calendar = null
+  }
+
+  _SUPER_HACK_RE_RENDER_CALENDAR = () => {
+    this.setState({SUPER_HACK_CALENDAR_RERENDER_STATE: true}, () => {
+      this.setState({SUPER_HACK_CALENDAR_RERENDER_STATE: false})
+    })
+
   }
 
   componentDidMount() {
@@ -52,6 +67,9 @@ class TrainingDash extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if(this.state.numDaysSelected !== prevState.numDaysSelected){
+      this._SUPER_HACK_RE_RENDER_CALENDAR()
+    }
     /*
     if (this.state.daysSelected.length !== prevState.daysSelected.length) {
       console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
@@ -70,7 +88,8 @@ class TrainingDash extends Component {
         }
       })
       this.setState({result:result})
-    }*/
+    }
+    */
   }
 
   /**
@@ -108,7 +127,9 @@ class TrainingDash extends Component {
     else
       nextStage = 1
 
-    this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false})
+    this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false}, () => {
+      console.log(this.calendar)
+    })
   }
 
   /**
@@ -152,32 +173,75 @@ class TrainingDash extends Component {
     return <span>{`${name} is a training plan that requires at least `} <b> {`${numWorkouts} days`} </b> per week.</span>
   }
 
+  /**
+   * Check to see whether or not a certain date should be disabled.
+   * This is based off the selection of available workout days.
+   */
+  isDateDisabled = ({activeStartDate, date, view }) => {
+    // Sanity check
+    // Apparently date might not be instantiated yet?
+    if(date === undefined) return true
+
+    /*
+    if(this.state.daysSelected[DAYS_ENUM[date.getDay()]] === false){
+      console.log('isDateDisabled', date, this.state.daysSelected)
+    }
+    else{
+      console.log('isDateNotDisabled', date, this.state.daysSelected)
+    }*/
+
+    return !this.state.daysSelected[DAYS_ENUM[date.getDay()]]
+  }
+
+  /**
+   * Populate the calendar with training day and rest days
+   * Great movie btw, highly recommend: https://www.imdb.com/title/tt0139654/
+   */
+  renderCalendarTile = ({date, view}) => {
+    if(!this.isDateDisabled({date}) && date.getTime() >= MIN_DATE.getTime() && date.getTime() <= MAX_DATE.getTime()){
+      return <p>Training Day</p>
+    }
+
+    return null 
+  }
+
   renderCalendar = () => {
     return (
       <Col md={12}>
         <Calendar
           // onChange={this.onChange}
+          ref={node => this.calendar = node}
+          maxDate={MAX_DATE}
+          minDate={MIN_DATE}
           style={{width:'100%'}}
           minDetail={'month'}
-          value={new Date()}
-          tileContent={({ date, view }) => {
-            for (let day of this.state.result) {
-              if (date.getDay() === day.start.getDay()) {
-                return <p>Training</p>
-              }
-              else return null
-            }
-          }}
+          tileDisabled={this.isDateDisabled}
+          tileContent={this.renderCalendarTile}
         />
       </Col>
     )
   }
+
+  /**
+   * Render all the workouts for the selected training plan.
+   */
+  renderWorkouts = () => {
+    // Sanity check
+    if(!this.props || !(this.state.activeIndex >= 0)) return null
+
+    // type, title, exercises (name, sets, reps, note, category)
+    let workoutData = this.props.plans[this.state.activeIndex]['workoutData']
+    let workouts = []
+
+  }
+
 
   renderAvailableDays = () => {
     let daySplitMessage = this.buildTrainingSplitMessage(this.state.activeIndex)
 
     return (
       <Collapse isOpen={this.state.planningStage >= 1}>
+        {this.renderWorkouts()}
         <Row className='justify-content-center'>
         <Label size='lg' >
           {daySplitMessage}<br/>
@@ -186,31 +250,8 @@ class TrainingDash extends Component {
         <ButtonGroup size={'lg'} className='m-3'
           vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
           <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button>
-          {Object.keys(DAYS_ENUM).map((day,i)=>{
-            return (
-                  // <Col key={i}>
-                    <>
-                    {/* <Label >{day}</Label> */}
-                    <Button active={this.state.daysSelected[day]} color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>
-                    </>
-                    //  {/* <Input type="checkbox" onChange={(e)=>{
-                    //         // let arr = this.state.daysSelected
-                    //         // arr.push(days[day])
-                    //         console.log(e.target.value, 'BEFORE') 
-                    //         if (!this.state.daysSelected.includes(day)) {
-                    //           this.setState({daysSelected:[...this.state.daysSelected, days[day]]})
-                    //         }
-                    //         else {
-                    //           let newArr = this.state.daysSelected
-                    //           let index = newArr.indexOf(days[day])
-                    //           newArr.splice(index,1)
-                    //           this.setState({daysSelected:newArr})
-                    //         }
-                    //       }}  
-                            // name={day} bsSize="lg"  /> */}
-                  //  </Col>
-                  )
-          })}
+          {Object.keys(SELECTED_DAYS_INIT).map((day,i)=>{
+            return ( <Button active={this.state.daysSelected[day]} color={'dark'} onClick={() => this.toggleSelectedDay(day)}>{day}</Button>) })}
           </ButtonGroup>
         </Row>
       </Collapse>
@@ -219,7 +260,7 @@ class TrainingDash extends Component {
 
   renderTrainingPlanSchedule = () => {
     return(
-      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2 }>
+      <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 1 }>
         
         {/* TODO: Below are hidden for beta testing but still need to be finished for launch */}
         {/* <Row>
@@ -236,9 +277,9 @@ class TrainingDash extends Component {
           <Label for="exampleSelect">When do you want to start?</Label>
           <Input type="date" name="date" id="exampleSelect" />
         </Row> */}
-        {this.renderCalendar()}
+        {this.state.SUPER_HACK_CALENDAR_RERENDER_STATE ? null : this.renderCalendar()}
 
-        <Button className='m-4' color={'dark'}> Set Training Plan</Button>
+        <Button active={this.state.planningStage >= 2} className='m-4' color={'dark'}> Set Training Plan</Button>
       </Collapse>
     )
   }
