@@ -41,6 +41,7 @@ class TrainingDash extends Component {
       planningStage: 0, // There are currently 3 stages to create a training plan. Selecting the plan, selecting available days, submitting the plan.
       daysSelected: SELECTED_DAYS_INIT,
       numDaysSelected: 0,
+      anyDaySelected: false,
       initPlanDays: [],
       result:[]
     }
@@ -51,12 +52,6 @@ class TrainingDash extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // Move to the next stage if the selected number of days is at least the number of days required for a training plan.
-    if(this.props.plans && this.state.activeIndex >= 0 && this.state.numDaysSelected >= this.props.plans[this.state.activeIndex]['workoutData'].length){
-      if(this.state.planningStage != 2)
-        this.setState({planningStage: 2})
-    }
-    
     /*
     if (this.state.daysSelected.length !== prevState.daysSelected.length) {
       console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
@@ -108,12 +103,37 @@ class TrainingDash extends Component {
 
     // Go to the stage 2 if the number of days matches the training plan days
     let nextStage = this.state.planningStage
-    if(this.props.plans[this.state.activeIndex]['workoutData'] == numDaysSelected)
+    if(this.props.plans[this.state.activeIndex]['workoutData'].length <= numDaysSelected)
       nextStage = 2
     else
       nextStage = 1
 
-    this.setState({daysSelected, numDaysSelected, planningStage: nextStage})
+    console.log(numDaysSelected)
+
+    this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false})
+  }
+
+  /**
+   * Toggle all days.
+   */
+  toggleAllDays = () => {
+    let daysSelected = {...this.state.daysSelected}
+    let planningStage = this.state.anyDaySelected ? 1 : 2 // Go to previous stage or next stage.
+    let numDaysSelected = this.state.anyDaySelected ? 0 : Object.keys(this.state.daysSelected).length
+
+    if(this.state.anyDaySelected){
+      for(let day of Object.keys(daysSelected)){
+        daysSelected[day] = false
+      }
+    }
+    else{
+      for(let day of Object.keys(daysSelected)){
+        daysSelected[day] = true
+      }
+    }
+
+    this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
+
   }
 
   /**
@@ -174,6 +194,7 @@ class TrainingDash extends Component {
         </Label>
         <ButtonGroup size={'lg'} className='m-3'
           vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
+          <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button>
           {Object.keys(DAYS_ENUM).map((day,i)=>{
             return (
                   // <Col key={i}>
