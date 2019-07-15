@@ -347,7 +347,7 @@ class SignUpForm extends Component {
         ) : null}
         {this.state.page === 1 ? (
           <Button
-            color="success"
+            style={{backgroundColor: 'rgba(237,49,100,0.9)'}}
             disabled={!this.state.nextBtn}
             onClick={() => this.setState({ page: 2, tooltip2: false })}
           >
