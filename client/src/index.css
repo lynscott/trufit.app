@@ -1,3 +1,6 @@
+* {
+  touch-action: manipulation !important;
+}
 body,
 html {
   font-size: 18px;
