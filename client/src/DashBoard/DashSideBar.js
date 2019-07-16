@@ -148,8 +148,7 @@ class DashSideBar extends React.Component {
 
             <NavItem>
               <a
-                href={'/api/logout'}
-                key="2"
+                onClick={()=>this.props.signOut()}
                 id="title"
                 // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
                 className="nav-item nav-link px-2"
