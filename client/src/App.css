@@ -1,4 +1,7 @@
 /* DEPRECATED: */
+* {
+  touch-action: manipulation !important;
+}
 .App {
   text-align: center;
 }
