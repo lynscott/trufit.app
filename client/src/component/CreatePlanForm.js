@@ -133,7 +133,7 @@ class CreatePlanForm extends Component {
         let state = { items }
 
         if (source.droppableId !== 'droppable') {
-            state = { [this.id2List[source.droppableId]]: items }
+            state = { [this.getList[source.droppableId]]: items }
         }
 
         console.log(state)
@@ -150,7 +150,7 @@ class CreatePlanForm extends Component {
 
         this.setState({
             items: result.droppable,
-            [this.id2List[destination.droppableId]]: result[destination.droppableId]
+            [this.getList[destination.droppableId]]: result[this.getList[destination.droppableId]]
         })
     }
   }
@@ -469,35 +469,6 @@ class CreatePlanForm extends Component {
           )}
         </Droppable>
         <label>Phase Two:</label>
-        <Droppable droppableId="droppable1" direction="horizontal">
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.p1.map((item, index) => (
-                        <Draggable
-                            key={item.title}
-                            draggableId={index+item.title}
-                            index={index}>
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                        snapshot.isDragging,
-                                        provided.draggableProps.style
-                                    )}>
-                                    {item.title}
-                                </div>
-                            )}
-                        </Draggable>
-                    ))}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-        {/* <label>Phase Three:</label>
         <Droppable droppableId="droppable2" direction="horizontal">
             {(provided, snapshot) => (
                 <div
@@ -526,13 +497,13 @@ class CreatePlanForm extends Component {
                 </div>
             )}
         </Droppable>
-        <label>Phase Four:</label>
+        <label>Phase Three:</label>
         <Droppable droppableId="droppable3" direction="horizontal">
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
                     style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.p3.map((item, index) => (
+                    {this.state.selected.map((item, index) => (
                         <Draggable
                             key={item.title}
                             draggableId={index+item.title}
@@ -554,7 +525,36 @@ class CreatePlanForm extends Component {
                     {provided.placeholder}
                 </div>
             )}
-        </Droppable> */}
+        </Droppable>
+        <label>Phase Four:</label>
+        <Droppable droppableId="droppable4" direction="horizontal">
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}>
+                    {this.state.selected.map((item, index) => (
+                        <Draggable
+                            key={item.title}
+                            draggableId={index+item.title}
+                            index={index}>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={getItemStyle(
+                                        snapshot.isDragging,
+                                        provided.draggableProps.style
+                                    )}>
+                                    {item.title}
+                                </div>
+                            )}
+                        </Draggable>
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
       </DragDropContext>
 
 
