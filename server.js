@@ -28,8 +28,13 @@ const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 mongoose.Promise = require('bluebird')
-//mongoose.connect('mongodb://localhost:27017')
+
+//Local testing
+// mongoose.connect('mongodb://localhost:27017')
+
+//Dev/Prod backend connections
 mongoose.connect(keys.mongoURI, { useMongoClient: true })
+
 sgMail.setApiKey(keys.sendGridKey)
 
 //TODO: Replace const in code with model calls
@@ -235,9 +240,10 @@ app.get('/api/exercises', async (req, res) => {
   res.send(exerciseList)
 })
 
-app.param('prof_id', async (req, res, next, id) => {
+app.param('prof_id', async (req, res, next) => {
+  console.log('ID PARAM')
   const userProf = await UserProfile.findOne({ _id: id })
-  req.plan = userProf
+  req.prof = userProf
 
   next()
 })
@@ -302,12 +308,12 @@ app.get('/api/admin_exercises', async (req, res) => {
   res.send(objMapper(exerciseList))
 })
 
-app.get('/api/profiles/:prof_id', async (req, res) => {
-  // console.log('Request Id:', req.params.id);
+app.use('/api/profiles/:prof_id', async (req, res) => {
+  console.log('Request Id:', req.params.prof_id);
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
-  res.send(req.profiles)
+  res.send(req.params.prof_id)
 })
 
 //// END ////////
@@ -399,6 +405,14 @@ app.get('/api/logout', (req, res) => {
   req.logout()
   // req.session = null;
   res.redirect('/')
+})
+
+app.get('/api/beta_users', async (req, res, next) => {
+  // requireLogin(req, res, next)
+  let betas = await models.BetaUsers.find()
+  console.log(betas)
+  // req.session = null;
+  res.send(betas)
 })
 
 app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
@@ -667,13 +681,21 @@ app.post('/api/signup', async (req, res, next) => {
   //TEMP Access list check
   // console.log(process.env)
   if (process.env.NODE_ENV) {
-    let preList = ['lennord@gmail.com', 'lunsford.carson@gmail.com', 'khalid3ali@gmail.com', 'j6quach@gmail.com', 'terencegfit@gmail.com',
-     'ronaldwill94@gmail.com', 'nathanielneal21@gmail.com', 'buckhalterkyrie@gmail.com', 'smithdeidra1@gmail.com']
-    if (!preList.includes(email)) {
-      return res.status(401).send({ message: 'Hey There! Registration is only open for Beta testing at the moment, come back soon!' })
+    let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
+        // console.log(beta, email)
+        if (beta.length === 0) {
+          return true 
+        }
+        else {
+          return false
+        }
+      })
+
+    if (accessDenied) {
+        return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
     }
   }
-
+  
   const findBMR = () => {
     let inToCm = height * 2.54 //190.54
     let lbsToKg = currentWeight / 2.2 //104.54
@@ -687,7 +709,6 @@ app.post('/api/signup', async (req, res, next) => {
   }
 
   
-
   await User.findOne({ email: email }, (err, existingUser) => {
     if (err) {
       return next(err)
