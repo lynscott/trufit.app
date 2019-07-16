@@ -121,7 +121,7 @@ class CreatePlanForm extends Component {
     if (!destination) {
         return
     }
-    console.log(destination)
+    console.log(destination, this.getList(source.droppableId), 'GET LIST')
 
     if (source.droppableId === destination.droppableId) {
         const items = reorder(
@@ -133,8 +133,10 @@ class CreatePlanForm extends Component {
         let state = { items }
 
         if (source.droppableId !== 'droppable') {
-            state = { [this.getList[source.droppableId]]: items }
+            state = { [this.id2List[source.droppableId]]: items }
         }
+
+        console.log(state)
 
         this.setState(state)
     } else {
@@ -144,10 +146,11 @@ class CreatePlanForm extends Component {
             source,
             destination
         )
+        console.log(result, 'RESULT CALLED')
 
         this.setState({
             items: result.droppable,
-            [this.getList[destination.droppableId]]: result[this.getList[destination.droppableId]]
+            [this.id2List[destination.droppableId]]: result[destination.droppableId]
         })
     }
   }
@@ -466,12 +469,12 @@ class CreatePlanForm extends Component {
           )}
         </Droppable>
         <label>Phase Two:</label>
-        <Droppable droppableId="droppable2" direction="horizontal">
+        <Droppable droppableId="droppable1" direction="horizontal">
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
                     style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
+                    {this.state.p1.map((item, index) => (
                         <Draggable
                             key={item.title}
                             draggableId={index+item.title}
@@ -494,13 +497,13 @@ class CreatePlanForm extends Component {
                 </div>
             )}
         </Droppable>
-        <label>Phase Three:</label>
-        <Droppable droppableId="droppable3" direction="horizontal">
+        {/* <label>Phase Three:</label>
+        <Droppable droppableId="droppable2" direction="horizontal">
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
                     style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
+                    {this.state.p2.map((item, index) => (
                         <Draggable
                             key={item.title}
                             draggableId={index+item.title}
@@ -524,12 +527,12 @@ class CreatePlanForm extends Component {
             )}
         </Droppable>
         <label>Phase Four:</label>
-        <Droppable droppableId="droppable4" direction="horizontal">
+        <Droppable droppableId="droppable3" direction="horizontal">
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
                     style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
+                    {this.state.p3.map((item, index) => (
                         <Draggable
                             key={item.title}
                             draggableId={index+item.title}
@@ -551,7 +554,7 @@ class CreatePlanForm extends Component {
                     {provided.placeholder}
                 </div>
             )}
-        </Droppable>
+        </Droppable> */}
       </DragDropContext>
 
 

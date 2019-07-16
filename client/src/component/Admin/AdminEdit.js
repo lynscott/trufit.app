@@ -76,7 +76,7 @@ export const ProfileEdit = props => (
       <NumberInput source="baseSomaType.macro.fat" />
       <BooleanInput source="isAdmin" />
       <DateInput source="calories" />
-      {/* <TextInput source="_user" /> */}
+      <TextInput source="_user" />
       <TextInput source="email" />
       {/* <ReferenceInput source="_id" reference="s">
         <SelectInput optionText="id" />
