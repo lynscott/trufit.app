@@ -121,7 +121,7 @@ class CreatePlanForm extends Component {
     if (!destination) {
         return
     }
-    console.log(destination)
+    console.log(destination, this.getList(source.droppableId), 'GET LIST')
 
     if (source.droppableId === destination.droppableId) {
         const items = reorder(
@@ -136,6 +136,8 @@ class CreatePlanForm extends Component {
             state = { [this.getList[source.droppableId]]: items }
         }
 
+        console.log(state)
+
         this.setState(state)
     } else {
         const result = move(
@@ -144,6 +146,7 @@ class CreatePlanForm extends Component {
             source,
             destination
         )
+        console.log(result, 'RESULT CALLED')
 
         this.setState({
             items: result.droppable,
@@ -471,7 +474,7 @@ class CreatePlanForm extends Component {
                 <div
                     ref={provided.innerRef}
                     style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
+                    {this.state.p2.map((item, index) => (
                         <Draggable
                             key={item.title}
                             draggableId={index+item.title}
