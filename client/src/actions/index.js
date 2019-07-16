@@ -43,6 +43,7 @@ export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
 export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
 export const INIT_NEW_USER_TRAINING_PLAN = 'INIT_NEW_USER_TRAINING_PLAN'
 export const INIT_NEW_USER_TRAINING_PLAN_FAILED = 'INIT_NEW_USER_TRAINING_PLAN_FAILED'
+export const ADD_NEW_BETA = 'ADD_NEW_BETA'
 
 
 
@@ -62,6 +63,12 @@ export function selectPlan(plan) {
     type: PLAN_SELECTED,
     payload: plan
   }
+}
+
+export const submitBeta = beta => async dispatch => {
+  const res = await axios.post('/api/add_beta_user', beta)
+
+  dispatch({ type: ADD_NEW_BETA, payload: res.data })
 }
 
 export const contactForm = values => async dispatch => {
