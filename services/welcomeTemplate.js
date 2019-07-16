@@ -18,12 +18,11 @@ module.exports = req => {
               - Setup a fitness plan. <br/>
               <br/>
               Lets get started!<br/>
-              www.lsfitness.co
+              www.tru-fit.co
               <br/>
               <br/>
-              For any questions feel free to reach out to lynscott@lsphysique.com
               <br/>
-              LS Fitness 2017
+              TruFit.ai Inc.
             </h4>
           </div>
         </div>
