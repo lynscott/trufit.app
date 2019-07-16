@@ -7,7 +7,8 @@ import Stats from './UserStats'
 import DashCalendar from './DashCalendar'
 // import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
-import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
+import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH, DOUBLE_TAP_HACK_HANDLER} from '../constants/Layout'
+
 
 // import CreatePlanForm from './CreatePlanForm'
 import {
@@ -168,11 +169,12 @@ class Dashboard extends Component {
   affirmationChange = () => {
     if (this.state.update === false) {
       return (
-        <p className="lead affirmation" style={{ fontSize: '1.2rem' }}
-          onDoubleClick={() => this.setState({ update: true })} >
-          {this.props.profile ? this.props.profile.affirmation !== ''
-            ? this.props.profile.affirmation : 'Tap to fill out' : ''}
-        </p>
+          <p className="lead affirmation" style={{ fontSize: '1.2rem' }}
+            onTouchStart={(e) => DOUBLE_TAP_HACK_HANDLER(e, () => this.setState({update: true}))}
+            onDoubleClick={() => {this.setState({ update: true })} } >
+            {this.props.profile ? this.props.profile.affirmation !== ''
+              ? this.props.profile.affirmation : 'Tap to fill out' : ''}
+          </p>
       )
     } else {
       return (
