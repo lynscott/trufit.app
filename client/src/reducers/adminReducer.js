@@ -2,8 +2,9 @@ import {FETCH_EXERCISES, FETCH_WORKOUTS} from '../actions'
 
 const initialState = {
     exercises: [],
-    workouts:[]
+    workouts:[],
     // errorMessage: null,
+    betaList:[]
     // user: null
   }
 
