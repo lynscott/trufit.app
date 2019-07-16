@@ -35,7 +35,7 @@ import { Pie, Doughnut, HorizontalBar, Bar } from 'react-chartjs-2'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {FULL_LAYOUT_WIDTH, COLLAPSE_TRIGGER_WIDTH} from '../constants/Layout'
+import {FULL_LAYOUT_WIDTH, COLLAPSE_TRIGGER_WIDTH, DOUBLE_TAP_HACK_HANDLER} from '../constants/Layout'
 
 const EMPTY_FOOD_ENTRY = {
   name: '',
@@ -116,30 +116,71 @@ export const formatMealTime = (mealTime, reformat=true) => {
 class NumbersOnlyEntry extends Component {
   static propTypes = {
     value: PropTypes.number,
-    onUpdate: PropTypes.func.isRequired
+    onUpdate: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired
   }
 
   static defaultProps = {
     value: 0
   }
 
+  constructor(props){
+    super(props)
+
+    this.text = null
+
+    this.state = {
+      editable: false
+    }
+  }
+
   getValue() {
     return parseFloat(this.text.value)
+  }
+
+  /**
+   * Pretend the user isn't in edit mode :)
+   */
+  renderFake() {
+    return <div style={{width: '100%', height: '100%', textAlign: 'center'}}
+    onClick={()=>this.setState({editable: true})}>
+      {this.props.value}</div>
+  }
+
+  fakeBlur() {
+    this.setState({editable: false})
   }
 
   render() {
     const { value, onUpdate, ...rest } = this.props
 
-    return [
-      <input
-        { ...rest }
-        style={{textAlign: 'center', width: '100%', height: '100%'}}
-        key="text"
-        ref={ node => this.text = node }
-        min={0}
-        type="number"
-      />,
-    ]
+      return [
+        <input
+          { ...rest }
+          style={{textAlign: 'center', width: '100%', height: '100%'}}
+          key="text"
+          ref={ node => this.text = node }
+          min={0}
+          type={this.props.type}
+        />,
+      ]
+
+    /*
+    if(this.state.editable){
+      return [
+        <input
+          { ...rest }
+          style={{textAlign: 'center', width: '100%', height: '100%'}}
+          key="text"
+          ref={ node => this.text = node }
+          min={0}
+          type={this.props.type}
+        />,
+      ]
+    }
+    else{
+      return [this.renderFake()]
+    }*/
   }
 }
 
@@ -637,7 +678,7 @@ class NutritionDash extends Component {
           if (row.name === 'Total') {
             return false
           }
-          return true
+          return false
         }
       },
       {
@@ -645,7 +686,7 @@ class NutritionDash extends Component {
         text: 'Amount(oz)',
         editorRenderer: (editorProps, value, row, column, rowIndex, columnIndex) => {
           if(row.name === 'Total') return null
-          else return <NumbersOnlyEntry { ...editorProps } value={ value } onUpdate={() => {}}/>
+          else return <NumbersOnlyEntry { ...editorProps } type="number" value={ value } onUpdate={() => {}}/>
         },
         editable: (cell, row, rowIndex, colIndex) => {
           // console.log(row)
@@ -704,7 +745,7 @@ class NutritionDash extends Component {
           }
           cellEdit={
             cellEditFactory({
-            mode: 'dbclick',
+            mode: 'click',
             blurToSave: true,
             autoSelectText: true,
             beforeSaveCell: (oldValue, newValue, row, column) => {
