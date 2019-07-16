@@ -62,6 +62,11 @@ export default function(state = initialState, action ) {
         ...state,
         signUpFail: false
       }
+    case 'SIGNOUT_SUCCESS':
+      return{
+        userProfile:null,
+        user:null
+      }
     default:
       return state
   }

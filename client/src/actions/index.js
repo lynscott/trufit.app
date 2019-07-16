@@ -65,6 +65,13 @@ export function selectPlan(plan) {
   }
 }
 
+export const signOut = () => async dispatch => {
+  await axios.get('/api/logout')
+
+  dispatch({ type: 'SIGNOUT_SUCCESS'})
+}
+
+
 export const submitBeta = beta => async dispatch => {
   const res = await axios.post('/api/add_beta_user', beta)
 
