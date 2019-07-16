@@ -240,10 +240,9 @@ app.get('/api/exercises', async (req, res) => {
   res.send(exerciseList)
 })
 
-app.param('prof_id', async (req, res, next) => {
-  console.log('ID PARAM')
+app.param('prof_id', async (req, res, next, id) => {
   const userProf = await UserProfile.findOne({ _id: id })
-  req.prof = userProf
+  req.plan = userProf
 
   next()
 })
@@ -308,8 +307,8 @@ app.get('/api/admin_exercises', async (req, res) => {
   res.send(objMapper(exerciseList))
 })
 
-app.use('/api/profiles/:prof_id', async (req, res) => {
-  console.log('Request Id:', req.params.prof_id);
+app.get('/api/profiles/:prof_id', async (req, res) => {
+  // console.log('Request Id:', req.params.id);
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' })
   }
