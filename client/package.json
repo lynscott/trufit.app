@@ -13,6 +13,7 @@
     "bootstrap": "^4.3.1",
     "chart.js": "^2.8.0",
     "connected-react-router": "^6.5.2",
+    "disable-double-tap": "^1.0.0",
     "http-proxy-middleware": "^0.19.1",
     "i": "^0.3.6",
     "konva": "^3.4.0",
