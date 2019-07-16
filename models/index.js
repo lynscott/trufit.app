@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird')
 // mongoose.set('debug', true);
 
+const { Schema } = mongoose;
 
+const betaUsers = new Schema({Email: String,});
+
+module.exports.BetaUsers = mongoose.model('beta_users', betaUsers);
 
 module.exports.User = require("./User");
 module.exports.Plans = require("./Plans");

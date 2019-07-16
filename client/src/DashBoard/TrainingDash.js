@@ -460,7 +460,7 @@ class TrainingDash extends Component {
         padding: '10px',
         marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
       >
-        <Jumbotron>
+        {/* <Jumbotron> //Temp hidden for plan loading
           {this.props.profile ? this.planWall() : null}
           <Collapse isOpen={this.state.planningStage >= 1}>
             {this.renderAvailableDays()}
@@ -468,6 +468,10 @@ class TrainingDash extends Component {
           <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
             {this.renderTrainingPlanSchedule()}
           </Collapse>
+        </Jumbotron> */}
+        <Jumbotron>
+          <h4>Training Plan selection will be available starting Wednesday. <br/><br/>
+          We want to offer you a variety of quality options to test and try out!</h4>
         </Jumbotron>
       </Col>
     )

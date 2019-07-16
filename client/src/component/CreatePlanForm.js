@@ -87,7 +87,10 @@ class CreatePlanForm extends Component {
     this.state = {
       tooltipOpen: false,
       items: this.props.workouts,
-      selected: []
+      p1: [],
+      p2: [],
+      p3: [],
+      p4: []
     }
 
     this.onDragEnd = this.onDragEnd.bind(this)
@@ -101,7 +104,10 @@ class CreatePlanForm extends Component {
      */
     id2List = {
       droppable: 'items',
-      droppable2: 'selected'
+      droppable1: 'p1',
+      droppable2: 'p2',
+      droppable3: 'p3',
+      droppable4: 'p1',
   };
 
   getList = id => this.state[this.id2List[id]];
@@ -126,8 +132,8 @@ class CreatePlanForm extends Component {
 
         let state = { items }
 
-        if (source.droppableId === 'droppable2') {
-            state = { selected: items }
+        if (source.droppableId !== 'droppable') {
+            state = { [this.getList[source.droppableId]]: items }
         }
 
         this.setState(state)
@@ -141,7 +147,7 @@ class CreatePlanForm extends Component {
 
         this.setState({
             items: result.droppable,
-            selected: result.droppable2
+            [this.getList[destination.droppableId]]: result[this.getList[destination.droppableId]]
         })
     }
   }
@@ -407,6 +413,13 @@ class CreatePlanForm extends Component {
           />
 
           <Field
+            placeholder="Description"
+            name="plan.description"
+            type="text"
+            component={this.renderField}
+          />
+
+          <Field
             placeholder="Category"
             name="plan.category"
             type="text"
@@ -422,7 +435,7 @@ class CreatePlanForm extends Component {
         </div>
 
         <DragDropContext onDragEnd={this.onDragEnd}>
-        <label>Track One:</label>
+        <label>Workouts:</label>
         <Droppable droppableId="droppable" direction="horizontal" >
           {(provided, snapshot) => (
             <div
@@ -430,7 +443,7 @@ class CreatePlanForm extends Component {
               style={getListStyle(snapshot.isDraggingOver)}
               {...provided.droppableProps}
             >
-              {this.state.items.map((item, index) => (
+              {this.props.workouts.map((item, index) => (
                 // console.log(item)
                 <Draggable key={item.title} draggableId={index+item.title} index={index}>
                   {(provided, snapshot) => (
@@ -452,8 +465,66 @@ class CreatePlanForm extends Component {
             </div>
           )}
         </Droppable>
-        <label>Track Two:</label>
+        <label>Phase Two:</label>
         <Droppable droppableId="droppable2" direction="horizontal">
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}>
+                    {this.state.selected.map((item, index) => (
+                        <Draggable
+                            key={item.title}
+                            draggableId={index+item.title}
+                            index={index}>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={getItemStyle(
+                                        snapshot.isDragging,
+                                        provided.draggableProps.style
+                                    )}>
+                                    {item.title}
+                                </div>
+                            )}
+                        </Draggable>
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
+        <label>Phase Three:</label>
+        <Droppable droppableId="droppable3" direction="horizontal">
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}>
+                    {this.state.selected.map((item, index) => (
+                        <Draggable
+                            key={item.title}
+                            draggableId={index+item.title}
+                            index={index}>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={getItemStyle(
+                                        snapshot.isDragging,
+                                        provided.draggableProps.style
+                                    )}>
+                                    {item.title}
+                                </div>
+                            )}
+                        </Draggable>
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
+        <label>Phase Four:</label>
+        <Droppable droppableId="droppable4" direction="horizontal">
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
