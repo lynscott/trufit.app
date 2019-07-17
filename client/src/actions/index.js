@@ -260,8 +260,9 @@ export const initTrainingPlan = (values) => async dispatch => {
 
 export const fetchActiveTrainingPlan = () => async dispatch => {
   const res = await axios.get('/api/active_training_plan')
+  
 
-  dispatch({ type: PLAN_SELECTED, payload: res.data })
+  dispatch({ type: PLAN_SELECTED, payload: res.data? res.data: null })
 }
 
 export const createNewMeal = (values) => async dispatch => {
