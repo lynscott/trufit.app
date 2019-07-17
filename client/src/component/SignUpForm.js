@@ -23,7 +23,7 @@ class SignUpForm extends Component {
       tooltip2: false,
       page: 1,
       nextBtn: false,
-      activeType: true,
+      activeType: null,
       visible: this.props.signUpFail
     }
   }
@@ -33,6 +33,9 @@ class SignUpForm extends Component {
     if (prevProps.activeType !== this.props.activeType) {
       this.setState({ activeType: true })
     }
+
+    if ((!this.props.activeType || this.props.activeType === '') && this.state.activeType === true)
+      this.setState({activeType:false, nextBtn:false})
 
     if (prevProps.values && this.props.values) {
       if (prevProps.values !== this.props.values) {

@@ -46,8 +46,6 @@ export const INIT_NEW_USER_TRAINING_PLAN_FAILED = 'INIT_NEW_USER_TRAINING_PLAN_F
 export const ADD_NEW_BETA = 'ADD_NEW_BETA'
 
 
-
-
 //Remove form prod
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
 
