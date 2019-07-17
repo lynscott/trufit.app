@@ -30,6 +30,12 @@ const app = express()
 const fetch = require('node-fetch');
 fetch.Promise = require('bluebird')
 
+if (process.env.NODE_ENV) {//if prod force use of key switcher
+  //Dev/Prod backend connections
+  mongoose.connect(keys.mongoURI, { useMongoClient: true })
+} else {
+  //Local testing
+  // mongoose.connect('mongodb://localhost:27017')
 
 if (process.env.NODE_ENV) {//if prod force use of key switcher
   //Dev/Prod backend connections
