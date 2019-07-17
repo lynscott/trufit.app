@@ -35,13 +35,6 @@ if (process.env.NODE_ENV) {//if prod force use of key switcher
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
 } else {
   //Local testing
-  // mongoose.connect('mongodb://localhost:27017')
-
-if (process.env.NODE_ENV) {//if prod force use of key switcher
-  //Dev/Prod backend connections
-  mongoose.connect(keys.mongoURI, { useMongoClient: true })
-} else {
-  //Local testing
   mongoose.connect('mongodb://localhost:27017')
 
   //Dev/Prod backend connections
