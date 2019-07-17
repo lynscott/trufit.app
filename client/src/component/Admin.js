@@ -95,14 +95,14 @@ class AdminPage extends Component {
             >
                 <Jumbotron>
                   <h1 className="display-5">Welcome back King.</h1>
-                  <ButtonGroup>
+                  <ButtonGroup vertical={this.props.windowWidth > FULL_LAYOUT_WIDTH ? false : true}>
                   <Button color="primary" size="lg" onClick={this.togglePlanModal}>Make a new training plan</Button>
-                  <Button color="secondary" size="lg" >Edit Beta User Access List</Button>
+                  {/* <Button color="secondary" size="lg" >Edit Beta User Access List</Button> */}
                   <Button color="info" size="lg" onClick={this.toggleWorkoutModal}>Make a new workout</Button>
                   </ButtonGroup>
                     {/* List of current plans and user stats */}
                   
-                  {this.renderBetaList()}
+                  {/* {this.renderBetaList()} */}
                     {/* <h1 className="display-3">Hello, world!</h1>
                     <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
                     <hr className="my-2" />
