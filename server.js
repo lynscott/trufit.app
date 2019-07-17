@@ -180,7 +180,7 @@ app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [/\/insecure
 app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
-app.use(cors({exposedHeaders:['Content-Range', 'Content-Length']}))
+app.use(cors({exposedHeaders:['X-Total-Count', 'Content-Length']}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -277,16 +277,16 @@ app.get('/api/users', async (req, res, next) => {
   requireLogin(req, res, next)
   const users = await User.find().select('-password -v')
 
-  res.set('Content-Range', 'users' +' '+users.length)
-  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.set('X-Total-Count', users.length)
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
   res.send(objMapper(users))
 })
 
 app.get('/api/profiles', async (req, res, next) => {
   requireLogin(req, res, next)
   const profiles = await UserProfile.find()
-  res.set('Content-Range', 'profiles' +' '+profiles.length)
-  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.set('X-Total-Count', 'profiles' +' '+profiles.length)
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
   res.send(objMapper(profiles))
 })
 
@@ -294,8 +294,8 @@ app.get('/api/all_plans', async (req, res, next) => {
   requireLogin(req, res, next)
   const plans = await Plan.find()
 
-  res.set('Content-Range', 'plans' +' '+plans.length)
-  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.set('X-Total-Count', 'plans' +' '+plans.length)
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
   res.send(objMapper(plans))
 })
 
@@ -304,8 +304,8 @@ app.get('/api/all_workouts', async (req, res, next) => {
   requireLogin(req, res, next)
   const workouts = await Workout.find()
 
-  res.set('Content-Range', 'workouts' +' '+workouts.length)
-  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.set('X-Total-Count', 'workouts' +' '+workouts.length)
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
   res.send(objMapper(workouts))
 })
 
@@ -315,8 +315,8 @@ app.get('/api/admin_exercises', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' })
   }
   const exerciseList = await Exercises.find()
-  res.set('Content-Range', 'exercises' +' '+exerciseList.length)
-  res.set('Access-Control-Expose-Headers', 'Content-Range')
+  res.set('X-Total-Count', exerciseList.length)
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
   res.send(objMapper(exerciseList))
 })
 
@@ -427,6 +427,27 @@ app.get('/api/beta_users', async (req, res, next) => {
   res.send(betas)
 })
 
+
+
+app.post('/api/add_beta_user', async (req, res, next) => {
+  // requireLogin(req, res, next)
+  await models.BetaUsers.find({Email:req.body.email}, async (err, beta)=>{
+    // console.log(beta, email)
+    if (beta.length !== 0) {
+      res.status(422).send({ message:'Beta with this email address has already been created.' })
+    }
+
+    else {
+      let beta = new models.BetaUsers({
+        Email:req.body.email
+      })
+      await beta.save()
+      res.status(200).send('Success')
+    }
+  })
+  // req.session = null;
+})
+
 app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
   res.redirect('/')
 })
@@ -520,7 +541,7 @@ app.post('/api/new_user_plan', async (req, res) => {
   await user_plan.save()
 
   // Now store the plan into the user profile to keep trac of it.
-  UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
+  UserProfile.findOne({ _user: req.user.id }, async (err, profile) => {
     if (err) {
       return err
     }
@@ -531,7 +552,7 @@ app.post('/api/new_user_plan', async (req, res) => {
       let arr = [...profile.trainingPlans]
       arr.push(user_plan._id)
       profile.trainingPlans = arr
-      profile.save()
+      await profile.save()
     } else {
       return res.send(500, { error: 'no profile found' })
     }
@@ -729,21 +750,21 @@ app.post('/api/signup', async (req, res, next) => {
 
   //TEMP Access list check
   // console.log(process.env)
-  if (process.env.NODE_ENV) {
-    let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
-        // console.log(beta, email)
-        if (beta.length === 0) {
-          return true 
-        }
-        else {
-          return false
-        }
-      })
+  // if (process.env.NODE_ENV) {
+  //   let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
+  //       // console.log(beta, email)
+  //       if (beta.length === 0) {
+  //         return true 
+  //       }
+  //       else {
+  //         return false
+  //       }
+  //     })
 
-    if (accessDenied) {
-        return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
-    }
-  }
+  //   if (accessDenied) {
+  //       return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
+  //   }
+  // }
   
   const findBMR = () => {
     let inToCm = height * 2.54 //190.54
