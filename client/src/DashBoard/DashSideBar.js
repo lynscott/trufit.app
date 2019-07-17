@@ -3,6 +3,7 @@ import React, { useLayoutEffect } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import * as actions from '../actions'
 import { connect } from 'react-redux'
+import axios from 'axios'
 import {
   Col,
   Card,
@@ -20,8 +21,8 @@ import './Sidebar.scss'
 import windowSize from 'react-window-size'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SlackFeedback,  { themes } from 'react-slack-feedback'
-import keys from '../config/keys'
 import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH} from '../constants/Layout'
+
 
 class DashSideBar extends React.Component {
   constructor(props) {
@@ -172,23 +173,8 @@ class DashSideBar extends React.Component {
             user={this.props.user ? 
               this.props.user.email + ' ' + this.props.user.name
             : null}
-            onSubmit={(payload, success, error) => {
-              let logPromise =  new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                  resolve(console.log(payload))
-                }, 300)
-              })
-              if (keys.slackWebHook) {
-                return fetch(keys.slackWebHook, {
-                  method: 'POST',
-                  body: JSON.stringify(payload)
-                })
-                .then(success)
-                .catch(error)
-              } else {
-               return logPromise.then(success)
-              }
-            }
+            onSubmit={(payload, success, error) => axios.post('/api/send_feedback', payload).then(success).catch(error)
+
             }//TODO: wire up
             onImageUpload={(file, success, error) => {}}
           />

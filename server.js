@@ -27,7 +27,10 @@ const welcomeTemplate = require('./services/welcomeTemplate')
 const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
+const fetch = require('node-fetch');
 mongoose.Promise = require('bluebird')
+fetch.Promise = require('bluebird')
+
 
 //Local testing
 // mongoose.connect('mongodb://localhost:27017')
@@ -426,6 +429,26 @@ app.post('/api/signin', passport.authenticate('local', { session: true }), async
   //Remove password before sending user
   req.user.password = ''
   res.send({ token: tokenForUser(req.user), user: req.user })
+})
+
+// Slack Feedback
+app.post('/api/send_feedback', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+
+	// Change this later if you plan on changing the payload from the frontend
+	if (!keys.slackWebHook || !req.body['attachments'] || req.body['attachments'].length == 0) return res.status(500)
+
+	let {author_name, color, fallback, footer, text, title, title_link} = req.body['attachments'][0] // Not using, but may be useful in future.
+	await fetch(keys.slackWebHook, {
+		method: 'POST',
+		body: JSON.stringify(req.body)
+	}).then(() => {
+		return res.status(200).send('The feedback was successfully sent!')
+	}).catch( () => {
+		return res.status(500)
+	})
 })
 
 app.post('/api/new_plan_template', async (req, res) => {
