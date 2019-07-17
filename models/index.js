@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird')
-// mongoose.set('debug', true);
+mongoose.set('debug', process.env.NODE_ENV ? false : true); //Debug mongoose queries in console
 
 const { Schema } = mongoose;
 

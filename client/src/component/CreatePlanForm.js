@@ -8,15 +8,17 @@ import {
   getFormValues,
   change,
   untouch,
-  touch
+  touch,
 } from 'redux-form'
 import { connect } from 'react-redux'
 import { signUpUser, fetchExercises, createNewPlan, fetchWorkouts } from '../actions'
 import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Tooltip, Input, Button, Row, Col, Container } from 'reactstrap'
+import { Tooltip, Input, Button, Row, Col, CardDeck, ButtonGroup, Label, Badge,
+  Container, Card, CardGroup, CardTitle, CardSubtitle, CardText } from 'reactstrap'
 import Select from 'react-select'
 import { Draggable, Droppable, DragDropContext } from 'react-beautiful-dnd'
+import _ from 'lodash'
 
 const afterSubmit = (result, dispatch) => dispatch(reset('CreatePlanForm'))
 
@@ -146,7 +148,7 @@ class CreatePlanForm extends Component {
             source,
             destination
         )
-        console.log(result, 'RESULT CALLED')
+        // console.log(result, 'RESULT CALLED')
 
         this.setState({
             items: result.droppable,
@@ -370,15 +372,95 @@ class CreatePlanForm extends Component {
     )
   };
 
+  updatePhaseState = (phase) => {
+    if (this.state.selectedWorkout) {
+      this.setState({[phase]:[...this.state[phase], this.state.selectedWorkout],selectedWorkout:null})
+    }
+  }
+
+  renderWorkouts = () => {
+    return(
+      <>
+      <ButtonGroup className='m-3' >
+          <Button onClick={()=>this.updatePhaseState('p1')} color='primary'>Add to Phase 1</Button>
+          <Button onClick={()=>this.updatePhaseState('p2')} color='secondary'>Add to Phase 2</Button>
+          <Button onClick={()=>this.updatePhaseState('p3')} color='dark'>Add to Phase 3</Button>
+          <Button onClick={()=>this.updatePhaseState('p4')} color='danger'>Add to Phase 4</Button>
+        </ButtonGroup>
+      <Row  style={{maxHeight:'200px', justifyContent:'center',overflowY:'scroll'}} >
+          {this.props.workouts.map((workout, k)=>{
+            return(
+              <Col md='3'className='m-2' onClick={()=>this.setState({selectedWorkout:workout})} key={k}>
+                <Card className='p-1' body inverse color={this.state.selectedWorkout === workout ? 'info' :'dark'} key={k} >
+                  <CardTitle><strong>Name:</strong> {workout.title}</CardTitle>
+                  <CardSubtitle><strong>type:</strong> {workout.type}</CardSubtitle>
+                  <CardText><strong># of exercises:</strong> {workout.exercises.length}</CardText>
+                </Card>
+              </Col>
+              )
+          })}
+        </Row>
+      </>
+    )
+  }
+
+  removeFromPhase = (e, phaseIndex, workoutIndex) => {
+    e.preventDefault()
+    let updatedPhase = this.state['p'+(phaseIndex+1)]
+    // console.log(updatedPhase)
+    for (let i = 0; i < updatedPhase.length; i++) {
+      // console.log(i, workoutIndex)
+      if (i === workoutIndex) {
+        updatedPhase.splice(i,1)
+        // break
+      }
+    }
+
+    this.setState({['p'+phaseIndex]:updatedPhase})
+  }
+
+
+  renderPhases = () => {
+    //HACK: temp for 8 weeks
+    let phasesArr = Array.from({length: 4}, (v, i) => i)
+    let phases = phasesArr.map((p,i)=>{
+      return (
+        <>
+        <Label>Phase {i+1}</Label>
+        <CardGroup className='my-2' key={i}>
+          {this.state['p'+(i+1)].map((workout, k)=>{
+            return(
+              <Card style={{padding:'5px', backgroundColor:'lightgrey'}} key={k} body outline  color='info'>
+                <CardTitle><strong>Name:</strong> {workout.title}</CardTitle>
+                <Button size='sm' onClick={(e)=>this.removeFromPhase(e,i,k)} color='danger'>Remove </Button>
+              </Card>
+              )
+          })}
+        </CardGroup>
+        </>
+        )
+    })
+
+    return phases
+  }
+
 
 
   async onSubmit(values) {
     
     let newValues = {
       ...values,
-      workouts: this.state.selected.map(workout=>workout._id),
-      data: this.state.selected
+      workouts: [...this.state.p1.map(workout=>workout._id), ...this.state.p2.map(workout=>workout._id),
+         ...this.state.p3.map(workout=>workout._id), ...this.state.p4.map(workout=>workout._id) ],
+      data: {p1:this.state.p1,p2:this.state.p2, p3:this.state.p3, p4:this.state.p4}
     }
+
+    let initState = {p1: [],
+    p2: [],
+    p3: [],
+    p4: []}
+    this.setState(initState)
+
     // console.log(newValues, 'Altered with workouts!')
     try {
       await this.props.createNewPlan(newValues)
@@ -401,7 +483,7 @@ class CreatePlanForm extends Component {
 
     return (
       <form
-        className="p-4 bg-light"
+        className="p-0 bg-light"
         onSubmit={handleSubmit(this.onSubmit.bind(this))}
         style={{ margin: 0, borderRadius: '5px' }}
       >
@@ -436,126 +518,8 @@ class CreatePlanForm extends Component {
             component={this.renderField}
           />
         </div>
-
-        <DragDropContext onDragEnd={this.onDragEnd}>
-        <label>Workouts:</label>
-        <Droppable droppableId="droppable" direction="horizontal" >
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              style={getListStyle(snapshot.isDraggingOver)}
-              {...provided.droppableProps}
-            >
-              {this.props.workouts.map((item, index) => (
-                // console.log(item)
-                <Draggable key={item.title} draggableId={index+item.title} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={getItemStyle(
-                        snapshot.isDragging,
-                        provided.draggableProps.style
-                      )}
-                    >
-                      {item.title}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-        <label>Phase Two:</label>
-        <Droppable droppableId="droppable2" direction="horizontal">
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.p2.map((item, index) => (
-                        <Draggable
-                            key={item.title}
-                            draggableId={index+item.title}
-                            index={index}>
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                        snapshot.isDragging,
-                                        provided.draggableProps.style
-                                    )}>
-                                    {item.title}
-                                </div>
-                            )}
-                        </Draggable>
-                    ))}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-        <label>Phase Three:</label>
-        <Droppable droppableId="droppable3" direction="horizontal">
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
-                        <Draggable
-                            key={item.title}
-                            draggableId={index+item.title}
-                            index={index}>
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                        snapshot.isDragging,
-                                        provided.draggableProps.style
-                                    )}>
-                                    {item.title}
-                                </div>
-                            )}
-                        </Draggable>
-                    ))}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-        <label>Phase Four:</label>
-        <Droppable droppableId="droppable4" direction="horizontal">
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
-                        <Draggable
-                            key={item.title}
-                            draggableId={index+item.title}
-                            index={index}>
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                        snapshot.isDragging,
-                                        provided.draggableProps.style
-                                    )}>
-                                    {item.title}
-                                </div>
-                            )}
-                        </Draggable>
-                    ))}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-      </DragDropContext>
+        {this.renderWorkouts()}
+        {this.renderPhases()}
 
 
         <Button type="submit" className="btn btn-outline-primary mt-4">
@@ -597,7 +561,7 @@ const mapStateToProps = state => {
 export default reduxForm({
   //   validate,
   form: 'CreatePlanForm',
-  // onSubmitSuccess: afterSubmit,
+  onSubmitSuccess: afterSubmit,
   // initialValues
 })(
   connect(

@@ -28,15 +28,18 @@ const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 const fetch = require('node-fetch');
-mongoose.Promise = require('bluebird')
 fetch.Promise = require('bluebird')
 
+if (process.env.NODE_ENV) {//if prod force use of key switcher
+  //Dev/Prod backend connections
+  mongoose.connect(keys.mongoURI, { useMongoClient: true })
+} else {
+  //Local testing
+  // mongoose.connect('mongodb://localhost:27017')
 
-//Local testing
-mongoose.connect('mongodb://localhost:27017')
-
-//Dev/Prod backend connections
-// mongoose.connect(keys.mongoURI, { useMongoClient: true })
+  //Dev/Prod backend connections
+  mongoose.connect(keys.mongoURI, { useMongoClient: true })
+}
 
 sgMail.setApiKey(keys.sendGridKey)
 
