@@ -16,7 +16,7 @@ import {
 } from 'react-admin'
 
 export const ProfileCreate = props => (
-  <Create {...props}>
+  <Create label='Create' {...props}>
     <SimpleForm>
         <DisabledInput source="id" />
       <TextInput source="id" />

@@ -16,7 +16,7 @@ import {
 } from 'react-admin'
 
 export const ProfileEdit = props => (
-  <Edit {...props}>
+  <Edit label='Edit' {...props}>
     <SimpleForm>
         <DisabledInput source="id" />
       <TextInput source="id" />
