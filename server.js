@@ -33,10 +33,10 @@ fetch.Promise = require('bluebird')
 
 
 //Local testing
-// mongoose.connect('mongodb://localhost:27017')
+mongoose.connect('mongodb://localhost:27017')
 
 //Dev/Prod backend connections
-mongoose.connect(keys.mongoURI, { useMongoClient: true })
+// mongoose.connect(keys.mongoURI, { useMongoClient: true })
 
 sgMail.setApiKey(keys.sendGridKey)
 
@@ -262,6 +262,13 @@ const objMapper = (obj) => {
   })
   return ret
 }
+
+app.delete('/api/users', async (req, res, next) => {
+  requireLogin(req, res, next)
+  let item = req.body.id
+  await models.NutritionPlan.deleteOne({_id:item})
+  res.status(200).send('Success')
+})
 
 app.get('/api/users', async (req, res, next) => {
   requireLogin(req, res, next)
@@ -689,7 +696,22 @@ app.post('/api/update_food_item', async (req, res, next) => {
   })
 })
 
+const expectedKeys = ['email', 'name', 'password1', 'gender', 'height_ft', 'height_in', 'current_weight', 'age', 'somatype', 'activity_mod' ]
 app.post('/api/signup', async (req, res, next) => {
+
+  try {
+    expectedKeys.map(key=>{
+      // console.log(key)
+      if (!req.body[key] || req.body[key === '']) {
+        throw new Error('Error:' +[key]+ ' required' )
+      } 
+    })
+  } catch (error) {
+    return res.status(401).send(error)
+  }
+  
+
+
   let email = req.body.email
   let name = req.body.name
   let password = req.body.password1
@@ -699,6 +721,8 @@ app.post('/api/signup', async (req, res, next) => {
   let age = parseInt(req.body.age)
   let somatype = req.body.somatype
   let modifier = parseInt(req.body.activity_mod)
+
+
 
   //TEMP Access list check
   // console.log(process.env)
@@ -730,7 +754,6 @@ app.post('/api/signup', async (req, res, next) => {
     }
   }
 
-  
   await User.findOne({ email: email }, (err, existingUser) => {
     if (err) {
       return next(err)
