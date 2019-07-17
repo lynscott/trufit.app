@@ -30,15 +30,16 @@ const app = express()
 const fetch = require('node-fetch');
 fetch.Promise = require('bluebird')
 
+
 if (process.env.NODE_ENV) {//if prod force use of key switcher
   //Dev/Prod backend connections
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
 } else {
   //Local testing
-  // mongoose.connect('mongodb://localhost:27017')
+  mongoose.connect('mongodb://localhost:27017')
 
   //Dev/Prod backend connections
-  mongoose.connect(keys.mongoURI, { useMongoClient: true })
+  // mongoose.connect(keys.mongoURI, { useMongoClient: true })
 }
 
 sgMail.setApiKey(keys.sendGridKey)
@@ -180,7 +181,7 @@ app.use(redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [/\/insecure
 app.use(compression())
 app.use(logger('dev'))
 app.use(cookieParser())
-app.use(cors({exposedHeaders:['X-Total-Count', 'Content-Length']}))
+app.use(cors({exposedHeaders:['Content-Range', 'Content-Length']}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -223,12 +224,18 @@ app.get('/api/plan_templates', async (req, res, next) => {
 //TODO: Refactor for less queries
 app.get('/api/active_training_plan', async (req, res, next) => {
   requireLogin(req, res, next)
-  let prof = await UserProfile.findOne({ _user: req.user.id }) 
-  let activePlan = await models.Plans.findOne({_id:prof.activePlan})
-  let template = await models.PlanTemplates.findOne({_id:activePlan.template})
-  console.log(template)
+  let prof = await UserProfile.findOne({ _user: req.user.id })
+  try {
+    let activePlan = await models.Plans.findOne({_id:prof.activePlan})
+    let template = await models.PlanTemplates.findOne({_id:activePlan.template})
+    console.log(template)
+    res.send({...activePlan._doc, templateData:template})
+  } catch (error) {
+    res.send(null)
+  } 
+  
 
-  res.send({...activePlan._doc, templateData:template})
+  
 })
 
 app.get('/api/nutrition_plans', async (req, res, next) => {
@@ -277,16 +284,16 @@ app.get('/api/users', async (req, res, next) => {
   requireLogin(req, res, next)
   const users = await User.find().select('-password -v')
 
-  res.set('X-Total-Count', users.length)
-  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
+  res.set('Content-Range', 'users' +' '+users.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
   res.send(objMapper(users))
 })
 
 app.get('/api/profiles', async (req, res, next) => {
   requireLogin(req, res, next)
   const profiles = await UserProfile.find()
-  res.set('X-Total-Count', 'profiles' +' '+profiles.length)
-  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
+  res.set('Content-Range', 'profiles' +' '+profiles.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
   res.send(objMapper(profiles))
 })
 
@@ -294,8 +301,8 @@ app.get('/api/all_plans', async (req, res, next) => {
   requireLogin(req, res, next)
   const plans = await Plan.find()
 
-  res.set('X-Total-Count', 'plans' +' '+plans.length)
-  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
+  res.set('Content-Range', 'plans' +' '+plans.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
   res.send(objMapper(plans))
 })
 
@@ -304,8 +311,8 @@ app.get('/api/all_workouts', async (req, res, next) => {
   requireLogin(req, res, next)
   const workouts = await Workout.find()
 
-  res.set('X-Total-Count', 'workouts' +' '+workouts.length)
-  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
+  res.set('Content-Range', 'workouts' +' '+workouts.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
   res.send(objMapper(workouts))
 })
 
@@ -315,8 +322,8 @@ app.get('/api/admin_exercises', async (req, res) => {
     return res.status(401).send({ error: 'You must log in!' })
   }
   const exerciseList = await Exercises.find()
-  res.set('X-Total-Count', exerciseList.length)
-  res.set('Access-Control-Expose-Headers', 'X-Total-Count')
+  res.set('Content-Range', 'exercises' +' '+exerciseList.length)
+  res.set('Access-Control-Expose-Headers', 'Content-Range')
   res.send(objMapper(exerciseList))
 })
 
@@ -427,27 +434,6 @@ app.get('/api/beta_users', async (req, res, next) => {
   res.send(betas)
 })
 
-
-
-app.post('/api/add_beta_user', async (req, res, next) => {
-  // requireLogin(req, res, next)
-  await models.BetaUsers.find({Email:req.body.email}, async (err, beta)=>{
-    // console.log(beta, email)
-    if (beta.length !== 0) {
-      res.status(422).send({ message:'Beta with this email address has already been created.' })
-    }
-
-    else {
-      let beta = new models.BetaUsers({
-        Email:req.body.email
-      })
-      await beta.save()
-      res.status(200).send('Success')
-    }
-  })
-  // req.session = null;
-})
-
 app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
   res.redirect('/')
 })
@@ -466,6 +452,10 @@ app.post('/api/signin', passport.authenticate('local', { session: true }), async
 app.post('/api/send_feedback', async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ error: 'You must log in!' });
+  }
+
+  if (!process.env.NODE_ENV) {
+    return res.status(401).send({ error: 'Feedback only for production' });
   }
 
 	// Change this later if you plan on changing the payload from the frontend
@@ -541,7 +531,7 @@ app.post('/api/new_user_plan', async (req, res) => {
   await user_plan.save()
 
   // Now store the plan into the user profile to keep trac of it.
-  UserProfile.findOne({ _user: req.user.id }, async (err, profile) => {
+  UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
     if (err) {
       return err
     }
@@ -552,7 +542,7 @@ app.post('/api/new_user_plan', async (req, res) => {
       let arr = [...profile.trainingPlans]
       arr.push(user_plan._id)
       profile.trainingPlans = arr
-      await profile.save()
+      profile.save()
     } else {
       return res.send(500, { error: 'no profile found' })
     }
@@ -750,21 +740,21 @@ app.post('/api/signup', async (req, res, next) => {
 
   //TEMP Access list check
   // console.log(process.env)
-  // if (process.env.NODE_ENV) {
-  //   let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
-  //       // console.log(beta, email)
-  //       if (beta.length === 0) {
-  //         return true 
-  //       }
-  //       else {
-  //         return false
-  //       }
-  //     })
+  if (process.env.NODE_ENV) {
+    let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
+        // console.log(beta, email)
+        if (beta.length === 0) {
+          return true 
+        }
+        else {
+          return false
+        }
+      })
 
-  //   if (accessDenied) {
-  //       return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
-  //   }
-  // }
+    if (accessDenied) {
+        return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
+    }
+  }
   
   const findBMR = () => {
     let inToCm = height * 2.54 //190.54
