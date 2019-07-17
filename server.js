@@ -33,10 +33,10 @@ fetch.Promise = require('bluebird')
 
 
 //Local testing
-mongoose.connect('mongodb://localhost:27017')
+// mongoose.connect('mongodb://localhost:27017')
 
 //Dev/Prod backend connections
-// mongoose.connect(keys.mongoURI, { useMongoClient: true })
+mongoose.connect(keys.mongoURI, { useMongoClient: true })
 
 sgMail.setApiKey(keys.sendGridKey)
 
