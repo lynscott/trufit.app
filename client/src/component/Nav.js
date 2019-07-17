@@ -70,6 +70,8 @@ class Nav extends Component {
     )
   }
 
+  
+
   renderContent() {
     switch (this.props.auth.user) {
       case false:
@@ -93,7 +95,7 @@ class Nav extends Component {
             Dashboard
           </Link>,
           <a
-            href={'/api/logout'}
+            onClick={()=>this.props.signOut()}
             key="2"
             id="title"
             // onClick={()=> localStorage.getItem('token') ? this.props.signUserOut(this.props.history) : null}
