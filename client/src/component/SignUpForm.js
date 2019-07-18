@@ -34,8 +34,8 @@ class SignUpForm extends Component {
       this.setState({ activeType: true })
     }
 
-    if ((!this.props.activeType || this.props.activeType === '') && this.state.activeType === true)
-      this.setState({activeType:false, nextBtn:false})
+    // if ((!this.props.activeType || this.props.activeType === '') && this.state.activeType === true)
+    //   this.setState({activeType:false, nextBtn:false})
 
     if (prevProps.values && this.props.values) {
       if (prevProps.values !== this.props.values) {
@@ -73,6 +73,7 @@ class SignUpForm extends Component {
           placeholder={field.placeholder}
           className={className}
           type={field.type}
+          autoComplete={'off'}
           required
           style={{ backgroundColor: '#e7e7e7' }}
           {...field.input}

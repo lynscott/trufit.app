@@ -29,10 +29,11 @@ const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 const fetch = require('node-fetch')
 fetch.Promise = require('bluebird')
+// const planTest = process.env.NODE_ENV ? null : require('./planTest')
 
 
 
-if (process.env.NODE_ENV) {//if prod force use of key switcher
+if (process.env.NODE_ENV) {//if prod force use of key switcher, we should probably move this elsewhere
   //Dev/Prod backend connections
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
 } else {
@@ -219,7 +220,7 @@ app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
   const allPlans = await models.PlanTemplates.find()
-  res.send(allPlans)
+  res.send( allPlans)
 })
 
 //TODO: Refactor for less queries
