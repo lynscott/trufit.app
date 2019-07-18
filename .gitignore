@@ -3,3 +3,5 @@ dev.js
 .history
 .vscode
 package-lock.json
+
+planTest.json

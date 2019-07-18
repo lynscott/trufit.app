@@ -28,14 +28,21 @@ const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
 const fetch = require('node-fetch')
+const Sentry = require('@sentry/node')
 fetch.Promise = require('bluebird')
 // const planTest = process.env.NODE_ENV ? null : require('./planTest')
 
+//TODO: Clean and SPLIT this file up!
 
 
 if (process.env.NODE_ENV) {//if prod force use of key switcher, we should probably move this elsewhere
   //Dev/Prod backend connections
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
+  Sentry.init({ dsn: keys.sentryServer })
+
+  // The request handler must be the first middleware on the app
+  app.use(Sentry.Handlers.requestHandler())
+  
 } else {
   //Local testing
   mongoose.connect('mongodb://localhost:27017')
@@ -957,7 +964,12 @@ app.post('/api/stripe', async (req, res) => {
   res.status(200).send(user)
 })
 
+
+
 if (process.env.NODE_ENV === 'production') {
+  // The error handler must be before any other error middleware and after all controllers
+  app.use(Sentry.Handlers.errorHandler())
+  
   app.use(express.static(path.join(__dirname, 'client/build')))
 
   app.get('*', (req, res) => {
