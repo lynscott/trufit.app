@@ -338,12 +338,13 @@ class Dashboard extends Component {
             { this.props.activePlan ? 
             <>
               <CardText>
-              Active Training Plan: {this.props.activePlan.templateData.name}
+              Active Training Plan: {this.props.activePlan.templateData? 
+              this.props.activePlan.templateData.name : null}
               </CardText>
-              <CardText> Training Days </CardText>
+              <CardText> Next Workout </CardText>
               <ListGroup >
-                {Object.keys(this.props.activePlan.days[0]).map((key,i)=>{
-                  if (this.props.activePlan.days[0][key]) {
+                {Object.keys(this.props.activePlan.days[0]).reverse().map((key,i)=>{
+                  if (this.props.activePlan.days[0][key] && i < 1) {//Hack to temp show the next three dates
                     return <ListGroupItem color={'dark'} key={i}>
                               {new Date(key).toLocaleDateString()} <br/>
                               {this.props.activePlan.days[0][key].title}
