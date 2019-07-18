@@ -50,7 +50,8 @@ class TrainingDash extends Component {
       initPlanDays: [],
       result:[],
       SUPER_HACK_CALENDAR_RERENDER_STATE: false,
-      trainingDates: {}
+      trainingDates: {},
+      changePlan:false
     }
 
     // Reference to calendar for dumb hacks.
@@ -76,15 +77,20 @@ class TrainingDash extends Component {
     }
 
     // State restoration from user profile
-    if(prevProps.activePlan !== this.props.activePlan){
-      // TODO: Change the backend to not return an array.
-      let activeIndex = this.getActiveIndexFromObjectId(this.props.activePlan.template)
-      let daysSelected = this.props.activePlan.days[0]
-      let numDaysSelected = this.getNumberOfDaysSelected(daysSelected)
-      let lastDaySelected = (() => {for(let i = 0; i < 7; i++) if(daysSelected[DAYS_ENUM[i]]) return DAYS_ENUM[i]})() // lol. HACK
-      let planningStage = 3
+    // if(prevProps.activePlan !== this.props.activePlan && this.state.changePlan === false){
+    //   // TODO: Change the backend to not return an array.
+    //   let activeIndex = this.getActiveIndexFromObjectId(this.props.activePlan.template)
+    //   let daysSelected = this.props.activePlan.days[0]
+    //   let numDaysSelected = this.getNumberOfDaysSelected(daysSelected)
+    //   let lastDaySelected = (() => {for(let i = 0; i < 7; i++) if(daysSelected[DAYS_ENUM[i]]) return DAYS_ENUM[i]})() // lol. HACK
+    //   let planningStage = 3
 
-      this.setState({daysSelected, numDaysSelected, planningStage, activeIndex, lastDaySelected})
+    //   this.setState({daysSelected, numDaysSelected, planningStage, activeIndex, lastDaySelected})
+    // }
+
+    if (this.state.daysSelected !== prevState.daysSelected) {
+      console.log('called')
+      this.mapDatesToWorkoutsToDay()
     }
 
     /*
@@ -124,6 +130,56 @@ class TrainingDash extends Component {
     return -1
   }
 
+
+  mapDatesToWorkoutsToDay = () =>{
+
+    Object.keys(this.state.daysSelected).map(async (dayKey)=>{
+      if (this.state.daysSelected[dayKey]) {
+        let start = moment(MIN_DATE.toDateString()).day(dayKey), // July. 15th
+        end   = moment(MAX_DATE.toDateString()), // Sept. 15th
+        day   = start.day()                  // Should always be the same
+
+        console.log(start.toDate(), 'START')
+        let current = start.clone()
+
+        let dayToTrainingMap = this.getDaysToTrainingMap()
+
+        //mapper function for grabbing the correct workout
+        let mapper = (phase, current) => this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[current.day()]]]
+        
+        //Map through days of plan
+        // console.log(current.toDate(), 'DATE')
+        let i = 0
+        while (current.add(7, 'd').isBefore(end)) {
+          let phase = ''
+
+          // edge case for the first day occurrence
+          if (i === 0) current = start
+
+          //Set the phase to grab workouts from based on date
+          if ((current.month() <= 7 && current.date() < 19) || current.month() ===6) {
+            phase = 'p1'
+          } else if (current.date()=== 5 && current.month() === 7) {
+            phase = 'p2'
+          } else {
+            phase = 'p3'
+          }
+
+          console.log( current.toDate(), 'MAIN FUNC', start.toDate())
+
+          
+          
+          i ++
+          //update the state of plans to map
+          await this.setState({trainingDates:{...this.state.trainingDates, [current.toDate()]:mapper(phase, current)}})
+
+          // current = current.add(7)
+          
+        }
+      }
+    })
+  }
+
   /**
    * Get a value of the number of days selected within the object.
    */
@@ -154,7 +210,7 @@ class TrainingDash extends Component {
 
     // Go to the stage 2 if the number of days matches the training plan days
     let nextStage = this.state.planningStage
-    if(numDaysSelected <= 5 && numDaysSelected > 3)
+    if(numDaysSelected <= 5 && numDaysSelected >= 3)
       // this.props.plans[this.state.activeIndex]['workoutData'].length <= numDaysSelected)
       nextStage = 3
     else
@@ -239,20 +295,24 @@ class TrainingDash extends Component {
       let dayToTrainingMap = this.getDaysToTrainingMap()
       let phase = ''
       
+      // console.log(date)
 
       //HACK: Strictly for beta test range and Clean up function into a selector
       if ((date.getMonth() <= 7 && date.getDate() < 19) || date.getMonth() ===6) {
         phase = 'p1'
         let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // console.log('p1 map', mapper)
       } else if (date.getDate()=== 5 && date.getMonth() === 7) {
         phase = 'p2'
         let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // console.log('p2 map', mapper)
       } else {
         phase = 'p3'
         let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+        // console.log('p3 map', mapper)
       }
 
       return <p>{this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]].title}</p>
@@ -503,9 +563,11 @@ class TrainingDash extends Component {
           else{
             this.setState({activeIndex: i, planningStage: 1})
           } }} >
-          <CardTitle>{plan.planName}</CardTitle>
-          <CardSubtitle>{plan.category}</CardSubtitle>
-          <CardText>8 Week Plan</CardText>
+          <CardTitle>{plan.name}</CardTitle>
+          <CardSubtitle className='muted'>Category: {plan.category}</CardSubtitle>
+          <CardText>Description: 8 Week Plan
+            {/* {plan.description} */}
+          </CardText>
           {/* <Button>Button</Button> */}
         </CardBody>
       </Card>
@@ -515,8 +577,11 @@ class TrainingDash extends Component {
     return (
       <>
         <Label size='lg' >
-          Select a training plan.
+          <strong>Training Manager</strong>
         </Label>
+        <Collapse isOpen={this.state.activePlan !==null}>
+          <Button className='mb-2' onClick={()=>this.setState({changePlan:true, daysSelected:SELECTED_DAYS_INIT})} color='info'>Change Training Plan</Button>
+        </Collapse>
         <CardColumns className='plan-wall bg-black p-3'>
           {plans}
         </CardColumns>
@@ -526,7 +591,7 @@ class TrainingDash extends Component {
   }
 
   render() {
-    console.log(this.state.trainingDates)
+    console.log(this.state.trainingDates, this.state.daysSelected)
     return (
       <Col md="10"
         style={{minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
