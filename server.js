@@ -232,7 +232,7 @@ app.get('/api/active_training_plan', async (req, res, next) => {
     console.log(activePlan, 'ACTIVE')
     let template = await models.PlanTemplates.findOne({_id:activePlan.template})
     console.log(template)
-    res.send({...activePlan._doc, templateData:template})
+    res.send({...activePlan._doc, templateData:activePlan.days})
   } catch (error) {
     res.send(null)
   } 
