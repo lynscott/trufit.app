@@ -27,8 +27,11 @@ const welcomeTemplate = require('./services/welcomeTemplate')
 const compression = require('compression')
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const app = express()
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 fetch.Promise = require('bluebird')
+
+const planTest = require('./planTest')
+
 
 if (process.env.NODE_ENV) {//if prod force use of key switcher
   //Dev/Prod backend connections
@@ -217,7 +220,7 @@ app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
   const allPlans = await models.PlanTemplates.find()
-  res.send(allPlans)
+  res.send([planTest])
 })
 
 //TODO: Refactor for less queries
@@ -226,9 +229,10 @@ app.get('/api/active_training_plan', async (req, res, next) => {
   let prof = await UserProfile.findOne({ _user: req.user.id })
   try {
     let activePlan = await models.Plans.findOne({_id:prof.activePlan})
+    console.log(activePlan, 'ACTIVE')
     let template = await models.PlanTemplates.findOne({_id:activePlan.template})
     console.log(template)
-    res.send({...activePlan._doc, templateData:template})
+    res.send({...activePlan._doc, templateData:activePlan.days})
   } catch (error) {
     res.send(null)
   } 
