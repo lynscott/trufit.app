@@ -33,7 +33,7 @@ const DAYS_ENUM = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frid
 const SELECTED_DAYS_INIT = {'Monday': false, 'Tuesday': false, 'Wednesday': false, 'Thursday': false, 'Friday': false, 'Saturday': false, 'Sunday': false}
 
 // HACK: HARD CODED VALUES JUST FOR BETA LAUNCH!
-const MAX_DATE = new Date(2019, 8, 1)
+const MAX_DATE = new Date(2019, 8, 15)
 const MIN_DATE = new Date(2019, 6, 22)
 
 class TrainingDash extends Component {
@@ -49,7 +49,8 @@ class TrainingDash extends Component {
       anyDaySelected: false,
       initPlanDays: [],
       result:[],
-      SUPER_HACK_CALENDAR_RERENDER_STATE: false
+      SUPER_HACK_CALENDAR_RERENDER_STATE: false,
+      trainingDates: {}
     }
 
     // Reference to calendar for dumb hacks.
@@ -153,13 +154,14 @@ class TrainingDash extends Component {
 
     // Go to the stage 2 if the number of days matches the training plan days
     let nextStage = this.state.planningStage
-    if(this.props.plans[this.state.activeIndex]['workoutData'].length <= numDaysSelected)
+    if(numDaysSelected <= 5 && numDaysSelected > 3)
+      // this.props.plans[this.state.activeIndex]['workoutData'].length <= numDaysSelected)
       nextStage = 3
     else
       nextStage = 2
 
     this.setState({daysSelected, numDaysSelected, planningStage: nextStage, anyDaySelected: false, lastDaySelected: day}, () => {
-      console.log(this.calendar)
+      // console.log(this.calendar)
     })
   }
 
@@ -219,7 +221,6 @@ class TrainingDash extends Component {
         count++
       }
     }
-
     return days
   }
 
@@ -229,20 +230,36 @@ class TrainingDash extends Component {
    */
   renderCalendarTile = ({date, view}) => {
     // Sanity check
-    if(!this.props.plans || this.state.activeIndex < 0 || this.state.numDaysSelected != this.props.plans[this.state.activeIndex]['workoutData'].length) return null
+    if(!this.props.plans || this.state.activeIndex < 0 || this.state.numDaysSelected > 5 ) return null
 
     if(!this.isDateDisabled({date}) && date.getTime() >= MIN_DATE.getTime() && date.getTime() <= MAX_DATE.getTime()){
 
       // Calculate title of date.
       // WARNING: Subject to change in the future, not efficient.
       let dayToTrainingMap = this.getDaysToTrainingMap()
+      let phase = ''
+      
 
-      return <p>{this.props.plans[this.state.activeIndex]['workoutData'][dayToTrainingMap[DAYS_ENUM[date.getDay()]]].title}</p>
+      //HACK: Strictly for beta test range and Clean up function into a selector
+      if ((date.getMonth() <= 7 && date.getDate() < 19) || date.getMonth() ===6) {
+        phase = 'p1'
+        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
+        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+      } else if (date.getDate()=== 5 && date.getMonth() === 7) {
+        phase = 'p2'
+        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
+        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+      } else {
+        phase = 'p3'
+        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
+        this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
+      }
+
+      return <p>{this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]].title}</p>
     }
     else if(date.getTime() >= MIN_DATE.getTime() && date.getTime() <= MAX_DATE.getTime()){
       return <p>Rest Day</p>
     }
-
     return null 
   }
 
@@ -271,31 +288,80 @@ class TrainingDash extends Component {
     if(!this.props || !(this.state.activeIndex >= 0)) return null
 
     // type, title, exercises (name, sets, reps, note, category)
-    let workoutData = this.props.plans[this.state.activeIndex]['workoutData']
-    let workouts = []
+    let workoutData = this.props.plans[this.state.activeIndex]['workoutData'][0] //Hack fix data
+    let phases = []
 
-    for(let workout of workoutData){
-      let exercises = []
-
-      for(let exercise of workout.exercises){
-        exercises.push(
-          <CardText style={{borderTopColor: 'black', fontSize: '12pt'}}> 
-            {exercise.name}: {exercise.sets}x{exercise.reps}<br/>
-            {/* exercise.note */}
-          </CardText>
-        )
+    // console.log(workoutData)
+    Object.keys(workoutData).reverse().map((phase,i)=>{
+      let workouts = []
+      let week1 =0
+      let week2= 0
+      //HACKY: better way to do this
+      if (i===0) {
+        week1 = 1
+        week2 = 2
+      } else if (i===1) {
+        week1 = 3
+        week2 = 4
+      } else if (i===2) {
+        week1 = 5
+        week2 = 6
+      } else if (i===3) {
+        week1 = 7
+        week2 = 8
       }
 
-      workouts.push(
-        <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
-          <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-            <CardTitle><h5>{workout.title}</h5></CardTitle>
-            {exercises}
-        </CardBody>
-      </Card>)
-    }
+      workoutData[phase].map((workout,k)=>{
+        let exercises = []
 
-    return workouts
+        workout.exercises.map((exercise, j)=>{
+          if (exercise) //HACK: Accidentally made null exercises in form
+            exercises.push(
+                    <CardText key={j} style={{borderTopColor: 'black', fontSize: '12pt'}}> 
+                      {exercise.name}: {exercise.sets}x{exercise.reps}<br/>
+                      {/* exercise.note */}
+                    </CardText>
+                  )
+          })
+
+          workouts.push(
+          <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
+            <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+              <CardTitle><h5>{workout.title}</h5></CardTitle>
+              {exercises}
+            </CardBody>
+          </Card>)
+
+      })
+
+      phases.push(
+        <>
+          <Label size='lg'><strong>Weeks {week1} and {week2}</strong> </Label>
+          {workouts}
+        </>
+      )
+      
+    })
+
+
+    // for(let workout of workoutData){
+    //   let exercises = []
+
+    //   for(let exercise of workout.exercises){
+    //     
+    //   }
+
+    //   workouts.push(
+    //     <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
+    //       <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+    //         <CardTitle><h5>{workout.title}</h5></CardTitle>
+    //         {exercises}
+    //     </CardBody>
+    //   </Card>)
+    // }
+    
+
+    return phases
   }
 
   /**
@@ -311,9 +377,9 @@ class TrainingDash extends Component {
 
     let category = trainingPlan['category']
     let name = trainingPlan['name']
-    let numWorkouts = trainingPlan['workoutData'].length
+    let numWorkouts = trainingPlan['workoutData'][0].length
     
-    return <span>{`${name} is a training plan that requires `} <b> {`${numWorkouts} days`} </b> per week.</span>
+    return <span>{`${name} is a training plan that requires `} <b> {'3-5 days'} </b> per week.</span>
   }
 
   /**
@@ -332,8 +398,8 @@ class TrainingDash extends Component {
     let numWorkouts = trainingPlan['workoutData'].length
     
     return <>
-    <span>{`${name} is a training plan that requires `} <b> {`${numWorkouts} days`} </b> per week.</span><br/>
-      <span>{`Select ${numWorkouts} days to workout on.`}</span>
+    <span>{`${name} is a training plan that requires `} <b> {'3-5 days'} </b> per week.</span><br/>
+      <span>{'Select 3-5 days to workout on.'}</span>
     </>
   }
 
@@ -346,10 +412,12 @@ class TrainingDash extends Component {
     return (
         <>
         <Label size='lg' >
-          This training plan is comprised of these workouts:
+          This training plan is comprised of these phases:
         </Label>
-        <Row className='justify-content-center'>
+        <Row className='justify-content-center' style={{maxHeight:'40vh', overflowY:'scroll'}}>
         {this.renderWorkouts()}
+        </Row>
+        <Row className='justify-content-center'>
         <Label size='lg' >
           {daySplitMessage}
         </Label>
@@ -361,9 +429,13 @@ class TrainingDash extends Component {
             return <Button 
               active={this.state.daysSelected[day]} 
               color={'dark'} 
-              onClick={() => {
-                if(this.state.numDaysSelected >= this.props.plans[this.state.activeIndex]['workoutData'].length){
-                  this.toggleSelectedDay(this.state.lastDaySelected)
+              onClick={async () => {
+                if(this.state.numDaysSelected >= 5
+                  // this.props.plans[this.state.activeIndex]['workoutData'].length
+                  ){
+                    // console.log('UNSELECT')
+                  await this.toggleSelectedDay(this.state.lastDaySelected)
+                  this.toggleSelectedDay(day)
                 }
                 else{
                   this.toggleSelectedDay(day)
@@ -405,7 +477,8 @@ class TrainingDash extends Component {
           color='dark' 
           style={{marginTop: '10px'}}
           onClick={() => {
-            this.props.initTrainingPlan({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.daysSelected, template: this.props.plans[this.state.activeIndex]._id})
+            // console.log({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.daysSelected, template: this.props.plans[this.state.activeIndex]._id, mapper:this.state.trainingDates})
+            this.props.initTrainingPlan({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.trainingDates, template: this.props.plans[this.state.activeIndex]._id })
           }}>
             Set Training Plan
         </Button>
@@ -453,14 +526,14 @@ class TrainingDash extends Component {
   }
 
   render() {
-    // console.log(this.props,this.state)
+    console.log(this.state.trainingDates)
     return (
       <Col md="10"
         style={{minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
         padding: '10px',
         marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
       >
-        {/* <Jumbotron> //Temp hidden for plan loading
+        <Jumbotron> 
           {this.props.profile ? this.planWall() : null}
           <Collapse isOpen={this.state.planningStage >= 1}>
             {this.renderAvailableDays()}
@@ -468,11 +541,11 @@ class TrainingDash extends Component {
           <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
             {this.renderTrainingPlanSchedule()}
           </Collapse>
-        </Jumbotron> */}
-        <Jumbotron>
+        </Jumbotron>
+        {/* <Jumbotron>
           <h4>Training Plan selection will be available starting Wednesday. <br/><br/>
           We want to offer you a variety of quality options to test and try out!</h4>
-        </Jumbotron>
+        </Jumbotron> */}
       </Col>
     )
   }
