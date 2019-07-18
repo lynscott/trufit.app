@@ -21,11 +21,16 @@ import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrash
 
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
+import * as Sentry from '@sentry/browser'
+import { keysToEventMessage } from '@sentry/utils'
+import keys from './config/keys'
+
 
 // HACK: console.log suppression on production build.
 // WARNING: We need to eject the app in order to do this the RIGHT way!!!! This is not secure.
 if (process.env.NODE_ENV !== 'development') {
   console.log = () => {}
+  Sentry.init({dsn: keysToEventMessage.sentry})
 }
 
  

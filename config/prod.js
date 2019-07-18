@@ -9,5 +9,6 @@ module.exports = {
   sendGridKey: process.env.SENDGRID,
   secret: process.env.SECRET,
   accessList: process.env.PRE_ACCESS_LIST,
-  slackWebHook: process.env.SLACK_WEBHOOK
+  slackWebHook: process.env.SLACK_WEBHOOK,
+  sentryServer: process.env.SENTRY_SERVER
 };
