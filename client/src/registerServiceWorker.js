@@ -75,6 +75,9 @@ function registerValidSW(swUrl, config) {
                   'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
               )
 
+              alert( 'New content is available and will be used when all ' +
+              'tabs for this page are closed. -Team TruFit.ai')
+
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration)
@@ -92,7 +95,7 @@ function registerValidSW(swUrl, config) {
             }
           }
         }
-      };
+      }
     })
     .catch(error => {
       console.error('Error during service worker registration:', error)
@@ -124,6 +127,7 @@ function checkValidServiceWorker(swUrl, config) {
       console.log(
         'No internet connection found. App is running in offline mode.'
       )
+      alert('No internet connection found. App is running in offline mode.')
     })
 }
 
