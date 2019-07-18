@@ -30,7 +30,6 @@ const app = express()
 const fetch = require('node-fetch')
 fetch.Promise = require('bluebird')
 
-const planTest = require('./planTest')
 
 
 if (process.env.NODE_ENV) {//if prod force use of key switcher
@@ -220,7 +219,7 @@ app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 
   const allPlans = await models.PlanTemplates.find()
-  res.send([planTest])
+  res.send(allPlans)
 })
 
 //TODO: Refactor for less queries
