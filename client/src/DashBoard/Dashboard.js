@@ -344,7 +344,10 @@ class Dashboard extends Component {
               <ListGroup >
                 {Object.keys(this.props.activePlan.days[0]).map((key,i)=>{
                   if (this.props.activePlan.days[0][key]) {
-                    return <ListGroupItem color={'dark'} key={i}>{key}</ListGroupItem>
+                    return <ListGroupItem color={'dark'} key={i}>
+                              {new Date(key).toLocaleDateString()} <br/>
+                              {this.props.activePlan.days[0][key].title}
+                              </ListGroupItem>
                   }
                 })}
               </ListGroup>
@@ -408,7 +411,7 @@ class Dashboard extends Component {
 
 
   render() {
-    // console.log(this.props, 'full layout')
+    console.log(this.props.activePlan, 'full layout')
 
     return (
       <Col
