@@ -30,6 +30,7 @@ const app = express()
 const fetch = require('node-fetch')
 const Sentry = require('@sentry/node')
 fetch.Promise = require('bluebird')
+// const planTest = process.env.NODE_ENV ? null : require('./planTest')
 
 //TODO: Clean and SPLIT this file up!
 
