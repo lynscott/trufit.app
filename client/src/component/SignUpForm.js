@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { signUpUser, resetSignUpFail } from '../actions'
 // import Alert from 'react-s-alert'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Tooltip, Input, Button, Media, Alert } from 'reactstrap'
+import { Tooltip, Input, Button, Media, Alert, Collapse } from 'reactstrap'
 import Fade from 'react-reveal/Fade'
 import TypeList from '../containers/types'
 import TypeDetail from '../containers/type_detail'
@@ -22,7 +22,7 @@ class SignUpForm extends Component {
       tooltipOpen: false,
       tooltip2: false,
       page: 1,
-      nextBtn: false,
+      nextBtn: true,
       activeType: null,
       visible: this.props.signUpFail
     }
@@ -30,25 +30,25 @@ class SignUpForm extends Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     // console.log(prevProps, 'prev props')
-    if (prevProps.activeType !== this.props.activeType) {
-      this.setState({ activeType: true })
-    }
+    // if (prevProps.activeType !== this.props.activeType) {
+    //   this.setState({ activeType: true })
+    // }
 
-    // if ((!this.props.activeType || this.props.activeType === '') && this.state.activeType === true)
-    //   this.setState({activeType:false, nextBtn:false})
+    // if (this.props.activeType && (prevState.activeType !== this.props.activeType) && !this.state.nextBtn)
+    //   this.setState({ nextBtn:true})
 
-    if (prevProps.values && this.props.values) {
-      if (prevProps.values !== this.props.values) {
-        if (
-          this.props.values.email !== undefined &&
-          this.props.values.name !== undefined &&
-          this.props.values.password2 !== undefined &&
-          this.state.activeType
-        ) {
-          this.setState({ nextBtn: true })
-        }
-      }
-    }
+    // if (prevProps.values && this.props.values) {
+    //   if (prevProps.values !== this.props.values) {
+    //     if (
+    //       // this.props.values.email !== undefined &&
+    //       // this.props.values.name !== undefined &&
+    //       // this.props.values.password2 !== undefined &&
+    //       this.state.activeType
+    //     ) {
+    //       this.setState({ nextBtn: true })
+    //     }
+    //   }
+    // }
   }
 
 
@@ -123,7 +123,7 @@ class SignUpForm extends Component {
         <TypeList />
         <br />
         <TypeDetail />
-        {field.input.onChange(this.props.activeType.type)}
+        {/* {field.input.onChange(this.props.activeType.type)} */}
         <div className="invalid-feedback">
           {field.meta.touched ? field.meta.error : ''}
         </div>
@@ -184,7 +184,7 @@ class SignUpForm extends Component {
 
   render() {
     const { handleSubmit, values } = this.props
-    // console.log(this.props)
+    console.log(this.props)
 
     return (
       <form
@@ -201,6 +201,7 @@ class SignUpForm extends Component {
           {this.props.errorMessage}
         </Alert>
         
+        <Collapse isOpen={!this.props.signUpSuccess}>
         {/* <h2>*Sign up is temporarily disabled to prepare for service launch!*</h2> */}
         <FontAwesomeIcon icon="user-plus" size={'2x'} />
         <h3>Create An Account</h3>
@@ -362,6 +363,9 @@ class SignUpForm extends Component {
             Submit
           </button>
         )}
+
+        </Collapse>
+
       </form>
     )
   }
