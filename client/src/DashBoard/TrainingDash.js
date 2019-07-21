@@ -28,7 +28,6 @@ import {
   CardSubtitle, CardBody
 } from 'reactstrap'
 
-// const localizer = momentLocalizer(moment)
 const DAYS_ENUM = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const SELECTED_DAYS_INIT = {'Monday': false, 'Tuesday': false, 'Wednesday': false, 'Thursday': false, 'Friday': false, 'Saturday': false, 'Sunday': false}
 
@@ -51,7 +50,8 @@ class TrainingDash extends Component {
       result:[],
       SUPER_HACK_CALENDAR_RERENDER_STATE: false,
       trainingDates: {},
-      changePlan:false
+      changePlan:false,
+      activePlan: null
     }
 
     // Reference to calendar for dumb hacks.
@@ -77,42 +77,27 @@ class TrainingDash extends Component {
     }
 
     // State restoration from user profile
-    // if(prevProps.activePlan !== this.props.activePlan && this.state.changePlan === false){
-    //   // TODO: Change the backend to not return an array.
-    //   let activeIndex = this.getActiveIndexFromObjectId(this.props.activePlan.template)
-    //   let daysSelected = this.props.activePlan.days[0]
-    //   let numDaysSelected = this.getNumberOfDaysSelected(daysSelected)
-    //   let lastDaySelected = (() => {for(let i = 0; i < 7; i++) if(daysSelected[DAYS_ENUM[i]]) return DAYS_ENUM[i]})() // lol. HACK
-    //   let planningStage = 3
+    if(prevProps.activePlan !== this.props.activePlan && this.state.changePlan === false){
+      // TODO: Change the backend to not return an array.
+      let activeIndex = this.getActiveIndexFromObjectId(this.props.activePlan.template)
+      let activePlan = this.props.activePlan
+      // let daysSelected = this.props.activePlan.days[0]
+      // let numDaysSelected = this.getNumberOfDaysSelected(daysSelected)
+      // let lastDaySelected = (() => {for(let i = 0; i < 7; i++) if(daysSelected[DAYS_ENUM[i]]) return DAYS_ENUM[i]})() // lol. HACK
+      let planningStage = -1
 
-    //   this.setState({daysSelected, numDaysSelected, planningStage, activeIndex, lastDaySelected})
-    // }
+      this.setState({ planningStage, activePlan})
+    }
+
+    if (prevState.planningStage !== this.state.planningStage && this.state.planningStage ===0) {
+        this.setState({activePlan:null, activeIndex:-1})      
+    }
 
     if (this.state.daysSelected !== prevState.daysSelected) {
       console.log('called')
       this.mapDatesToWorkoutsToDay()
     }
 
-    /*
-    if (this.state.daysSelected.length !== prevState.daysSelected.length) {
-      console.log('REG CHANGE', prevState.daysSelected.length, this.state.daysSelected.length)
-      let result = []
-      this.state.daysSelected.map(dayKey=>{
-        let start = moment('2019-07-15'), // July. 15th
-        end   = moment('2019-09-13'), // Sept. 13th
-        day   = dayKey                    // Monday
-  
-        console.log(dayKey, 'KEY')
-        let current = start.clone()
-  
-        while (current.day(7 + day).isBefore(end)) {
-          result.push({title:day,start: new Date(current.clone()), 
-            allDay:true, end: new Date(current.day(0+day))})
-        }
-      })
-      this.setState({result:result})
-    }
-    */
   }
 
   /**
@@ -139,7 +124,6 @@ class TrainingDash extends Component {
         end   = moment(MAX_DATE.toDateString()), // Sept. 15th
         day   = start.day()                  // Should always be the same
 
-        console.log(start.toDate(), 'START')
         let current = start.clone()
 
         let dayToTrainingMap = this.getDaysToTrainingMap()
@@ -148,7 +132,6 @@ class TrainingDash extends Component {
         let mapper = (phase, current) => this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[current.day()]]]
         
         //Map through days of plan
-        // console.log(current.toDate(), 'DATE')
         let i = 0
         while (current.add(7, 'd').isBefore(end)) {
           let phase = ''
@@ -156,7 +139,8 @@ class TrainingDash extends Component {
           // edge case for the first day occurrence
           if (i === 0) current = start
 
-          //Set the phase to grab workouts from based on date
+          //Set the phase to grab workouts from based on date ranges.
+          //This should be changed in the future
           if ((current.month() <= 7 && current.date() < 19) || current.month() ===6) {
             phase = 'p1'
           } else if (current.date()=== 5 && current.month() === 7) {
@@ -165,15 +149,9 @@ class TrainingDash extends Component {
             phase = 'p3'
           }
 
-          console.log( current.toDate(), 'MAIN FUNC', start.toDate())
-
-          
-          
           i ++
           //update the state of plans to map
           await this.setState({trainingDates:{...this.state.trainingDates, [current.toDate()]:mapper(phase, current)}})
-
-          // current = current.add(7)
           
         }
       }
@@ -225,24 +203,24 @@ class TrainingDash extends Component {
    * Toggle all days.
    * DEPRECATED
    */
-  toggleAllDays = () => {
-    let daysSelected = {...this.state.daysSelected}
-    let planningStage = 2 // this.state.anyDaySelected ? 1 : 2 // Go to previous stage or next stage.
-    let numDaysSelected = this.state.anyDaySelected ? 0 : Object.keys(this.state.daysSelected).length
+  // toggleAllDays = () => {
+  //   let daysSelected = {...this.state.daysSelected}
+  //   let planningStage = 2 // this.state.anyDaySelected ? 1 : 2 // Go to previous stage or next stage.
+  //   let numDaysSelected = this.state.anyDaySelected ? 0 : Object.keys(this.state.daysSelected).length
 
-    if(this.state.anyDaySelected){
-      for(let day of Object.keys(daysSelected)){
-        daysSelected[day] = false
-      }
-    }
-    else{
-      for(let day of Object.keys(daysSelected)){
-        daysSelected[day] = true
-      }
-    }
+  //   if(this.state.anyDaySelected){
+  //     for(let day of Object.keys(daysSelected)){
+  //       daysSelected[day] = false
+  //     }
+  //   }
+  //   else{
+  //     for(let day of Object.keys(daysSelected)){
+  //       daysSelected[day] = true
+  //     }
+  //   }
 
-    this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
-  }
+  //   this.setState({anyDaySelected: !this.state.anyDaySelected, daysSelected, planningStage, numDaysSelected})
+  // }
 
   /**
    * Check to see whether or not a certain date should be disabled.
@@ -295,24 +273,14 @@ class TrainingDash extends Component {
       let dayToTrainingMap = this.getDaysToTrainingMap()
       let phase = ''
       
-      // console.log(date)
 
-      //HACK: Strictly for beta test range and Clean up function into a selector
+      //HACK: Strictly for beta test range and 
       if ((date.getMonth() <= 7 && date.getDate() < 19) || date.getMonth() ===6) {
         phase = 'p1'
-        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
-        // console.log('p1 map', mapper)
       } else if (date.getDate()=== 5 && date.getMonth() === 7) {
         phase = 'p2'
-        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
-        // console.log('p2 map', mapper)
       } else {
         phase = 'p3'
-        let mapper = this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]]
-        // this.setState({trainingDates:{...this.state.trainingDates, [date]:mapper}})
-        // console.log('p3 map', mapper)
       }
 
       return <p>{this.props.plans[this.state.activeIndex]['workoutData'][0][phase][dayToTrainingMap[DAYS_ENUM[date.getDay()]]].title}</p>
@@ -339,6 +307,42 @@ class TrainingDash extends Component {
       </Col>
     )
   }
+
+  /**
+   * Detail view of a selected plan
+   *
+   * @memberof TrainingDash
+   */
+  renderPlanDetailView = () => {
+    
+    if (this.state.activePlan)
+      return (
+        <Collapse isOpen={this.state.activePlan}>
+        {this.state.planningStage === -1 ? <h3 ><strong>Current Plan</strong> </h3> : null}
+        <Media className='row p-4 justify-content-center' >
+          <Media className='col-md-12 justify-content-center' > 
+            {/* Will use placeholder image for now */}
+            <Media style={{display:'block'}}><img height='200px' width='200px' style={{borderRadius:'10px'}}
+            src=' https://cloud-cube.s3.amazonaws.com/fsh57utbg0z9/public/tf1.png' /></Media>
+          </Media>
+          <Media body className='col-md-8'>
+            <Media heading>
+              {this.state.activePlan.name}
+            </Media>
+            <p>{this.state.activePlan.description}</p>
+
+            {/* Give button functionality and look for plan creation and plan cancel */}
+            <Button color={this.state.planningStage === 0 ? 'dark':'warning' }
+                onClick={()=>this.setState({planningStage: this.state.planningStage === 0 ? 1:
+                  this.state.planningStage === 1 ? -1 : 0 }) }>
+                 {this.state.planningStage === 0 ? 'Start Plan ': 'Cancel Plan'}</Button>
+
+          </Media>     
+        </Media>
+        </Collapse>
+      )
+  }
+
 
   /**
    * Render all the workouts for the selected training plan.
@@ -385,10 +389,10 @@ class TrainingDash extends Component {
           })
 
           workouts.push(
-          <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
+          <Card className='workout-card' style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
             <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
               <CardTitle><h5>{workout.title}</h5></CardTitle>
-              {exercises}
+              {/* {exercises} */}
             </CardBody>
           </Card>)
 
@@ -402,23 +406,6 @@ class TrainingDash extends Component {
       )
       
     })
-
-
-    // for(let workout of workoutData){
-    //   let exercises = []
-
-    //   for(let exercise of workout.exercises){
-    //     
-    //   }
-
-    //   workouts.push(
-    //     <Card style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
-    //       <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-    //         <CardTitle><h5>{workout.title}</h5></CardTitle>
-    //         {exercises}
-    //     </CardBody>
-    //   </Card>)
-    // }
     
 
     return phases
@@ -468,43 +455,43 @@ class TrainingDash extends Component {
     if(this.state.activeIndex < 0 || !this.props.plans) return
 
     let daySplitMessage = this.buildTrainingSplitMessage(this.state.activeIndex)
+    
 
     return (
         <>
-        <Label size='lg' >
-          This training plan is comprised of these phases:
-        </Label>
-        <Row className='justify-content-center' style={{maxHeight:'40vh', overflowY:'scroll'}}>
-        {this.renderWorkouts()}
-        </Row>
-        <Row className='justify-content-center'>
-        <Label size='lg' >
-          {daySplitMessage}
-        </Label>
-        <ButtonGroup size={'lg'} className='m-3'
-          vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
+          <Label size='lg'>This training plan is comprised of these phases:</Label>
 
-          {/* NOT IN USE <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button> */}
-          {Object.keys(SELECTED_DAYS_INIT).map((day,i)=>{
-            return <Button 
-              active={this.state.daysSelected[day]} 
-              color={'dark'} 
-              onClick={async () => {
-                if(this.state.numDaysSelected >= 5
-                  // this.props.plans[this.state.activeIndex]['workoutData'].length
-                  ){
-                    // console.log('UNSELECT')
-                  await this.toggleSelectedDay(this.state.lastDaySelected)
-                  this.toggleSelectedDay(day)
-                }
-                else{
-                  this.toggleSelectedDay(day)
-                }
-              }}>{day}
-            </Button>
-            })}
-          </ButtonGroup>
-        </Row>
+          <Row className='justify-content-center' style={{maxHeight:'40vh', overflowY:'scroll'}}>
+            {this.renderWorkouts()}
+          </Row>
+
+          <Row className='justify-content-center'>
+            <Label size='lg' >{daySplitMessage}</Label>
+
+            <ButtonGroup size={'lg'} className='m-3'
+              vertical={!(this.props.windowWidth > FULL_LAYOUT_WIDTH)}>
+
+              {/* NOT IN USE <Button active={this.state.anyDaySelected} color={'dark'} onClick={this.toggleAllDays}>Any day</Button> */}
+              {Object.keys(SELECTED_DAYS_INIT).map((day,i)=>{
+                return <Button 
+                  active={this.state.daysSelected[day]} 
+                  color={'dark'} 
+                  onClick={async () => {
+                    if(this.state.numDaysSelected >= 5
+                      // this.props.plans[this.state.activeIndex]['workoutData'].length
+                      ){
+                        // console.log('UNSELECT')
+                      await this.toggleSelectedDay(this.state.lastDaySelected)
+                      this.toggleSelectedDay(day)
+                    }
+                    else{
+                      this.toggleSelectedDay(day)
+                    }
+                  }}>{day}
+                </Button>
+                })}
+              </ButtonGroup>
+          </Row>
         </>
     )
   }
@@ -536,9 +523,10 @@ class TrainingDash extends Component {
           disabled={this.state.planningStage < 3} 
           color='dark' 
           style={{marginTop: '10px'}}
-          onClick={() => {
+          onClick={async () => {
             // console.log({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.daysSelected, template: this.props.plans[this.state.activeIndex]._id, mapper:this.state.trainingDates})
-            this.props.initTrainingPlan({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.trainingDates, template: this.props.plans[this.state.activeIndex]._id })
+            await this.props.initTrainingPlan({end_date: MAX_DATE, start_date: MIN_DATE, days: this.state.trainingDates, template: this.props.plans[this.state.activeIndex]._id })
+            this.setState({planningStage:-1})
           }}>
             Set Training Plan
         </Button>
@@ -561,7 +549,7 @@ class TrainingDash extends Component {
             this.setState({activeIndex: -1, planningStage: 0, daysSelected: SELECTED_DAYS_INIT, anyDaySelected: false, numDaysSelected: 0})
           }
           else{
-            this.setState({activeIndex: i, planningStage: 1})
+            this.setState({activeIndex: i, activePlan:plan})
           } }} >
           <CardTitle>{plan.name}</CardTitle>
           <CardSubtitle className='muted'>Category: {plan.category}</CardSubtitle>
@@ -577,10 +565,11 @@ class TrainingDash extends Component {
     return (
       <>
         <Label size='lg' >
-          <strong>Training Manager</strong>
+         <h2> <strong>Training Manager</strong></h2>
+         <h5>Select a plan</h5>
         </Label>
         <Collapse isOpen={this.state.activePlan !==null}>
-          <Button className='mb-2' onClick={()=>this.setState({changePlan:true, daysSelected:SELECTED_DAYS_INIT})} color='info'>Change Training Plan</Button>
+          {/* <Button className='mb-2' onClick={()=>this.setState({changePlan:true, daysSelected:SELECTED_DAYS_INIT})} color='info'>Change Training Plan</Button> */}
         </Collapse>
         <CardColumns className='plan-wall bg-black p-3'>
           {plans}
@@ -591,26 +580,42 @@ class TrainingDash extends Component {
   }
 
   render() {
-    console.log(this.state.trainingDates, this.state.daysSelected)
+    console.log( this.state)
     return (
       <Col md="10"
         style={{minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
         padding: '10px',
         marginLeft: this.props.windowWidth > FULL_LAYOUT_WIDTH ? this.props.sidebarWidth : 0}}
       >
-        <Jumbotron> 
-          {this.props.profile ? this.planWall() : null}
-          <Collapse isOpen={this.state.planningStage >= 1}>
-            {this.renderAvailableDays()}
-          </Collapse>
-          <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
-            {this.renderTrainingPlanSchedule()}
-          </Collapse>
-        </Jumbotron>
-        {/* <Jumbotron>
-          <h4>Training Plan selection will be available starting Wednesday. <br/><br/>
-          We want to offer you a variety of quality options to test and try out!</h4>
-        </Jumbotron> */}
+        {this.state.planningStage > 0 ? //After plan selected -> planning phases
+        
+          <Jumbotron>
+            {this.renderPlanDetailView()}
+
+            {/* Show days */}
+            <Collapse isOpen={this.state.planningStage >= 1}>
+              {this.renderAvailableDays()}
+            </Collapse>
+
+            {/* Show calendar */}
+            <Collapse className='training-plan-schedule' isOpen={this.state.planningStage >= 2}>
+              {this.renderTrainingPlanSchedule()}
+            </Collapse>
+          </Jumbotron>
+
+          : this.state.planningStage === -1 ? //Return view, plan already selected
+            <Jumbotron>
+              {/* Show detail view when one is selected */}
+              {this.renderPlanDetailView()}
+            </Jumbotron> 
+
+          : //Beginning view
+            <Jumbotron>
+              {/* Show plan list */}
+              {this.props.plans ? this.planWall() : null}
+              {/* Show detail view when one is selected */}
+              {this.renderPlanDetailView()}
+            </Jumbotron> }
       </Col>
     )
   }

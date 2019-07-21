@@ -22,7 +22,6 @@ import { faUserCircle, faUserPlus, faInfoCircle, faTools, faMinusCircle, faTrash
 import { ConnectedRouter } from 'connected-react-router'
 import * as registerServiceWorker  from './registerServiceWorker'
 import * as Sentry from '@sentry/browser'
-import { keysToEventMessage } from '@sentry/utils'
 import keys from './config/keys'
 
 
@@ -30,10 +29,11 @@ import keys from './config/keys'
 // WARNING: We need to eject the app in order to do this the RIGHT way!!!! This is not secure.
 if (process.env.NODE_ENV !== 'development') {
   console.log = () => {}
-  Sentry.init({dsn: keysToEventMessage.sentry})
+  Sentry.init({dsn: keys.sentry})
+  Sentry.captureMessage('Prod Test')
 }
 
- 
+
 export const history = createBrowserHistory()
 
 history.listen(_ => {

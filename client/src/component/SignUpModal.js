@@ -15,6 +15,16 @@ class SignUpModal extends Component {
           aria-hidden="true"
         >
           <div className="modal-dialog" role="document">
+          {/* <div className="modal-header">
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div> */}
             <div className="modal-content">
               {/* <div className="modal-header">
                 <button
@@ -43,8 +53,8 @@ class SignUpModal extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default SignUpModal;
+export default SignUpModal
