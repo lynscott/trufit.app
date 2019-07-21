@@ -40,9 +40,9 @@ if (process.env.NODE_ENV) {//if prod force use of key switcher, we should probab
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
   Sentry.init({ dsn: keys.sentryServer })
 
-  Sentry.configureScope((scope) => {
-    scope.setUser({"email": req.user.email});
-  })
+  // Sentry.configureScope((scope) => {
+  //   scope.setUser({"email": req.user.email});
+  // })
 
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler())
