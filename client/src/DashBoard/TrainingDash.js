@@ -389,10 +389,10 @@ class TrainingDash extends Component {
           })
 
           workouts.push(
-          <Card className='workout-card' style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
+          <Card className='workout-card text-white' style={{maxWidth: '300px', margin: '10px', height: '100%'}}>
             <CardBody style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
               <CardTitle><h5>{workout.title}</h5></CardTitle>
-              {/* {exercises} */}
+              {exercises}
             </CardBody>
           </Card>)
 
