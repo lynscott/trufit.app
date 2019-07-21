@@ -56,7 +56,7 @@ const BarChart = ({ display, calories, planned, todaysIntake }) => {
               borderWidth: 1,
               hoverBackgroundColor: ' rgba(117, 200, 171, 0.4)', //'rgba(130, 128, 128,0.4)',
               hoverBorderColor: 'rgba(117, 200, 171, 1)',
-              data: [ planned, todaysIntake, Math.abs(planned-todaysIntake)]
+              data: [ planned, todaysIntake, todaysIntake-planned]
             }
           ]
         }}
@@ -277,7 +277,7 @@ class Dashboard extends Component {
   }
 
   renderOverviewWall = () => {
-    console.log(this.props.profile.nutritionCalories)
+    // console.log(this.props.profile.nutritionCalories)
     let { protein, fat, carb } = this.props.profile.macros
     return (
       <CardColumns className="card-wall mt-4">
@@ -338,8 +338,7 @@ class Dashboard extends Component {
             { this.props.activePlan ? 
             <>
               <CardText>
-              Active Training Plan: {this.props.activePlan.templateData? 
-              this.props.activePlan.templateData.name : null}
+              Active Training Plan: { this.props.activePlan.name }
               </CardText>
               <CardText> Next Workout </CardText>
               <ListGroup >

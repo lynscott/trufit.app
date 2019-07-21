@@ -40,15 +40,19 @@ if (process.env.NODE_ENV) {//if prod force use of key switcher, we should probab
   mongoose.connect(keys.mongoURI, { useMongoClient: true })
   Sentry.init({ dsn: keys.sentryServer })
 
+  Sentry.configureScope((scope) => {
+    scope.setUser({"email": req.user.email});
+  })
+
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler())
   
 } else {
   //Local testing
-  mongoose.connect('mongodb://localhost:27017')
-
+  // mongoose.connect('mongodb://localhost:27017')
+  
   //Dev/Prod backend connections
-  // mongoose.connect(keys.mongoURI, { useMongoClient: true })
+  mongoose.connect(keys.mongoURI, { useMongoClient: true })
 }
 
 sgMail.setApiKey(keys.sendGridKey)
@@ -238,8 +242,8 @@ app.get('/api/active_training_plan', async (req, res, next) => {
     let activePlan = await models.Plans.findOne({_id:prof.activePlan})
     // console.log(activePlan, 'ACTIVE')
     let template = await models.PlanTemplates.findOne({_id:activePlan.template})
-    // console.log(template)
-    res.send({...activePlan._doc, templateData:activePlan.days})
+    console.log(template, 'TEMPLATE FOUND?')
+    res.send({...activePlan._doc, name:template.name, description:template.description })
   } catch (error) {
     res.send(null)
   } 
@@ -436,10 +440,15 @@ app.get('/api/logout', (req, res) => {
   res.redirect('/')
 })
 
+app.get('/api/debug-sentry', function mainHandler(req, res) {
+  throw new Error('My first Sentry error!')
+})
+
 app.get('/api/beta_users', async (req, res, next) => {
   // requireLogin(req, res, next)
   let betas = await models.BetaUsers.find()
-  // console.log(betas)
+  let emailList = betas.map(beta=>beta.Email)
+  // console.log(emailList)
   // req.session = null;
   res.send(betas)
 })
@@ -731,7 +740,7 @@ app.post('/api/signup', async (req, res, next) => {
       } 
     })
   } catch (error) {
-    return res.status(401).send(error)
+    return res.status(500).send(error)
   }
   
 
@@ -750,21 +759,19 @@ app.post('/api/signup', async (req, res, next) => {
 
   //TEMP Access list check
   // console.log(process.env)
-  // if (process.env.NODE_ENV) {
-  //   let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
-  //       // console.log(beta, email)
-  //       if (beta.length === 0) {
-  //         return true 
-  //       }
-  //       else {
-  //         return false
-  //       }
-  //     })
+  if (process.env.NODE_ENV) {
+    let accessDenied = await models.BetaUsers.find({Email:email}, (err, beta)=>{
+        console.log(beta)
+        if (beta.length === 0) {
+          return true 
+        }
+        else {
+          return false
+        }
+      })
 
-  //   if (accessDenied) {
-  //       return res.status(401).send({ message: 'Hey There! SignUp is only open for Beta Testers at the moment, come back soon!' })
-  //   }
-  // }
+    
+  }
   
   const findBMR = () => {
     let inToCm = height * 2.54 //190.54
