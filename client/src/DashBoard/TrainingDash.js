@@ -23,7 +23,7 @@ import {
   Collapse,
   Input,
   Button,
-  Media, ButtonGroup,
+  Media, ButtonGroup, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText,
   Jumbotron, Card, CardImg, CardTitle, CardText, CardColumns,
   CardSubtitle, CardBody
 } from 'reactstrap'
@@ -314,6 +314,32 @@ class TrainingDash extends Component {
    * @memberof TrainingDash
    */
   renderPlanDetailView = () => {
+
+    let getNextWorkout = () =>{
+      let eMap = []
+      let day = Object.keys(this.state.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
+      if (!day) return <ListGroupItemText>Rest Day</ListGroupItemText>
+      else {
+        this.state.activePlan.days[0][day].exercises.map(e=>{
+          console.log(e,)
+          if (e) {
+            eMap.push(
+              <>
+                <ListGroupItem className='bg-dark text-white'><strong>{e.name}</strong>{ ': ' + e.sets + ' x ' + e.reps}</ListGroupItem>
+                <ListGroupItem className='mb-2'>{e.note}</ListGroupItem>
+              </>
+            )
+          }
+        })
+      }
+
+      return(
+        <ListGroup>
+            <ListGroupItemHeading>Next Workout: {new Date(day).toDateString()}</ListGroupItemHeading>
+            {eMap}
+        </ListGroup>
+      )
+    }
     
     if (this.state.activePlan)
       return (
@@ -334,11 +360,12 @@ class TrainingDash extends Component {
             {/* Give button functionality and look for plan creation and plan cancel */}
             <Button color={this.state.planningStage === 0 ? 'dark':'warning' }
                 onClick={()=>this.setState({planningStage: this.state.planningStage === 0 ? 1:
-                  this.state.planningStage === 1 ? -1 : 0 }) }>
+                  this.state.planningStage === 1 ? -1 : 0, activePlan:this.props.activePlan }) }>
                  {this.state.planningStage === 0 ? 'Start Plan ': 'Cancel Plan'}</Button>
 
           </Media>     
         </Media>
+        { this.state.planningStage === -1 ? getNextWorkout()  :null}
         </Collapse>
       )
   }
@@ -580,7 +607,7 @@ class TrainingDash extends Component {
   }
 
   render() {
-    console.log( this.state)
+    console.log( this.state.activePlan, this.props.activePlan)
     return (
       <Col md="10"
         style={{minHeight: this.props.windowWidth > FULL_LAYOUT_WIDTH ? '100vh' : null,
