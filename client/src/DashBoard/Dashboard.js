@@ -4,7 +4,7 @@ import { withRouter, Link } from 'react-router-dom'
 import * as actions from '../actions'
 import classnames from 'classnames'
 import Stats from './UserStats'
-import DashCalendar from './DashCalendar'
+import TrainingTracker from './TrainingTracker'
 // import PoseNet from '../component/PoseNet'
 import NutritionTable from './NutritionTable'
 import {COLLAPSE_TRIGGER_WIDTH, FULL_LAYOUT_WIDTH, DOUBLE_TAP_HACK_HANDLER} from '../constants/Layout'
@@ -34,7 +34,7 @@ import {
   DropdownItem,
   CardColumns,
   CardImg, Spinner, ListGroup, ListGroupItem,
-  CardSubtitle
+  CardSubtitle, Modal, ModalHeader, ModalBody, ModalFooter,
 } from 'reactstrap'
 import './Sidebar.scss'
 import './DashBoard.scss'
@@ -334,7 +334,7 @@ class Dashboard extends Component {
           <CardHeader >Training Schedule</CardHeader>
           <CardBody>
             {/* <CardTitle>Training Schedule</CardTitle> */}
-            {/* <DashCalendar /> */}
+            {/* <TrainingTracker /> */}
             { this.props.activePlan ? 
             <>
               <CardText>
