@@ -244,6 +244,7 @@ app.get('/api/active_training_plan', async (req, res, next) => {
     let template = await models.PlanTemplates.findOne({_id:activePlan.template})
     console.log(template, 'TEMPLATE FOUND?')
     res.send({...activePlan._doc, name:template.name, description:template.description })
+    // res.send({...activePlan._doc, days:activePlan.days })
   } catch (error) {
     res.send(null)
   } 
