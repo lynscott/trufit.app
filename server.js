@@ -458,6 +458,39 @@ app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => 
   res.redirect('/')
 })
 
+
+
+app.get('/api/user_workout_data', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
+
+  UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
+    if (err) {
+      return err
+    }
+
+    console.log(req.body)
+
+    // If the user has a profile set the plan accordingly.
+    if (profile) {
+      models.Plans.findOne({_id:profile.activePlan}, async (err, plan) =>{
+        if (err) {
+          return err
+        }
+
+        if(plan) {
+          res.status(200).send(plan.stats)
+        }
+      })
+      
+    } else {
+      return res.send(500, { error: 'no profile found' })
+    }
+  })
+
+})
+
 //START POSTS
 
 //Authenticate User locally then supply jwt
@@ -608,7 +641,40 @@ app.post('/api/new_meal', async (req, res) => {
   res.status(200).send('Success')
 })
 
+app.post('/api/workout_tracker', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' });
+  }
 
+  UserProfile.findOne({ _user: req.user.id }, (err, profile) => {
+    if (err) {
+      return err
+    }
+
+    console.log(req.body, 'WORKOUT DATA')
+
+    // If the user has a profile set the plan accordingly.
+    if (profile) {
+      models.Plans.findOne({_id:profile.activePlan}, async (err, plan) =>{
+        if (err) {
+          return err
+        }
+
+        if(plan) {
+          let arr = [plan.stats]
+          arr.push(req.body)
+          plan.stats = arr
+          await plan.save()
+          res.status(200).send('Success')
+        }
+      })
+      
+    } else {
+      return res.send(500, { error: 'no profile found' })
+    }
+  })
+
+})
 
 app.post('/api/log_meal', async (req, res) => {
   if (!req.user) {
@@ -631,21 +697,7 @@ app.post('/api/log_meal', async (req, res) => {
     }
 
   })
-  // await models.Meals.findOne({_id:id}, (err, meal) => {
-  //   // console.log(meal.completions, meal)
-  //   if (err) {
-  //     return err
-  //   }
 
-  //   if (meal) {
-  //     let arr = meal.completions
-  //     arr.push(new Date(timestamp))
-  //     meal.completions = arr
-  //     meal.save()
-  //     res.status(200).send('Success')
-  //   }
-
-  // })
 })
 
 app.post('/api/new_workout', async (req, res) => {

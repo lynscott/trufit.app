@@ -45,6 +45,9 @@ export const INIT_NEW_USER_TRAINING_PLAN = 'INIT_NEW_USER_TRAINING_PLAN'
 export const INIT_NEW_USER_TRAINING_PLAN_FAILED = 'INIT_NEW_USER_TRAINING_PLAN_FAILED'
 export const ADD_NEW_BETA = 'ADD_NEW_BETA'
 
+export const SEND_TRACKER_DATA_SUCCESS = 'SEND_TRACKER_DATA_SUCCESS'
+
+
 
 //Remove form prod
 const API_KEY = 'I2TVQAcEbt0u34UC4BnjUdiSxSMJlrTxnTLBgcoh'
@@ -443,4 +446,16 @@ export const setSideBarWidth = (width) => async dispatch => {
 
   if (width !== undefined)
     dispatch({type:SET_SIDEBAR_WIDTH, payload:width})
+}
+
+export const sendWorkoutTrackerData = (values) => async dispatch => {
+
+  try {
+    await axios.post('/api/workout_tracker', values)
+    dispatch({type: SEND_TRACKER_DATA_SUCCESS})
+  } catch (error) {
+    console.log(error)
+    dispatch({type: 'SEND_TRACKER_DATA_FAILED', payload:'Error Occured'+ error})
+  }
+  
 }
