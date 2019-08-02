@@ -33,7 +33,7 @@ import {
   DropdownMenu,
   DropdownItem,
   CardColumns,
-  CardImg, Spinner, ListGroup, ListGroupItem,
+  CardImg, Spinner, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText,
   CardSubtitle, Modal, ModalHeader, ModalBody, ModalFooter,
 } from 'reactstrap'
 import './Sidebar.scss'
@@ -333,24 +333,15 @@ class Dashboard extends Component {
         <Card>
           <CardHeader >Training Schedule</CardHeader>
           <CardBody>
-            {/* <CardTitle>Training Schedule</CardTitle> */}
-            {/* <TrainingTracker /> */}
+
             { this.props.activePlan ? 
             <>
-              <CardText>
+              {/* <CardText>
               Active Training Plan: { this.props.activePlan.name }
-              </CardText>
-              <CardText> Next Workout </CardText>
-              <ListGroup >
-                {Object.keys(this.props.activePlan.days[0]).reverse().map((key,i)=>{
-                  if (this.props.activePlan.days[0][key] && i < 1) {//Hack to temp show the next three dates
-                    return <ListGroupItem color={'dark'} key={i}>
-                              {new Date(key).toLocaleDateString()} <br/>
-                              {this.props.activePlan.days[0][key].title}
-                              </ListGroupItem>
-                  }
-                })}
-              </ListGroup>
+              </CardText> */}
+              {/* <CardText> Next Workout </CardText> */}
+              {this.getNextWorkout()}
+              <TrainingTracker />
             </>
             :
             <>
@@ -382,6 +373,37 @@ class Dashboard extends Component {
         </Card>
 
       </CardColumns>
+    )
+  }
+
+  getNextWorkout = () =>{
+    let eMap = []
+    let day = Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
+    if (!day) return <ListGroupItemText>Rest Day</ListGroupItemText>
+    else {
+      this.props.activePlan.days[0][day].exercises.map(e=>{
+        console.log(e,)
+        if (e) {
+          eMap.push(
+            <>
+              <ListGroupItem className='bg-dark text-white'><strong>{e.name}</strong>{ ': ' + e.sets + ' x ' + e.reps}</ListGroupItem>
+              <ListGroupItem className='mb-2'>{e.note}</ListGroupItem>
+            </>
+          )
+        }
+      })
+    }
+
+    return(
+      <ListGroup>
+          <Label><h4>Your Next Workout</h4></Label>
+          <ListGroupItemText>{this.props.activePlan.days[0][day].title + ': ' + new Date(day).toLocaleDateString('en-US', {
+            day: 'numeric',
+            weekday: 'short',
+            month: 'short',
+            year: 'numeric'
+          })}</ListGroupItemText>
+      </ListGroup>
     )
   }
 

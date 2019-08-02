@@ -3,20 +3,28 @@ import moment from 'moment'
 
 import * as actions from '../actions'
 import { connect } from 'react-redux'
-import { formatMealTime} from './NutritionDash'
+import Timer from 'react-compound-timer'
 
-import { Card, Button, CardTitle, CardText, Row, Col,
-   Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { Fade, Button, Collapse, CardText, Badge, Col, Input, ListGroupItem, ListGroupItemText, ButtonGroup, Label,
+  InputGroup, InputGroupAddon, InputGroupText, ListGroup, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 
 const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
+
 
 class TrainingTracker extends Component {
   constructor(props){
     super(props)
 
     this.state = {
-      nextWorkout: null
+      nextWorkout: null,
+      trackerData: {},
+      trackerOpen: false,
+      tracker: null,
+      workoutStarted: false,
+      workoutEnded: false,
+      workoutTime: 0,
+      workoutName: null
     }
   }
 
@@ -25,107 +33,137 @@ class TrainingTracker extends Component {
     this.props.fetchActiveTrainingPlan()
   }
 
-  getMonday = () => {
-    let d = new Date()
-    let day = d.getDay(),
-        diff = d.getDate() - day + (day == 0 ? -6:1), // adjust when day is sunday
-        newDate = new Date(d.setDate(diff))
-    return newDate
+  startWorkout = () => {
+    this.setState({trackerOpen:!this.state.trackerOpen})
   }
 
 
-  eventCard = ({ event })  => {
-    return (
-      <span className='text-center event-card-div' style={{textAlign:'center', backgroundColor:'green'}}>
-        <strong>{event.title}</strong>
-        {/* {event.desc && ':  ' + event.desc} */}
-      </span>
+
+  setNextWorkout = () =>{
+    let eMap = []
+    let day = Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
+
+    let updateData = (workout, value, type, set) => { //Assumes you won't do the same exercise twice in a workout
+      let name = workout.split(' ').join('_')
+      let trackerData = this.state.trackerData
+      if (!trackerData[name]) trackerData[name] = {}
+      if (!trackerData[name][set]) trackerData[name][set] = {}
+      trackerData[name][set][type] = value
+      this.setState({trackerData})
+    }
+
+    if (!day) return {}
+    else {
+      
+      this.props.activePlan.days[0][day].exercises.map((e,k)=>{
+        if (e) {
+          eMap.push(
+            <>
+              
+                <ListGroupItem style={{borderRadius:'10px'}} className='bg-dark text-white m-2'>
+
+                  <h6><strong>{e.name}</strong>{ ': ' + e.sets + ' x ' + e.reps}</h6>
+                  { e.note?  <p className='mb-0'>Exercise note: {e.note}</p> : null }
+
+                  <Button color='light' size='sm' className='mb-2'
+                    onClick={()=>this.setState({tracker: this.state.tracker === k?null:k})}>Track Stats</Button>
+
+                  <Collapse isOpen={this.state.tracker===k}>
+                    {[...Array(parseInt(e.sets)).keys()].map(i=>{
+                      return(  
+                        <>
+                          <Label className='m-0'><strong>Set #{i+1}</strong></Label>
+                          <InputGroup className='my-2'>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>Weight Used(lb)</InputGroupText>
+                            </InputGroupAddon>
+                            <Input onChange={(event)=> updateData(e.name, event.target.value, 'weight',i+1)} placeholder='(optional)'/>
+                          </InputGroup>
+                          <InputGroup className='mb-3'>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>Reps Achieved </InputGroupText>
+                            </InputGroupAddon>
+                            <Input onChange={(event)=> updateData(e.name, event.target.value, 'reps', i+1)} placeholder='(optional)'/> 
+                          </InputGroup>
+                        </>)
+                    })}
+                  </Collapse> 
+                  
+                </ListGroupItem>
+                
+            </>
+          )
+        }
+      })
+    }
+
+    return(
+      <ListGroup>
+          <ListGroupItemText className='mb-0'><h3>{this.props.activePlan.days[0][day].title }</h3></ListGroupItemText>
+          {eMap}
+
+          <Collapse isOpen={this.state.workoutStarted} tag="h5" className="mt-2">
+            <ListGroupItemText>
+              <Label>Timer</Label>
+              <h4><Badge color="info" id='timer' pill>
+                <Timer id='timer'>  <Timer.Hours /> hr : <Timer.Minutes /> min : <Timer.Seconds /> sec </Timer>
+              </Badge></h4>
+            </ListGroupItemText>
+          </Collapse>
+
+          <ButtonGroup  className='justify-content-center'>
+            <Button onClick={()=>{
+              this.setState({ workoutStarted:true, workoutName:this.props.activePlan.days[0][day].title})
+              }} color='success'>Start Workout</Button>
+            <Button onClick={()=>this.sendTrackerData()} color='danger'>End Workout</Button>
+          </ButtonGroup>
+      </ListGroup>
     )
   }
 
-  clock = () => {
-      let list = []
-      let dates = Object.keys(this.props.activePlan.days[0])
-      
 
-      let gooday = dates.map(date=>{
-        let today = moment()
-        // console.log(moment(date), 'DATE')
-        if (moment(date).isBetween(today, today.add(7, 'days'))) {
-          return date
-        }
-      })
-      console.log(gooday)
-      return gooday
-      // Map the difference between now and meal time for every meal
-      // dates.map((date, i)=>{
-      //   list.push( Math.abs(formatMealTime(date, false) - new Date()) )
-      // })
+  sendTrackerData = async () => {
+    let totalTime = document.getElementById('timer').innerText //HACK:
+    let workoutData = {
+      workoutName: this.state.workoutName,
+      date: new Date(),
+      totalTime,
+      trackerData: this.state.trackerData
+    }
 
-      // // Find the index of the minimum difference, which is the next meal
-      // if (formatMealTime(dates[list.indexOf(Math.min(...list))], false) > new Date()) {
-      //   let index = list.indexOf(Math.min(...list))
-      //   return formatMealTime(dates[index], false)
-        
-      // } else {
-      //   let index = list.length -1//list.indexOf(Math.min(...list)) 
-      //   return formatMealTime(dates[index], false)
-      // }
-      
-    
+    console.log(workoutData)
+    await this.props.sendWorkoutTrackerData(workoutData)
+    alert('Workout completed!')
+    this.setState({trackerOpen:false})
   }
 
 
-  nextWorkout = () => {
+  /**
+   *
+   *
+   * @memberof TrainingTracker
+   */
+  renderTracker = () => {
     return (
-          <Modal isOpen={this.state.startWorkout} toggle={this.startWorkoutTrigger}>
+          <Modal isOpen={this.state.trackerOpen} toggle={this.startWorkout}>
             <ModalBody>
-
+              {/* {For loop here of current workout sets/reps/ note and optional place to fill in weights/reps achieved } */}
+              {this.props.activePlan ? this.setNextWorkout() : null}
             </ModalBody>
             <ModalFooter style={{padding:'0.5rem'}}>
-              <Button color="dark" onClick={this.signup}>End Workout</Button>
+              <Button color="secondary" onClick={()=>this.setState({trackerOpen:false})}>Cancel</Button>
             </ModalFooter>
           </Modal>  
     )
   }
 
 
-  formatDate = () => {
-    // let weekStart = this.getMonday
-    let planEvents = []
-    for (let i = 0; i < this.props.plan.template.weeks.length; i++) {
-      
-      for (let j = 0; j < weekArray.length; j++) {
-        // console.log('array started')
-        let weekStart = this.getMonday()
-        let event = {
-          title: this.props.plan.template.weeks[i].day[weekArray[j]].type,
-          start: weekStart.setDate(weekStart.getDate() + j ),
-          end: weekStart.setDate(weekStart.getDate() + 0),
-          allDay: false,
-          workout: this.props.plan.template.weeks[i].day[weekArray[j]]
-        }
-        // console.log(event)
-        planEvents.push(event)
-        weekStart = this.getMonday()
-        if (new Date(event.start).getDate() === new Date().getDate()) {
-          this.state.nextWorkout = event
-        }
-        
-      }
-
-      
-    }
-    // this.state.nextWorkout = planEvents[0]
-    // console.log(planEvents)
-    return planEvents
-  }
-
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <React.Fragment>
-        {this.props.activePlan ? this.clock(): null}
+        {this.renderTracker()}
+        <Button onClick={()=>this.setState({trackerOpen:true})}>View Workout</Button>
       </React.Fragment>
 
     )
