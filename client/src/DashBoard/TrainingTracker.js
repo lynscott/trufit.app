@@ -52,7 +52,7 @@ class TrainingTracker extends Component {
       this.setState({trackerData})
     }
 
-    if (!day) return {}
+    if (!day) return <h5>Rest Up!</h5>
     else {
       
       this.props.activePlan.days[0][day].exercises.map((e,k)=>{
