@@ -5,7 +5,7 @@ import * as actions from '../actions'
 import { connect } from 'react-redux'
 import Timer from 'react-compound-timer'
 
-import { Fade, Button, Collapse, CardText, Badge, Col, Input, ListGroupItem, ListGroupItemText, ButtonGroup, Label,
+import { Row, Button, Collapse, CardText, Badge, Col, Input, ListGroupItem, ListGroupItemText, ButtonGroup, Label,
   InputGroup, InputGroupAddon, InputGroupText, ListGroup, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 
@@ -24,7 +24,8 @@ class TrainingTracker extends Component {
       workoutStarted: false,
       workoutEnded: false,
       workoutTime: 0,
-      workoutName: null
+      workoutName: null,
+      activeDay: null
     }
   }
 
@@ -38,8 +39,13 @@ class TrainingTracker extends Component {
   }
 
 
+  getWorkoutDayOrUndefined = () => {
+    return Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
+  }
 
-  setNextWorkout = () =>{
+
+
+  setNextWorkout = () =>{ //TODO: Refactor to include modal 
     let eMap = []
     let day = Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
 
@@ -54,7 +60,6 @@ class TrainingTracker extends Component {
 
     if (!day) return {}
     else {
-      
       this.props.activePlan.days[0][day].exercises.map((e,k)=>{
         if (e) {
           eMap.push(
@@ -65,7 +70,7 @@ class TrainingTracker extends Component {
                   <h6><strong>{e.name}</strong>{ ': ' + e.sets + ' x ' + e.reps}</h6>
                   { e.note?  <p className='mb-0'>Exercise note: {e.note}</p> : null }
 
-                  <Button color='light' size='sm' className='mb-2'
+                  <Button color={this.state.tracker === k ? 'warning' : 'light'} size='sm' className='mb-2'
                     onClick={()=>this.setState({tracker: this.state.tracker === k?null:k})}>Track Stats</Button>
 
                   <Collapse isOpen={this.state.tracker===k}>
@@ -98,11 +103,17 @@ class TrainingTracker extends Component {
     }
 
     return(
-      <ListGroup>
-          <ListGroupItemText className='mb-0'><h3>{this.props.activePlan.days[0][day].title }</h3></ListGroupItemText>
+      <ListGroup style={{maxHeight:'50vh', overflowY:'scroll'}}>
           {eMap}
+      </ListGroup>
+    )
+  }
 
-          <Collapse isOpen={this.state.workoutStarted} tag="h5" className="mt-2">
+  renderWorkoutStart = () => {
+    let day = Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
+    return (
+      <Row>
+        <Collapse isOpen={this.state.workoutStarted} tag="h5" className="mt-2 col-md">
             <ListGroupItemText>
               <Label>Timer</Label>
               <h4><Badge color="info" id='timer' pill>
@@ -111,13 +122,13 @@ class TrainingTracker extends Component {
             </ListGroupItemText>
           </Collapse>
 
-          <ButtonGroup  className='justify-content-center'>
+          <ButtonGroup  className='justify-content-center col-md'>
             <Button onClick={()=>{
               this.setState({ workoutStarted:true, workoutName:this.props.activePlan.days[0][day].title})
               }} color='success'>Start Workout</Button>
             <Button onClick={()=>this.sendTrackerData()} color='danger'>End Workout</Button>
           </ButtonGroup>
-      </ListGroup>
+      </Row>
     )
   }
 
@@ -146,12 +157,14 @@ class TrainingTracker extends Component {
   renderTracker = () => {
     return (
           <Modal isOpen={this.state.trackerOpen} toggle={this.startWorkout}>
+            {/* <ModalHeader toggle={this.startWorkout}>{<h3>{this.props.activePlan.days[0][this.getWorkoutDayOrUndefined()].title }</h3>}</ModalHeader> */}
             <ModalBody>
               {/* {For loop here of current workout sets/reps/ note and optional place to fill in weights/reps achieved } */}
               {this.props.activePlan ? this.setNextWorkout() : null}
             </ModalBody>
             <ModalFooter style={{padding:'0.5rem'}}>
-              <Button color="secondary" onClick={()=>this.setState({trackerOpen:false})}>Cancel</Button>
+              {this.getWorkoutDayOrUndefined() ? this.renderWorkoutStart() : null}
+              {/* <Button color="secondary" onClick={()=>this.setState({trackerOpen:false})}>Cancel</Button> */}
             </ModalFooter>
           </Modal>  
     )
