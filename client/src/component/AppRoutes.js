@@ -42,6 +42,7 @@ const loadFromPath = (loaderCallBack) => Loadable({
   timeout: 5000
 })
 
+
 const Home = loadFromPath(() => import('./App'))
 const About = lazy(() => import('./About'))
 const DashSideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
@@ -121,6 +122,8 @@ class AppRoutes extends Component {
   authCheckOrRedirect = componentRendererFunc => {
     // Required for asynchronous authentication.
     // You must handle the authentication race condition on direct routes.
+    return () => <Redirect to="/" />
+    
     if(this.props.isAuthenticating){
       return () => <Spinner  color='dark' />
     }
