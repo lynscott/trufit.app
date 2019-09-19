@@ -16,7 +16,8 @@ import './App2.scss'
 
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, 
+  Card, CardBody, CardTitle, CardSubtitle, CardText, CardImg } from 'reactstrap'
 
 
 class App extends Component {
@@ -30,7 +31,6 @@ class App extends Component {
       signup: false
     }
 
-    this.sendEmail = this.sendEmail.bind(this)
     this.toggle = this.toggle.bind(this)
     this.signup = this.signup.bind(this)
   }
@@ -60,14 +60,18 @@ class App extends Component {
     // }
   }
 
-  sendEmail(name, email, text) {//DEPRECATED
-    fetch('/email', {
-      method: 'post',
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
-      body: JSON.stringify({ name: name, email: email, text: text })
-    }).then(res => res.json())
+  renderInfoBlock = () => {
+    return(
+      <Card>
+        <CardImg top width="100%" src="/assets/318x180.svg" alt="Card image cap" />
+        <CardBody>
+          <CardTitle>Card title</CardTitle>
+          <CardSubtitle>Card subtitle</CardSubtitle>
+          <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText>
+          <Button>Button</Button>
+        </CardBody>
+      </Card>
+    )
   }
 
   render() {
@@ -84,12 +88,12 @@ class App extends Component {
                 <img src={require("./images/FT1-01-T.png")} style={{maxWidth:300,minWidth:10,marginBottom:0}} />
               </h1>
               <div className="arrow bounce"><a className="fa fa-arrow-down fa-2x"></a></div>
-              <Button className='mb-3 MainButton' color="info" onClick={this.signup}>GET STARTED</Button>
+              <Button className='mb-3 MainButton' color="info" onClick={this.signup}>Coming Soon</Button>
             </Fade>
             <div className='row pt-3' >
               <Fade top delay={1000}>
 
-                <Modal isOpen={this.state.signup} toggle={this.signup}>
+                <Modal isOpen={false} toggle={this.signup}>
                   <ModalBody>
                     <SignUpForm closeForm={this.signup}/>
                   </ModalBody>
@@ -98,7 +102,7 @@ class App extends Component {
                   </ModalFooter>
                 </Modal>   
   
-                <Modal isOpen={this.state.modal} toggle={this.toggle}>
+                <Modal isOpen={false} toggle={this.toggle}>
                   <ModalHeader toggle={this.toggle}>Welcome Back!
                   </ModalHeader>
                   <ModalBody>

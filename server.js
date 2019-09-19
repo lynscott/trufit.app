@@ -14,7 +14,7 @@ const models = require('./models/index')
 const cookieSession = require('cookie-session')
 const requireLogin = require('./middlewares/requireLogin')
 const fs = require('fs')
-const pdf = require('html-pdf')
+// const pdf = require('html-pdf')
 const sgMail = require('@sendgrid/mail')
 const stripe = require('stripe')(keys.stripeSecret)
 const mongoose = require('mongoose')
@@ -497,8 +497,11 @@ app.get('/api/user_workout_data', async (req, res) => {
 app.post('/api/signin', passport.authenticate('local', { session: true }), async (req, res, next) => {
   // console.log('inside logg')
   //Remove password before sending user
-  req.user.password = ''
-  res.send({ token: tokenForUser(req.user), user: req.user })
+  //Temp disable signin
+  res.send({ token: null, user: null})
+
+  // req.user.password = ''
+  // res.send({ token: tokenForUser(req.user), user: req.user })
 })
 
 // Slack Feedback
@@ -651,7 +654,7 @@ app.post('/api/workout_tracker', async (req, res) => {
       return err
     }
 
-    console.log(req.body, 'WORKOUT DATA')
+    // console.log(req.body, 'WORKOUT DATA')
 
     // If the user has a profile set the plan accordingly.
     if (profile) {

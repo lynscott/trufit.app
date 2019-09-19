@@ -29,7 +29,6 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-http-to-https": "^1.1.4",
-    "html-pdf": "^2.2.0",
     "jwt-simple": "^0.5.6",
     "mongoose": "^4.13.18",
     "morgan": "^1.9.1",
