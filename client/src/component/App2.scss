@@ -68,12 +68,12 @@ row, .row{
     min-height: 250px;
 
     .svg-inline--fa {
-        color: #008ed6;
+        color: rgba(10,460,100,0.5);//rgba(237,49,100,0.9);
     }
 }
 
 .section-header{
-    text-decoration: white underline;
+    // text-decoration: white underline;
     font-family: 'Fira Sans', sans-serif;//'Cinzel', serif;
 }
 
@@ -92,13 +92,25 @@ row, .row{
 }
 
 #test-div{
-    border-top: white 3px solid;
-    background-image: linear-gradient(to top, rgba(0, 0, 0, 0), #008ed6);
+    border-top: rgba(237,49,100,0.9) 3px solid;
+    // background-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0,0,0,0));
+    background-color: black;
+    color:white;
     // border-bottom-left-radius:50%;
     // border-bottom-right-radius:50%;
 }
 
 .modal-open{
     padding-right: 0 !important;
+}
+
+.title-head{
+    background-image: url('./images/swirl-unsplash.jpg');
+    opacity:1;
+    background-size: cover;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    // -webkit-filter: grayscale(1);
+    // filter: grayscale(1);
 }
 

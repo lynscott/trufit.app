@@ -78,9 +78,9 @@ class Nav extends Component {
         return <LoadingBar />
       case null:
         return [
-          // <a className="nav-item nav-link px-2" key="1" onClick={this.toggle}>
-          //   Sign-in
-          // </a>,
+          <a className="nav-item nav-link px-2" key="1" onClick={this.toggle}>
+            Sign-in
+          </a>
           // <a className="nav-item nav-link px-2" onClick={this.signup} key="2">
           //   Sign-up
           // </a>
@@ -94,14 +94,14 @@ class Nav extends Component {
           >
             Dashboard
           </Link>,
-          // <a
-          //   onClick={()=>this.props.signOut()}
-          //   key="2"
-          //   id="title"
-          //   className="nav-item nav-link px-2"
-          // >
-          //   Sign-out
-          // </a>
+          <a
+            onClick={()=>this.props.signOut()}
+            key="2"
+            id="title"
+            className="nav-item nav-link px-2"
+          >
+            Sign-out
+          </a>
         ]
     }
   }
