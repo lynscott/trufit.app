@@ -217,11 +217,12 @@ class AppRoutes extends Component {
         <Row className={'main-row bg-white'} style={{margin:0}}>
         <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
-            <Route
+            {/* DEPRECATED: */}
+            {/* <Route
               exact
               path="/dashboard/:userid/plan/:id"
               component={ShowPlan}
-            />
+            /> */}
 
             <Route exact path="/dashboard/overview" render={this.authCheckOrRedirect(this.renderDash)} />
 
@@ -235,7 +236,7 @@ class AppRoutes extends Component {
 
             <Route
               exact
-              path="/admin"
+              path="/dashboard/admin"
               render={this.authCheckOrRedirect(this.renderReactAdmin)}
             />
 

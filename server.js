@@ -30,6 +30,7 @@ const app = express()
 const fetch = require('node-fetch')
 const Sentry = require('@sentry/node')
 fetch.Promise = require('bluebird')
+const sendmail = require('sendmail')()
 // const planTest = process.env.NODE_ENV ? null : require('./planTest')
 
 //TODO: Clean and SPLIT this file up!
@@ -497,8 +498,6 @@ app.get('/api/user_workout_data', async (req, res) => {
 app.post('/api/signin', passport.authenticate('local', { session: true }), async (req, res, next) => {
   // console.log('inside logg')
   //Remove password before sending user
-  //Temp disable signin
-  res.send({ token: null, user: null})
 
   req.user.password = ''
   res.send({ token: tokenForUser(req.user), user: req.user })
@@ -990,14 +989,15 @@ app.post('/api/contactform', async (req, res) => {
   const { affiliation, email } = req.body
   console.log('TEST', email)
   const msg = {
-    to: 'LS Fitness <lynscott@lsphysique.com>', //'lscott@tru-fit.co',
-    from: 'no-reply@trufit.co',
+    to:  'lscott@tru-fit.co',
+    from: 'lscott@tru-fit.co',
     subject: 'New Beta Request',
     text: 'New Requester',
     html: `From: ${email} Affiliation: ${affiliation}`,
   }
   await sgMail.send(msg)
   res.send('200')
+  
 })
 
 app.post('/api/trainingform', async (req, res) => {

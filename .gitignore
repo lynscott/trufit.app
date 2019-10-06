@@ -5,3 +5,4 @@ dev.js
 package-lock.json
 
 planTest.json
+sendgrid.env

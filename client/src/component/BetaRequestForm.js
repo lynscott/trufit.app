@@ -2,18 +2,29 @@ import React, {useState} from "react"
 // import "./App.css";
 import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap"
 import { Form, Field } from "react-final-form"
-import { connect } from 'react-redux'
+import { useDispatch, useSelector  } from 'react-redux'
 import { contactForm } from '../actions'
 import axios from 'axios'
 
 const onSubmit = async (values) => {
-  console.log(values)
-  await axios.post('/api/contactform', values)
+  // console.log(values)
+  
+  
+  // await axios.post('/api/contactform', values)
 }
 
-const RequestForm = () => (
+
+
+
+const RequestForm = () => {
+
+  const pending = useSelector(state => state.emails.pendingBetaRequest)
+  const dispatch = useDispatch()
+  
+
+  return (
   <Form
-    onSubmit={onSubmit}
+    onSubmit={(values)=> dispatch(contactForm(values))}
     validate={values => {
       const errors = {};
       function validateEmail(email) {
@@ -148,23 +159,25 @@ const RequestForm = () => (
           </Field>
         </FormGroup> */}
 
-        <Button type="submit" color="primary" disabled={!valid}>
+        <Button type="submit" color="primary" disabled={!valid || submitting || pending}>
           Submit
         </Button>
       </form>
     )}
-  />
-)
+  />)
+
+}
 
 const FormWithModal = () => {
-    const [openForm, setForm] = useState(false);
+    const [openForm, setForm] = useState(false)
+    const success = useSelector(state => state.emails.successBetaRequest)
     return (
         <>
             <Button className='MainButton'  onClick={()=> setForm(!openForm)} 
                 color="info" >Request Access To Our Private Beta</Button>
             <Modal isOpen={openForm} toggle={()=> setForm(!openForm)}>
                 <ModalHeader toggle={()=> setForm(!openForm)}>Request Beta Access </ModalHeader>
-                <ModalBody> <RequestForm/> </ModalBody>
+                <ModalBody> { success ? 'Request Sent!' : <RequestForm/>} </ModalBody>
                 <ModalFooter style={{padding:'0.5rem'}}>
                     <Button color="secondary" onClick={()=> setForm(!openForm)}>Cancel</Button>
                 </ModalFooter>
@@ -173,4 +186,4 @@ const FormWithModal = () => {
     )
 }
 
-export default (connect(null, { contactForm })(FormWithModal));
+export default FormWithModal
