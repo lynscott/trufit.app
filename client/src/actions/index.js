@@ -1,5 +1,6 @@
 import axios from 'axios'
 import ndb from 'nutrient-database'
+import history from 'react-router'
 // import Alert from 'react-s-alert'
 
 export const TYPE_SELECTED = 'type_selected'
@@ -47,6 +48,10 @@ export const ADD_NEW_BETA = 'ADD_NEW_BETA'
 
 export const SEND_TRACKER_DATA_SUCCESS = 'SEND_TRACKER_DATA_SUCCESS'
 
+export const REQUEST_PENDING = 'REQUEST_PENDING'
+export const REQUEST_SUCCESS = 'REQUEST_SUCCESS'
+
+
 
 
 //Remove form prod
@@ -68,6 +73,7 @@ export function selectPlan(plan) {
 
 export const signOut = () => async dispatch => {
   await axios.get('/api/logout')
+  // history.push('/')
 
   dispatch({ type: 'SIGNOUT_SUCCESS'})
 }
@@ -80,9 +86,16 @@ export const submitBeta = beta => async dispatch => {
 }
 
 export const contactForm = values => async dispatch => {
-  const res = await axios.post('/api/contactform', values)
+  dispatch({type: REQUEST_PENDING})
+  
+  try {
+    await axios.post('/api/contactform', values)
+    dispatch({ type: REQUEST_SUCCESS})
 
-  dispatch({ type: CONTACT, payload: res.data })
+  } catch (error) {
+    alert(error)
+  }
+  
 }
 
 export const trainingForm = (values, callback) => async dispatch => {
