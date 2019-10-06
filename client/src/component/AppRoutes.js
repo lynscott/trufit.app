@@ -122,7 +122,6 @@ class AppRoutes extends Component {
   authCheckOrRedirect = componentRendererFunc => {
     // Required for asynchronous authentication.
     // You must handle the authentication race condition on direct routes.
-    return () => <Redirect to="/" />
     
     if(this.props.isAuthenticating){
       return () => <Spinner  color='dark' />
