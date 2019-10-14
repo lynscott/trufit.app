@@ -11,6 +11,28 @@ import { Row, Button, Collapse, CardText, Badge, Col, Input, ListGroupItem, List
 
 const weekArray = [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ]
 
+/**
+ * startTimer = () => {
+  this.setState({
+    timerOn: true,
+    timerTime: this.state.timerTime,
+    timerStart: Date.now() - this.state.timerTime
+  });
+  this.timer = setInterval(() => {
+    this.setState({
+      timerTime: Date.now() - this.state.timerStart
+    });
+  }, 10);
+};
+
+state = {
+  timerOn: false,
+  timerStart: 0,
+  timerTime: 0
+};
+
+ */
+
 
 class TrainingTracker extends Component {
   constructor(props){
@@ -25,7 +47,10 @@ class TrainingTracker extends Component {
       workoutEnded: false,
       workoutTime: 0,
       workoutName: null,
-      activeDay: null
+      activeDay: null,
+      timerOn: false,
+      timerStart: 0,
+      timerTime: 0
     }
   }
 
@@ -43,7 +68,21 @@ class TrainingTracker extends Component {
     return Object.keys(this.props.activePlan.days[0]).find(date => new Date(date).toDateString() === new Date().toDateString())
   }
 
+  startTimer = async (workoutName) => {
+    await this.setState({
+      timerOn: true,
+      workoutStarted: true,
+      workoutName: workoutName,
+      timerTime: this.state.timerTime,
+      timerStart: Date.now() - this.state.timerTime//moment().subtract( 'seconds', this.state.timerTime.getSecon)
+    })
 
+    this.timer = setInterval(() => {
+      this.setState({
+        timerTime: Date.now() - this.state.timerStart//moment().subtract('seconds', this.state.timerStart.seconds()).format('HH:mm')
+      })
+    }, 10)
+  }
 
   setNextWorkout = () =>{ //TODO: Refactor to include modal 
     let eMap = []
@@ -58,7 +97,7 @@ class TrainingTracker extends Component {
       this.setState({trackerData})
     }
 
-    if (!day) return {}
+    if (!day) return <h5>Rest Up!</h5>
     else {
       this.props.activePlan.days[0][day].exercises.map((e,k)=>{
         if (e) {
@@ -117,16 +156,18 @@ class TrainingTracker extends Component {
             <ListGroupItemText>
               <Label>Timer</Label>
               <h4><Badge color="info" id='timer' pill>
-                <Timer id='timer'>  <Timer.Hours /> hr : <Timer.Minutes /> min : <Timer.Seconds /> sec </Timer>
+                {/* <Timer id='timer'>  <Timer.Hours /> hr : <Timer.Minutes /> min : <Timer.Seconds /> sec </Timer> */}
+                {moment(this.state.timerTime).format('HH:mm')}
               </Badge></h4>
             </ListGroupItemText>
           </Collapse>
 
           <ButtonGroup  className='justify-content-center col-md'>
             <Button onClick={()=>{
-              this.setState({ workoutStarted:true, workoutName:this.props.activePlan.days[0][day].title})
+              this.startTimer(this.props.activePlan.days[0][day].title)
+              // this.setState({  workoutName:this.props.activePlan.days[0][day].title})
               }} color='success'>Start Workout</Button>
-            <Button onClick={()=>this.sendTrackerData()} color='danger'>End Workout</Button>
+            <Button disabled={!this.state.timerOn} onClick={()=>this.sendTrackerData()} color='danger'>End Workout</Button>
           </ButtonGroup>
       </Row>
     )
@@ -142,7 +183,7 @@ class TrainingTracker extends Component {
       trackerData: this.state.trackerData
     }
 
-    console.log(workoutData)
+    // console.log(workoutData)
     await this.props.sendWorkoutTrackerData(workoutData)
     alert('Workout completed!')
     this.setState({trackerOpen:false})
@@ -172,7 +213,7 @@ class TrainingTracker extends Component {
 
 
   render() {
-    // console.log(this.props)
+    console.log(this.state)
     return (
       <React.Fragment>
         {this.renderTracker()}

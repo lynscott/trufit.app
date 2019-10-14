@@ -14,7 +14,7 @@ const models = require('./models/index')
 const cookieSession = require('cookie-session')
 const requireLogin = require('./middlewares/requireLogin')
 const fs = require('fs')
-const pdf = require('html-pdf')
+// const pdf = require('html-pdf')
 const sgMail = require('@sendgrid/mail')
 const stripe = require('stripe')(keys.stripeSecret)
 const mongoose = require('mongoose')
@@ -30,6 +30,7 @@ const app = express()
 const fetch = require('node-fetch')
 const Sentry = require('@sentry/node')
 fetch.Promise = require('bluebird')
+const sendmail = require('sendmail')()
 // const planTest = process.env.NODE_ENV ? null : require('./planTest')
 
 //TODO: Clean and SPLIT this file up!
@@ -497,6 +498,7 @@ app.get('/api/user_workout_data', async (req, res) => {
 app.post('/api/signin', passport.authenticate('local', { session: true }), async (req, res, next) => {
   // console.log('inside logg')
   //Remove password before sending user
+
   req.user.password = ''
   res.send({ token: tokenForUser(req.user), user: req.user })
 })
@@ -651,7 +653,7 @@ app.post('/api/workout_tracker', async (req, res) => {
       return err
     }
 
-    console.log(req.body, 'WORKOUT DATA')
+    // console.log(req.body, 'WORKOUT DATA')
 
     // If the user has a profile set the plan accordingly.
     if (profile) {
@@ -864,7 +866,7 @@ app.post('/api/signup', async (req, res, next) => {
 
     let msg = {
       to: email,
-      from: 'no-reply@LSFitness.com',
+      from: 'no-reply@trufit.co',
       subject: 'Welcome to LS Fitness!',
       text: 'Welcome',
       html: welcomeTemplate(req),
@@ -872,7 +874,7 @@ app.post('/api/signup', async (req, res, next) => {
 
     let alert = {
       to: 'lynscott@lsphysique.com',
-      from: 'no-reply@LSFitness.com',
+      from: 'no-reply@trufit.co',
       subject: 'A New User Has Signed Up!',
       text: name,
       html: emailTemplate(req),
@@ -974,7 +976,7 @@ app.post('/api/freeplans', async (req, res) => {
   const { name, type, person, email } = req.body
   const msg = {
     to: req.body[0].email,
-    from: 'no-reply@LSFitness.com',
+    from: 'no-reply@trufit.co',
     subject: 'Free Training Plan',
     text: req.body[1].name,
     html: freePlanTemplate(req),
@@ -984,22 +986,24 @@ app.post('/api/freeplans', async (req, res) => {
 })
 
 app.post('/api/contactform', async (req, res) => {
-  const { message, subject, email } = req.body
+  const { affiliation, email } = req.body
+  console.log('TEST', email)
   const msg = {
-    to: 'lynscott@lsphysique.com',
-    from: 'no-reply@LSFitness.com',
-    subject: 'New Message!',
-    text: 'New Message',
-    html: emailTemplate(req),
+    to:  'lscott@tru-fit.co',
+    from: 'lscott@tru-fit.co',
+    subject: 'New Beta Request',
+    text: 'New Requester',
+    html: `From: ${email} Affiliation: ${affiliation}`,
   }
   await sgMail.send(msg)
   res.send('200')
+  
 })
 
 app.post('/api/trainingform', async (req, res) => {
   const msg = {
     text: 'Form Below',
-    from: 'no-reply@LSFitness.com',
+    from: 'no-reply@trufit.co',
     to: 'LS Fitness <lynscott@lsphysique.com>',
     subject: 'Training Form Submission',
     html: trainingTemplate(req),

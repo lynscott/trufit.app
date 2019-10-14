@@ -17,7 +17,8 @@ const userSchema = new Schema ({
   startDate: Date,
   provider: String,
   isAdmin: Boolean,
-  isBetaTester: Boolean
+  isBetaTester: Boolean,
+  permissionType: {type: Schema.ObjectId, ref: 'Permissions' }
 });
 
 

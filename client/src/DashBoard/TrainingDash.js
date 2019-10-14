@@ -32,7 +32,7 @@ const DAYS_ENUM = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frid
 const SELECTED_DAYS_INIT = {'Monday': false, 'Tuesday': false, 'Wednesday': false, 'Thursday': false, 'Friday': false, 'Saturday': false, 'Sunday': false}
 
 // HACK: HARD CODED VALUES JUST FOR BETA LAUNCH!
-const MAX_DATE = new Date(2019, 8, 15)
+const MAX_DATE = new Date(2019, 12, 15)
 const MIN_DATE = new Date(2019, 6, 22)
 
 class TrainingDash extends Component {
@@ -385,8 +385,8 @@ class TrainingDash extends Component {
     // console.log(workoutData)
     Object.keys(workoutData).reverse().map((phase,i)=>{
       let workouts = []
-      let week1 =0
-      let week2= 0
+      let week1 = 0
+      let week2 = 0
       //HACKY: better way to do this
       if (i===0) {
         week1 = 1
@@ -428,7 +428,9 @@ class TrainingDash extends Component {
       phases.push(
         <>
           <Label size='lg'><strong>Weeks {week1} and {week2}</strong> </Label>
-          {workouts}
+          <Row style={{overflowX:'scroll'}}>
+            {workouts}
+          </Row>
         </>
       )
       

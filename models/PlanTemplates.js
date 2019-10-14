@@ -16,7 +16,8 @@ const planTemplateSchema = new Schema({
   ratings: [Schema.Types.Mixed],
   difficulty: String,
   video_url: String,
-  socials: [Schema.Types.Mixed]
+  socials: [Schema.Types.Mixed],
+  owner: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 module.exports = mongoose.model('plan_templates', planTemplateSchema);
