@@ -42,6 +42,7 @@ const loadFromPath = (loaderCallBack) => Loadable({
   timeout: 5000
 })
 
+
 const Home = loadFromPath(() => import('./App'))
 const About = lazy(() => import('./About'))
 const DashSideBar = loadFromPath(() => import('../DashBoard/DashSideBar'))
@@ -121,6 +122,7 @@ class AppRoutes extends Component {
   authCheckOrRedirect = componentRendererFunc => {
     // Required for asynchronous authentication.
     // You must handle the authentication race condition on direct routes.
+    
     if(this.props.isAuthenticating){
       return () => <Spinner  color='dark' />
     }
@@ -215,11 +217,12 @@ class AppRoutes extends Component {
         <Row className={'main-row bg-white'} style={{margin:0}}>
         <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
-            <Route
+            {/* DEPRECATED: */}
+            {/* <Route
               exact
               path="/dashboard/:userid/plan/:id"
               component={ShowPlan}
-            />
+            /> */}
 
             <Route exact path="/dashboard/overview" render={this.authCheckOrRedirect(this.renderDash)} />
 
@@ -233,7 +236,7 @@ class AppRoutes extends Component {
 
             <Route
               exact
-              path="/admin"
+              path="/dashboard/admin"
               render={this.authCheckOrRedirect(this.renderReactAdmin)}
             />
 
