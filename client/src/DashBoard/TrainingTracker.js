@@ -156,8 +156,8 @@ class TrainingTracker extends Component {
             <ListGroupItemText>
               <Label>Timer</Label>
               <h4><Badge color="info" id='timer' pill>
-                {/* <Timer id='timer'>  <Timer.Hours /> hr : <Timer.Minutes /> min : <Timer.Seconds /> sec </Timer> */}
-                {moment(this.state.timerTime).format('HH:mm')}
+                <Timer id='timer'>  <Timer.Hours /> hr : <Timer.Minutes /> min : <Timer.Seconds /> sec </Timer>
+                {/* {moment(this.state.timerTime).format('HH:mm')} */}
               </Badge></h4>
             </ListGroupItemText>
           </Collapse>

@@ -164,7 +164,7 @@ class App extends Component {
         <div className="row title-head" id="header">
           <div className="col d-md-block">
             <Fade top>
-            <img src={require("./images/Trufit.png")} className='img-fluid' style={{minWidth:10,marginBottom:0, maxWidth:500}} />
+            <img src={require("./images/Trufit.png")} className='img-fluid' style={{minWidth:10,marginBottom:0, maxWidth:'50vw'}} />
             <div className="arrow bounce"><a className="fa fa-arrow-down fa-2x"></a></div>
               {/* <h5
                 className="main-header p-2"

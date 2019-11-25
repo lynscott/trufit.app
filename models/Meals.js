@@ -6,7 +6,8 @@ const mealSchema = new Schema({
   time: Date, 
   completions: [Date],
   calories: Number,
-  creator: { type: Schema.Types.ObjectId, ref: 'User' }
+  creator: { type: Schema.Types.ObjectId, ref: 'User' },
+  name: String
 });
 
 module.exports = mongoose.model('meal', mealSchema);
