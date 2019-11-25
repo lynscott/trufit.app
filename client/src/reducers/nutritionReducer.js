@@ -1,10 +1,14 @@
-import {FOOD_SEARCH, FOOD_SELECTED, FETCH_MEALS, FETCH_NUTRITION_PLANS } from '../actions'
+import {FOOD_SEARCH, FOOD_SELECTED, FETCH_MEALS, FOOD_FOUND,
+  FETCH_NUTRITION_PLANS, SEARCH_LOADING } from '../actions'
 
 const initialState = {
     searchList: [],
     foodSelected: null,
     userMeals: [],
-    userNutritionPlans: []
+    userNutritionPlans: [],
+    foodLoading: false,
+    foodFound: false,
+    
   }
 
 export default function(state = initialState, action) {
@@ -30,10 +34,22 @@ export default function(state = initialState, action) {
         newMeal: action.payload
       }
     case FETCH_NUTRITION_PLANS:
-        return {
-          ...state,
-          userNutritionPlans: action.payload
-        }
+      return {
+        ...state,
+        userNutritionPlans: action.payload
+      }
+    case SEARCH_LOADING:
+      return {
+        ...state,
+        foodLoading: true
+      }
+      case FOOD_FOUND:
+      return {
+        ...state,
+        foodLoading: false,
+        foodFound:true,
+        foodSelected: action.payload
+      }
   default:
     return state
   }

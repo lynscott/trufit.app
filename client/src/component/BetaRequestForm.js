@@ -4,14 +4,6 @@ import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalHeader, ModalFo
 import { Form, Field } from "react-final-form"
 import { useDispatch, useSelector  } from 'react-redux'
 import { contactForm } from '../actions'
-import axios from 'axios'
-
-const onSubmit = async (values) => {
-  // console.log(values)
-  
-  
-  // await axios.post('/api/contactform', values)
-}
 
 
 
@@ -37,22 +29,7 @@ const RequestForm = () => {
       if (!values.affiliation) {
         errors.affiliation = "Required";
       }
-    //   if (!values.email) {
-    //     errors.email = "Required";
-    //   } else if (!validateEmail(values.email)) {
-    //     errors.email = "Not an email adress";
-    //   }
-    //   if (!values.password) {
-    //     errors.password = "Required";
-    //   }
-    //   if (!values.tos) {
-    //     errors.tos = "Required";
-    //   }
-    //   if (!values.confirmPassword) {
-    //     errors.confirmPassword = "Required";
-    //   } else if (values.confirmPassword !== values.password) {
-    //     errors.confirmPassword = "Does not match";
-    //   }
+
       return errors;
     }}
 
@@ -91,73 +68,6 @@ const RequestForm = () => {
             )}
           </Field>
         </FormGroup>
-        
-        {/* <FormGroup>
-          <Label for="email">Email</Label>
-          <Field name="email">
-            {({ input, meta }) => (
-              <div>
-                <Input
-                  {...input}
-                  type="text"
-                  placeholder="first name"
-                  invalid={meta.error && meta.touched}
-                />
-                {meta.error && meta.touched && <span>{meta.error}</span>}
-              </div>
-            )}
-          </Field>
-        </FormGroup> */}
-
-        {/* <FormGroup>
-          <Label for="password">Password</Label>
-          <Field name="password">
-            {({ input, meta }) => (
-              <div>
-                <Input
-                  {...input}
-                  type="password"
-                  placeholder="password"
-                  invalid={meta.error && meta.touched}
-                />
-                {meta.error && meta.touched && <span>{meta.error}</span>}
-              </div>
-            )}
-          </Field>
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="confirmPassword">Confirm Password</Label>
-          <Field name="confirmPassword">
-            {({ input, meta }) => (
-              <div>
-                <Input
-                  {...input}
-                  type="password"
-                  placeholder="confirm password"
-                  invalid={meta.error && meta.touched}
-                />
-                {meta.error && meta.touched && <span>{meta.error}</span>}
-              </div>
-            )}
-          </Field>
-        </FormGroup>
-
-        <FormGroup check>
-          <Field name="tos" type="checkbox">
-            {({ input, meta }) => (
-              <Label>
-                <Input
-                  {...input}
-                  type="checkbox"
-                  invalid={meta.error && meta.touched}
-                />{" "}
-                Check Me
-                {meta.error && meta.touched && <span>{meta.error}</span>}
-              </Label>
-            )}
-          </Field>
-        </FormGroup> */}
 
         <Button type="submit" color="primary" disabled={!valid || submitting || pending}>
           Submit

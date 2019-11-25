@@ -35,7 +35,7 @@ class NextMeal extends Component {
 
 
   renderNextMeal = () => {
-    console.log(this.props)
+    // console.log(this.props)
     
     if (this.props.userNutritionPlans.length > 0) {
 

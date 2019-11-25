@@ -228,6 +228,40 @@ app.get('/api/meals', async (req, res) => {
   res.send(userMeals)
 })
 
+
+app.post('/api/edit_meal', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  // console.log(req.body)
+  const userMeal = await models.Meals.findOne({ _id: req.body.id })
+  userMeal.items = req.body.meal
+
+  await userMeal.save()
+
+  res.status(200).send('Success')
+})
+
+
+app.post('/api/add_item', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'You must log in!' })
+  }
+  
+  const userMeal = await models.Meals.findOne({ _id: req.body.id })
+  let tempItems = userMeal.items
+  tempItems.push(req.body.food)
+
+  userMeal.items = tempItems
+
+  await userMeal.save()
+
+  res.status(200).send('Success')
+})
+
+
+
+
 app.get('/api/plan_templates', async (req, res, next) => {
   requireLogin(req, res, next)
 

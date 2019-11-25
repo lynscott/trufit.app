@@ -17,7 +17,9 @@ import Nav from './Nav'
 import keys from '../config/keys'
 import ShowPlan from './ShowPlan'
 import * as actions from '../actions'
-import { Container, Row, Fade, Spinner } from 'reactstrap'
+import { Fade, Spinner } from 'reactstrap'
+import Container from '@material-ui/core/Container'
+import Grid from '@material-ui/core/Grid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {isMobileSafari, isSafari, osName, isIOS} from 'react-device-detect'
 import Loadable from 'react-loadable'
@@ -51,6 +53,9 @@ const NutritionDash = loadFromPath(() => import('../DashBoard/NutritionDash'))
 const Admin = loadFromPath(() => import('./Admin'))
 const TrainingDash = loadFromPath(() => import('../DashBoard/TrainingDash'))
 const ReactAdminDash = loadFromPath(() => import('./Admin/ReactAdmin')) 
+const NutritionDashV2 = loadFromPath(() => import('../DashBoard/Nutrition/NutritionDashV2'))
+
+
 
 
 
@@ -139,7 +144,7 @@ class AppRoutes extends Component {
   }
 
   renderNutrition = () => {
-        return <NutritionDash/>
+        return <NutritionDashV2/>
   }
 
   renderPlans = () => {
@@ -210,12 +215,12 @@ class AppRoutes extends Component {
 
   render() {
     return (
-      <Container className='main-container' fluid>
+      <Container style={{padding:0, backgroundColor:'white'}} maxWidth={'xl'} >
         <Route exact path="/" render={this.renderHomeNavigation} />
         <Route exact path="/dashboard" render={() => <Redirect to="/dashboard/overview"/> }/>
 
-        <Row className={'main-row bg-white'} style={{margin:0}}>
-        <Route path="/dashboard" render={this.renderSidebar} />
+        <Grid container >
+          <Route path="/dashboard" render={this.renderSidebar} />
           <Switch>
             {/* DEPRECATED: */}
             {/* <Route
@@ -252,7 +257,7 @@ class AppRoutes extends Component {
 
             <Route exact path="/" component={Home} />
           </Switch>
-        </Row>
+        </Grid>
       </Container>
     )
   }
