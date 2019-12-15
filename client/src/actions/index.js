@@ -52,6 +52,7 @@ export const INIT_NEW_USER_TRAINING_PLAN_FAILED =
 export const ADD_NEW_BETA = 'ADD_NEW_BETA'
 
 export const SEND_TRACKER_DATA_SUCCESS = 'SEND_TRACKER_DATA_SUCCESS'
+export const TOGGLE_WORKOUT_MODE = 'TOGGLE_WORKOUT_MODE'
 
 export const REQUEST_PENDING = 'REQUEST_PENDING'
 export const REQUEST_SUCCESS = 'REQUEST_SUCCESS'
@@ -98,8 +99,9 @@ export const foodSearchV2 = (search, route) => async dispatch => {
         let food = {...nutrientData.data, name: search.food.label}
 
         axios.post('/api/add_item', {food, id: search.id})
+        dispatch({type: 'FOOD_SEARCH_SUCCESS', food})
 
-        console.log(nutrientData.data)
+        console.log(nutrientData.data, 'DT')
     } else {
         const autocompleteURL = `http://api.edamam.com/auto-complete?q=${search}&limit=10&app_id=${APP_ID}&app_key=${API_KEY}`
 
@@ -403,6 +405,7 @@ export const deleteMeal = i => async dispatch => {
     const res = await axios.post('/api/delete_meal', {id: i})
 
     dispatch({type: DELETE_MEAL, payload: res.data})
+    dispatch(fetchMeals())
 }
 
 export const editMeal = (meal, id) => async dispatch => {
@@ -562,5 +565,11 @@ export const sendWorkoutTrackerData = values => async dispatch => {
             type: 'SEND_TRACKER_DATA_FAILED',
             payload: 'Error Occured' + error
         })
+    }
+}
+
+export const workoutModeToggle = () => {
+    return {
+        type: TOGGLE_WORKOUT_MODE
     }
 }
