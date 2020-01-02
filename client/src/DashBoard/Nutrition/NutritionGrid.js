@@ -19,6 +19,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const NutritionTable = ({meal}) => {
+    //TODO: Fix the name edits for edamame meals
     const dispatch = useDispatch()
     const customMeal = {
         name: '',
@@ -28,30 +29,46 @@ const NutritionTable = ({meal}) => {
         carbs: 0,
         protein: 0
     }
-    const [mealState, setMeals] = useState(meal.items)
+    const [mealState, setMeals] = useState([])
+
+    const handleEdit = data => {
+        setMeals(data)
+
+        delete data['tableData']
+        dispatch(editMeal(data, meal._id))
+
+        //NOTE: For now we'll fetch all meals after deleting an item
+        //This would be better if the grid handled individual meal state
+        dispatch(fetchMeals())
+    }
 
     useEffect(() => {
-        setMeals(meal.items)
-    }, [meal])
+        let m = formatNewState(meal.items)
+        setMeals(m)
+    }, [])
+    //Break into individual meal calls for information
+
+    const nutrientSelector = (meal, item) => {
+        if (!meal.totalNutrients[item]) return 0
+        return meal.totalNutrients[item].quantity.toFixed(2)
+    }
+
+    const ingredientSelector = (meal, term) => {
+        return meal.ingredients[0]['parsed'][0][term]
+    }
 
     const formatNewState = meals => {
         if (!meal) return []
         for (let i = 0; i < meals.length; i++) {
-            if ('totalNutrients' in meals[i]) {
-                meals[i].carb = meals[i]['totalNutrients']['CHOCDF'][
-                    'quantity'
-                ].toFixed(2)
-                meals[i].protein = meals[i]['totalNutrients']['PROCNT'][
-                    'quantity'
-                ].toFixed(2)
-                meals[i].fats = meals[i]['totalNutrients']['FAT'][
-                    'quantity'
-                ].toFixed(2)
-                meals[i].name = meals[i]['ingredients'][0]['parsed'][0]['food']
+            if ('totalNutrients' in meals[i] && 'ingredients' in meals[i]) {
+                meals[i].carb = nutrientSelector(meals[i], 'CHOCDF')
+                meals[i].protein = nutrientSelector(meals[i], 'PROCNT')
+                meals[i].fats = nutrientSelector(meals[i], 'FAT')
+                meals[i].name = ingredientSelector(meals[i], 'food')
                 meals[i].serving =
-                    meals[i]['ingredients'][0]['parsed'][0]['quantity'] +
+                    ingredientSelector(meals[i], 'quantity') +
                     ' ' +
-                    meals[i]['ingredients'][0]['parsed'][0]['measure']
+                    ingredientSelector(meals[i], 'measure')
             }
         }
         return meals
@@ -62,19 +79,34 @@ const NutritionTable = ({meal}) => {
             <MaterialTable
                 icons={tableIcons}
                 columns={[
-                    {title: 'Item', field: 'name'},
-                    {title: 'Serving', field: 'serving'},
+                    {title: 'Item Name', field: 'name'},
+                    {title: 'Serving', field: 'serving', editable: 'never'},
                     {
                         title: 'Calories',
                         field: 'calories',
                         type: 'numeric',
-                        readonly: true
+                        editable: 'never'
                     },
-                    {title: 'Fats(g)', field: 'fats', type: 'numeric'},
-                    {title: 'Carbs(g)', field: 'carb', type: 'numeric'},
-                    {title: 'Protein(g)', field: 'protein', type: 'numeric'}
+                    {
+                        title: 'Fats(g)',
+                        field: 'fats',
+                        type: 'numeric',
+                        editable: 'never'
+                    },
+                    {
+                        title: 'Carbs(g)',
+                        field: 'carb',
+                        type: 'numeric',
+                        editable: 'never'
+                    },
+                    {
+                        title: 'Protein(g)',
+                        field: 'protein',
+                        type: 'numeric',
+                        editable: 'never'
+                    }
                 ]}
-                data={formatNewState(mealState)}
+                data={formatNewState(meal.items)}
                 title="Meal Details"
                 options={{
                     selection: false,
@@ -82,7 +114,8 @@ const NutritionTable = ({meal}) => {
                     emptyRowsWhenPaging: false,
                     headerStyle: {backgroundColor: 'black', color: 'white'},
                     grouping: false,
-                    showTitle: false
+                    showTitle: false,
+                    actionsColumnIndex: 6
                 }}
                 editable={{
                     onRowUpdate: (newData, oldData) =>
@@ -92,10 +125,7 @@ const NutritionTable = ({meal}) => {
                                     let data = mealState
                                     let index = data.indexOf(oldData)
                                     data[index] = newData
-                                    setMeals(data)
-
-                                    delete data['tableData']
-                                    dispatch(editMeal(data, meal._id))
+                                    handleEdit(data)
                                     resolve()
                                 }
                                 resolve()
@@ -108,10 +138,7 @@ const NutritionTable = ({meal}) => {
                                     let data = mealState
                                     let index = data.indexOf(oldData)
                                     data.splice(index, 1)
-                                    setMeals(data)
-
-                                    delete data['tableData']
-                                    dispatch(editMeal(data, meal._id))
+                                    handleEdit(data)
                                     resolve()
                                 }
                                 resolve()

@@ -160,23 +160,7 @@ class DashSideBar extends React.Component {
           </div>
 
 
-          <SlackFeedback
-            channel="#user-feedback"
-            errorTimeout={8 * 1000}
-            onClose={() => {}}
-            onOpen={() => {}}
-            sentTimeout={5 * 1000}
-            showChannel={false}
-            showIcon={true}
-            theme={themes.dark}
-            user={this.props.user ? 
-              this.props.user.email + ' ' + this.props.user.name
-            : null}
-            onSubmit={(payload, success, error) => axios.post('/api/send_feedback', payload).then(success).catch(error)
-
-            }//TODO: wire up
-            onImageUpload={(file, success, error) => {}}
-          />
+          
 
           {this.props.profile ?
             this.renderAdminLink()

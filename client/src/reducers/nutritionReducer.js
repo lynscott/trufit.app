@@ -4,7 +4,8 @@ import {
     FETCH_MEALS,
     FOOD_FOUND,
     FETCH_NUTRITION_PLANS,
-    SEARCH_LOADING
+    SEARCH_LOADING,
+    SEARCH_FAILED
 } from '../actions'
 
 const initialState = {
@@ -14,6 +15,7 @@ const initialState = {
     userNutritionPlans: [],
     foodLoading: false,
     foodFound: false,
+    searchFailed: false,
     nutrientData: null
 }
 
@@ -47,7 +49,14 @@ export default function(state = initialState, action) {
         case SEARCH_LOADING:
             return {
                 ...state,
-                foodLoading: true
+                foodLoading: true,
+                searchFailed: false
+            }
+        case SEARCH_FAILED:
+            return {
+                ...state,
+                foodLoading: false,
+                searchFailed: true
             }
         case FOOD_FOUND:
             return {

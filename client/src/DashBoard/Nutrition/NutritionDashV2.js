@@ -19,10 +19,11 @@ const useStyles = makeStyles({
         width: '100%',
         position: 'fixed',
         bottom: 0,
-        top: 'auto'
+        top: 'auto',
+        backgroundColor: 'black',
+        color: 'white'
     },
     mealGrid: {
-        // overflowY: 'scroll',
         height: '100%',
         backgroundColor: 'white',
         padding: '16px'
@@ -33,8 +34,12 @@ const useStyles = makeStyles({
     },
     title: {
         width: '100%'
-        // paddingLeft: '16px'
-        // paddingTop: '16px'
+    },
+    icon: {
+        color: 'white'
+    },
+    iconSeleceted: {
+        color: 'rgb(26, 161, 114)'
     }
 })
 
@@ -42,6 +47,12 @@ export default function NutritionDash() {
     const classes = useStyles()
     const dispatch = useDispatch()
     const [index, setValue] = useState(0)
+
+    const navClass = {
+        root: classes.icon,
+        selected: classes.iconSeleceted,
+        label: classes.icon
+    }
 
     const handleChange = (event, value) => {
         setValue(value)
@@ -64,7 +75,6 @@ export default function NutritionDash() {
                 <Grid>
                     <PlanView />
                 </Grid>
-                {/* <Grid>Stats</Grid>  */}
             </SwipeableViews>
 
             <Grid style={{marginTop: '56px'}} item xs={12}>
@@ -76,15 +86,16 @@ export default function NutritionDash() {
                     showLabels
                     className={classes.root}
                 >
-                    <BottomNavigationAction label="Meals" icon={<Meals />} />
                     <BottomNavigationAction
-                        label="Nutrition Plans"
-                        icon={<Nutrition />}
+                        classes={navClass}
+                        label="Meals"
+                        icon={<Meals className={classes.icon} />}
                     />
-                    {/* <BottomNavigationAction
-                        label="Stats"
-                        icon={<AssessmentIcon />}
-                    /> */}
+                    <BottomNavigationAction
+                        classes={navClass}
+                        label="Nutrition Plans"
+                        icon={<Nutrition className={classes.icon} />}
+                    />
                 </BottomNavigation>
             </Grid>
         </Grid>

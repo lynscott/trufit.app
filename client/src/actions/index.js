@@ -44,6 +44,8 @@ export const CREATE_NUTRITION_PLAN_FAILED = 'CREATE_NUTRITION_PLAN_FAILED'
 export const FETCH_NUTRITION_PLANS = 'FETCH_NUTRITION_PLANS'
 export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
 export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
+export const EDIT_NUTRITION_PLAN = 'EDIT_NUTRITION_PLAN'
+export const EDIT_NUTRITION_PLAN_FAILED = 'EDIT_NUTRITION_PLAN_FAILED'
 
 export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
 export const INIT_NEW_USER_TRAINING_PLAN = 'INIT_NEW_USER_TRAINING_PLAN'
@@ -68,6 +70,7 @@ const APP_ID = '80b7d665'
 const baseURL = 'https://api.edamam.com/api/food-database/parser?'
 const nutrientURL = `https://api.edamam.com/api/food-database/nutrients?app_id=${APP_ID}&app_key=${API_KEY}`
 
+//TODO: Clean up func, well and this file
 export const foodSearchV2 = (search, route) => async dispatch => {
     if (route === parse) {
         dispatch({type: SEARCH_LOADING})
@@ -75,25 +78,33 @@ export const foodSearchV2 = (search, route) => async dispatch => {
         const foodURL = `nutrition-type=logging&ingr=${search}&app_id=${APP_ID}&app_key=${API_KEY}`
 
         const res = await axios.get(baseURL + foodURL)
+        // console.log(res.data)
+        if (res.data) {
+            const parsedFood = res.data.parsed[0]
 
-        const parsedFood = res.data.parsed[0]
-
-        console.log(parsedFood)
-
-        if (!parsedFood) return dispatch({type: SEARCH_FAILED})
-
-        dispatch({type: FOOD_FOUND, payload: parsedFood})
+            console.log(parsedFood)
+            if (parsedFood) dispatch({type: FOOD_FOUND, payload: parsedFood})
+            else dispatch({type: SEARCH_FAILED})
+        } else {
+            dispatch({type: SEARCH_FAILED})
+        }
     } else if (route === nutrient) {
+        if (!('measure' in search.food)) return 'Bad Item Request'
         const foodJSON = {
             ingredients: [
                 {
-                    quantity: search.food.quantity,
-                    measureURI: search.food.measure.url,
-                    foodId: search.food.food.foodId
+                    foodId: search.food.food.foodId,
+                    quantity: search.food.quantity ? search.food.quantity : 1,
+                    measureURI: search.food.measure.uri
                 }
             ]
         }
 
+        // if ('quantity' in search.food) foodJSON.quantity = search.food.quantity
+
+        // foodJSON.ingredients[0].measureURI = search.food.measure.uri
+
+        console.log(search, foodJSON, 'JSON')
         const nutrientData = await axios.post(nutrientURL, foodJSON)
 
         let food = {...nutrientData.data, name: search.food.label}
@@ -330,11 +341,23 @@ export const fetchNutritionPlans = () => async dispatch => {
 
 export const createNutritionPlan = values => async dispatch => {
     try {
-        await axios.post('/api/nutrition_plan', values)
+        await axios.post('/api/create_nutrition_plan', values)
         dispatch({type: CREATE_NUTRITION_PLAN})
     } catch (error) {
         dispatch({
             type: CREATE_NUTRITION_PLAN_FAILED,
+            payload: 'Error Occured' + error
+        })
+    }
+}
+
+export const editNutritionPlan = values => async dispatch => {
+    try {
+        await axios.post('/api/edit_nutrition_plan', values)
+        dispatch({type: EDIT_NUTRITION_PLAN})
+    } catch (error) {
+        dispatch({
+            type: EDIT_NUTRITION_PLAN_FAILED,
             payload: 'Error Occured' + error
         })
     }

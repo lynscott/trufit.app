@@ -11,6 +11,13 @@ html,body{
     border-bottom: #008ed6 3px solid;
 }
 
+.signup-container{
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    top: 65%;
+}
+
 .carousel {
     border-radius: 20px;
 }
@@ -105,12 +112,20 @@ row, .row{
 }
 
 .title-head{
-    background-image: url('./images/swirl-unsplash.jpg');
+    // background-image: url('./images/swirl-unsplash.jpg');
     opacity:1;
-    background-size: cover;
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
+    background-color: black;
+    overflow: hidden;
+    // background-size: cover;
+    // -webkit-backdrop-filter: blur(5px);
+    // backdrop-filter: blur(5px);
+    height: 100vh;
     // -webkit-filter: grayscale(1);
     // filter: grayscale(1);
+}
+
+.fprCaL {
+    position: 'relative' !important;
+    background-color: 'blue';
 }
 

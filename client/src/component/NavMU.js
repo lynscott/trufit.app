@@ -11,9 +11,12 @@ import {
 import PropTypes from 'prop-types'
 import AppBar from '@material-ui/core/AppBar'
 import LoginForm from './LoginForm'
+import SignUpForm from './SignUpForm'
 import Button from '@material-ui/core/Button'
 import * as actions from '../actions'
 import Grid from '@material-ui/core/Grid'
+import SlackFeedback, {themes} from 'react-slack-feedback'
+import axios from 'axios'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Divider from '@material-ui/core/Divider'
@@ -27,7 +30,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import MenuIcon from '@material-ui/icons/Menu'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-import {makeStyles, useTheme} from '@material-ui/core/styles'
+import {makeStyles, useTheme, withStyles} from '@material-ui/core/styles'
 import {useDispatch, useSelector} from 'react-redux'
 import FitnessCenterIcon from '@material-ui/icons/FitnessCenter'
 import HomeIcon from '@material-ui/icons/Home'
@@ -81,6 +84,13 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+const StyledFeedBack = withStyles({
+    fprCaL: {
+        position: 'relative !important',
+        backgroundColor: 'blue'
+    }
+})(SlackFeedback)
+
 const UserMenu = () => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
@@ -88,7 +98,7 @@ const UserMenu = () => {
     const currentUser = useSelector(state => state.auth.user)
     const [signUp, setSignUp] = useState(false)
 
-    const signUpDialog = (
+    const loginDialog = (
         <Dialog
             onClose={() => setSignUp(false)}
             aria-labelledby="simple-dialog-title"
@@ -150,9 +160,24 @@ const UserMenu = () => {
             >
                 Sign In
             </Button>
-            {signUpDialog}
+            {loginDialog}
         </>
     )
+}
+
+{
+    /* <NavItem active={this.props.currentTab === 'admin'}>
+            <Link style={{textDecoration:'none'}} to="/dashboard/admin">
+              <NavLink  onClick={() => {
+                        if (!this.state.collapsed && this.props.windowWidth < COLLAPSE_TRIGGER_WIDTH) {
+                            this.toggleNavbar()
+                        }
+                      }} >
+                  Admin 
+              </NavLink>
+            </Link>
+            </NavItem>
+          </> */
 }
 
 /**
@@ -175,6 +200,28 @@ function NavMUI(props) {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen)
     }
+
+    const slackFeedBack = (
+        <StyledFeedBack
+            channel="#user-feedback"
+            errorTimeout={8 * 1000}
+            onClose={() => {}}
+            onOpen={() => {}}
+            sentTimeout={5 * 1000}
+            showChannel={false}
+            showIcon={true}
+            theme={themes.dark}
+            style={{maxWidth: '300px', position: 'absolute'}}
+            user={currentUser}
+            onSubmit={(payload, success, error) =>
+                axios
+                    .post('/api/send_feedback', payload)
+                    .then(success)
+                    .catch(error)
+            } //TODO: wire up
+            onImageUpload={(file, success, error) => {}}
+        />
+    )
 
     const drawer = (
         <div>
@@ -205,6 +252,7 @@ function NavMUI(props) {
                             <BugReportIcon />
                         </ListItemIcon>
                         <ListItemText primary={text} />
+                        <div className="feedback">{slackFeedBack}</div>
                     </ListItem>
                 ))}
             </List>
@@ -228,7 +276,7 @@ function NavMUI(props) {
                         </IconButton>
                     )}
                     <Typography variant="h6" className={classes.title} noWrap>
-                        TruFit
+                        {/* TruFit */}
                     </Typography>
                     <UserMenu />
                 </Toolbar>

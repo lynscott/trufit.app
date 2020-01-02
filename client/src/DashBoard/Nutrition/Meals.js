@@ -80,9 +80,15 @@ const useStyles = makeStyles(theme => ({
     gridStyle: {
         backgroundColor: 'white'
     },
-    button: {
+    button1: {
         marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1)
+        marginRight: theme.spacing(1),
+        color: 'red'
+    },
+    button2: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        color: 'black'
     },
     alignDialog: {
         textAlign: 'center',
@@ -113,8 +119,19 @@ const useStyles = makeStyles(theme => ({
         '&on-hover': {
             backgroundColor: 'red'
         }
+    },
+    fab: {
+        backgroundImage:
+            'linear-gradient(to top, rgba(241, 97, 74, 1), rgba(244, 123, 40, 1))',
+        color: 'white'
     }
 }))
+
+// $color1: rgba(236, 33, 103, 1);
+// $color2: rgba(255, 255, 255, 1);
+// $color3: rgba(244, 123, 40, 1);
+// $color4: rgba(241, 97, 74, 1);
+// $color5: rgb(26, 161, 114);
 
 const NewMeal = () => {
     const classes = useStyles()
@@ -123,8 +140,8 @@ const NewMeal = () => {
     const [open, setOpen] = useState(false)
     const user = useSelector(state => state.auth.user)
 
-    const createMeal = async () => {
-        await dispatch(actions.createNewMeal({name, creator: user._id}))
+    const createMeal = () => {
+        dispatch(actions.createNewMeal({name, creator: user._id}))
         dispatch(actions.fetchMeals())
         setOpen(false)
     }
@@ -134,7 +151,6 @@ const NewMeal = () => {
             <Slide direction="down" in={true} mountOnEnter unmountOnExit>
                 <Grid className={classes.textCenter} item xs={12}>
                     <Fab
-                        color="primary"
                         variant="extended"
                         aria-label="add"
                         onClick={() => setOpen(!open)}
@@ -195,22 +211,23 @@ const MealActions = ({confirmDelete, setDelete, open, meal, setOpen}) => {
                 <div>
                     <Button
                         color="secondary"
-                        className={classes.button}
+                        className={classes.button1}
                         onClick={() => setDelete(true)}
                         size="small"
-                        variant="outlined"
+                        variant="text"
                     >
-                        Delete
+                        Delete Meal
                     </Button>
                     <Button
-                        variant="outlined"
-                        className={classes.button}
+                        variant="text"
+                        className={classes.button2}
                         size="small"
                         color="primary"
                         onClick={() => setOpen(!open)}
                     >
                         <>
-                            <Add /> Item
+                            <Add />
+                            Food Item
                         </>
                     </Button>
                 </div>
@@ -292,6 +309,7 @@ const MealPanel = ({m, i}) => {
     }, [meal])
 
     const handleClose = () => {
+        dispatch(fetchMeals())
         setOpen(false)
     }
 
@@ -339,17 +357,14 @@ const MealPanel = ({m, i}) => {
 }
 
 const MealList = () => {
-    //TODO: FIx bug with measure uri
-    //TODO: Add ui for food item add and researching for food & add to UX
-    //TODO: Fix bug with quantity vs yield
-    //TODO: Fix fields that should be un-editable
     //TODO: Add some stats? total meal count, avg cal/day eaten
-    // Bonus TODO: Add bad food log
+    // Bonus TODO: Add bad food log, figure out what a parsed amount is (1 whole?)
     const classes = useStyles()
     const dispatch = useDispatch()
     const userMeals = useSelector(state => state.nutrition.userMeals)
 
     const [meals, setMeals] = useState([])
+    console.log(userMeals)
 
     useEffect(() => {
         dispatch(fetchMeals())
