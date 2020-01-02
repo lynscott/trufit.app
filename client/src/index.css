@@ -434,11 +434,17 @@ label {
   margin-top: 10px;
 }
 
+.fprCaL {
+  position: 'relative' !important;
+  background-color: 'blue';
+}
+
 .MainButton {
   background-color: rgba(237,49,100,0.9);
   /* padding: 10px 20px 10px 20px; */
   border: 1px solid rgba(0,0,0,0.9);
   border-radius: 30px;
+  font-size: 1em;
 }
 
 .MainButton:hover {

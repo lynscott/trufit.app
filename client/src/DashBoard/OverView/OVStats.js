@@ -203,22 +203,22 @@ const WeightStats = () => {
     const profile = useSelector(state => state.auth.userProfile)
     const [shouldCheckIn, setCheckIn] = useState(false)
     const [difference, setDiff] = useState(0)
+    const [arrowChoice, setArrow] = useState('')
     const classes = useStyles()
+    console.log(profile)
     let w1 = 0
     let w2 = 0
-    let arrowChoice = ''
-    console.log(profile, 'PRO')
 
     useEffect(() => {
         if (profile.weighIns.length > 2) {
             w1 = profile.weighIns[profile.weighIns.length - 1].weight
             w2 = profile.weighIns[profile.weighIns.length - 2].weight
-            arrowChoice = Math.sign(w1 - w2) ? '+ ' : ''
+            setArrow(Math.sign(w1 - w2) === 1 ? '+ ' : '')
             const recent = moment(
                 profile.weighIns[profile.weighIns.length - 1].date
             )
             setDiff(w1 - w2)
-            console.log(w1, w2, 'WS', w1 - w2)
+            console.log(arrowChoice)
             const next = recent.add(1, 'w')
             if (moment().isAfter(next)) setCheckIn(true)
         }
@@ -234,7 +234,7 @@ const WeightStats = () => {
         <CardComponent
             headline={headline}
             subheader={
-                '+/- from past week : ' + arrowChoice + difference.toString()
+                arrowChoice + difference.toString() + 'lbs from last week'
             }
         >
             {shouldCheckIn ? <WeightCheckIn /> : null}

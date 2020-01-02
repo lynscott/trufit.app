@@ -40,7 +40,10 @@ const sendmail = require("sendmail")()
 if (process.env.NODE_ENV) {
     //if prod force use of key switcher, we should probably move this elsewhere
     //Dev/Prod backend connections
-    mongoose.connect(keys.mongoURI, {useNewUrlParser: true})
+    mongoose.connect(keys.mongoURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
     Sentry.init({dsn: keys.sentryServer})
 
     // Sentry.configureScope((scope) => {
@@ -54,7 +57,10 @@ if (process.env.NODE_ENV) {
     // mongoose.connect('mongodb://localhost:27017')
 
     //Dev/Prod backend connections
-    mongoose.connect(keys.mongoURI, {useNewUrlParser: true})
+    mongoose.connect(keys.mongoURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
 }
 
 sgMail.setApiKey(keys.sendGridKey)
@@ -293,7 +299,7 @@ app.get("/api/active_training_plan", async (req, res, next) => {
         let template = await models.PlanTemplates.findOne({
             _id: activePlan.template
         })
-        console.log(template, "TEMPLATE FOUND?")
+        // console.log(template, "TEMPLATE FOUND?")
         res.send({
             ...activePlan._doc,
             name: template.name,
@@ -528,8 +534,6 @@ app.get("/api/user_workout_data", async (req, res) => {
             return err
         }
 
-        console.log(req.body)
-
         // If the user has a profile set the plan accordingly.
         if (profile) {
             models.Plans.findOne(
@@ -681,20 +685,20 @@ app.post("/api/new_user_plan", async (req, res) => {
     res.status(200).send("Success")
 })
 
-app.post("/api/nutrition_plan", async (req, res) => {
+app.post("/api/create_nutrition_plan", async (req, res) => {
     if (!req.user) {
         return res.status(401).send({error: "You must log in!"})
     }
     let {items, day, name} = req.body
     let itemIds = items.map(item => item.meal._id)
-    // console.log(itemIds)
     let nutrition_plan = new models.NutritionPlan({
-        scheduleData: items,
+        schedule: schedule,
         creator: req.user.id,
-        items: itemIds
+        items: itemIds,
+        name: name
     })
-    day ? (nutrition_plan.day = day) : null
-    name ? (nutrition_plan.name = name) : null
+    // day ? (nutrition_plan.day = day) : null
+    // name ? (nutrition_plan.name = name) : null
     await nutrition_plan.save()
 
     res.status(200).send("Success")
@@ -895,7 +899,6 @@ app.post("/api/signup", async (req, res, next) => {
         let accessDenied = await models.BetaUsers.find(
             {Email: email},
             (err, beta) => {
-                console.log(beta)
                 if (beta.length === 0) {
                     return true
                 } else {
@@ -1065,7 +1068,6 @@ app.post("/api/freeplans", async (req, res) => {
 
 app.post("/api/contactform", async (req, res) => {
     const {affiliation, email} = req.body
-    console.log("TEST", email)
     const msg = {
         to: "lscott@tru-fit.co",
         from: "lscott@tru-fit.co",

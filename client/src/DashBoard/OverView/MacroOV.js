@@ -111,6 +111,7 @@ export default function MacroCard() {
     const [index, setValue] = useState(0)
     const [profCalories, setPC] = useState(0)
     const [goal, setGoal] = useState(0)
+    const [nutriCals, setNC] = useState(0)
     const userProfile = useSelector(state => state.auth.userProfile)
 
     const macroSelector = val => val.baseSomaType.macro
@@ -157,8 +158,11 @@ export default function MacroCard() {
     }, [])
 
     useEffect(() => {
-        setPC(userProfile.calories)
-        setGoal(userProfile.currentGoal.value)
+        if (userProfile) {
+            setPC(userProfile.calories)
+            setGoal(userProfile.currentGoal.value)
+            setNC(userProfile.nutritionCalories)
+        }
     }, [userProfile])
 
     const handleExpandClick = () => {
@@ -223,7 +227,7 @@ export default function MacroCard() {
                                 </Typography>
                                 <BarChart
                                     planned={parseInt(profCalories)}
-                                    recommended={userProfile.nutritionCalories}
+                                    recommended={nutriCals}
                                     todaysIntake={todaysCalories}
                                 />
                             </>

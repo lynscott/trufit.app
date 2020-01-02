@@ -55,13 +55,10 @@ class Nav extends Component {
   signUpModal = () => {
     return (
       <Modal isOpen={this.state.signup} toggle={this.signup}>
-        {/* <ModalHeader toggle={this.toggle}>Welcome Back!
-        </ModalHeader> */}
         <ModalBody>
           <SignUpForm closeForm={this.signup} />
         </ModalBody>
         <ModalFooter style={{padding:'0.5rem'}}>
-          {/* <Button color="primary" onClick={this.toggle}>Sign Up</Button>{' '} */}
           <Button color="secondary" onClick={this.signup}>
             Cancel
           </Button>
