@@ -119,7 +119,12 @@ row, .row{
     // background-size: cover;
     // -webkit-backdrop-filter: blur(5px);
     // backdrop-filter: blur(5px);
+    padding-bottom: 64px;
     height: 100vh;
+    width: 100%;
+    canvas {
+        width: 100vw !important;
+    }
     // -webkit-filter: grayscale(1);
     // filter: grayscale(1);
 }

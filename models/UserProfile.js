@@ -40,7 +40,8 @@ const userProfileSchema = new Schema(
         activePlan: {type: Schema.ObjectId, ref: "Plans"},
         activeNutritionPlan: {type: Schema.ObjectId, ref: "NutritionPlan"},
         _user: {type: Schema.Types.ObjectId, ref: "User"},
-        trainingPlans: [{type: Schema.ObjectId, ref: "Plans"}]
+        trainingPlans: [{type: Schema.ObjectId, ref: "Plans"}],
+        foodLog: [{type: Schema.ObjectId, ref: "FoodLog"}]
     },
     {usePushEach: true}
 )

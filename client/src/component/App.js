@@ -8,6 +8,7 @@ import Alert from 'react-s-alert'
 import {Spring} from 'react-spring'
 import Particles from 'react-particles-js'
 import BetaRequestForm from './BetaRequestForm'
+import SignUpForm from './SignUpV2'
 import {useTheme} from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import 'react-s-alert/dist/s-alert-default.css'
@@ -33,7 +34,7 @@ import {
     CardText,
     CardImg
 } from 'reactstrap'
-import SignUpForm from './SignUpForm.js'
+// import SignUpForm from './SignUpForm.js'
 
 const IconBlock = ({text, iconClass, title, icon}) => {
     return (
@@ -64,7 +65,7 @@ const LogoBtnBlock = ({formWithModal}) => {
                     maxWidth: matches ? '50vw' : '70vw',
                     left: 0,
                     right: 0,
-                    top: matches ? '20%' : '40%',
+                    top: matches ? '20%' : '30%',
                     position: 'absolute'
                 }}
             />
@@ -76,7 +77,7 @@ const LogoBtnBlock = ({formWithModal}) => {
                     top: large ? '85%' : '65%'
                 }}
             >
-                {formWithModal()}
+                <SignUpForm />
             </div>
         </>
     )
@@ -188,7 +189,13 @@ class App extends Component {
                         <Fade bottom>
                             <h1 className="section-header">What's TruFit?</h1>
                             <h6>At it's core, it's a set of simple ideas:</h6>
-                            <ul style={{listStyle: 'none', padding: 0}}>
+                            <ul
+                                style={{
+                                    listStyle: 'none',
+                                    padding: 0,
+                                    fontSize: '1.1em'
+                                }}
+                            >
                                 <li>
                                     That all of your nutritional and fitness
                                     planning should be in the same place.
@@ -340,10 +347,6 @@ class App extends Component {
                                     }
                                 }
                             }
-                        }}
-                        style={{
-                            width: '100%',
-                            color: 'red'
                         }}
                     />
                     {/* <div className="col d-md-block">

@@ -1,13 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import {makeStyles} from '@material-ui/core/styles'
 import {useDispatch, useSelector} from 'react-redux'
-import Card from '@material-ui/core/Card'
-import CardHeader from '@material-ui/core/CardHeader'
-import CardMedia from '@material-ui/core/CardMedia'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import Collapse from '@material-ui/core/Collapse'
-import Avatar from '@material-ui/core/Avatar'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import {red} from '@material-ui/core/colors'
@@ -22,6 +20,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import Grid from '@material-ui/core/Grid'
 import moment from 'moment'
+import CardComponent from './OVCard'
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -103,7 +102,48 @@ const BarChart = ({planned, todaysIntake, recommended}) => (
     />
 )
 
+const TodaysLog = () => {
+    //TODO: create log model
+    const nutritionPlans = useSelector(
+        state => state.nutrition.userNutritionPlans
+    )
+    const userMeals = useSelector(state => state.nutrition.userMeals)
+
+    const [log, setLog] = useState([])
+
+    useEffect(() => {
+        if (nutritionPlans.length > 0) {
+            setLog(
+                nutritionPlans[0].log.filter(
+                    l =>
+                        moment(l.timestamp).day() === moment().day() &&
+                        moment(l.timestamp).month() === moment().month()
+                )
+            )
+        }
+    }, [nutritionPlans])
+    console.log(userMeals)
+
+    return (
+        <List dense aria-label="meal log">
+            {nutritionPlans[0].log.map((l, i) => (
+                <>
+                    <ListItem key={i}>
+                        Log
+                        {/* <ListItemText
+                                    primary={l.name}
+                                    secondary={e.sets + ' x ' + e.reps}
+                                /> */}
+                    </ListItem>
+                    <Divider />
+                </>
+            ))}
+        </List>
+    )
+}
+
 export default function MacroCard() {
+    //TODO: add custom graphs and macro/gram breakdown
     const classes = useStyles()
     const dispatch = useDispatch()
     const [expanded, setExpanded] = useState(false)
@@ -117,11 +157,11 @@ export default function MacroCard() {
     const macroSelector = val => val.baseSomaType.macro
 
     const handleNext = () => {
-        setValue(1)
+        setValue(index + 1)
     }
 
     const handleBack = () => {
-        setValue(0)
+        setValue(index - 1)
     }
     const nutritionPlans = useSelector(
         //TODO: Get planned cals from here
@@ -185,73 +225,55 @@ export default function MacroCard() {
             })
     }, [nutritionPlans])
 
-    // console.log(userProfile) TODO: Replace with OVCard
-
     return (
-        <Grid style={{padding: '16px'}} item xs={12} lg={4} md={4} xl={3}>
-            <Card className={classes.card}>
-                <CardHeader
-                    action={
-                        <IconButton
-                            aria-expanded={expanded}
-                            onClick={handleExpandClick}
-                            aria-label="show more"
-                        >
-                            <ExpandMoreIcon />
-                        </IconButton>
-                    }
-                    className={classes.header}
-                    title="Macronutrients"
-                    subheader={
-                        todaysCalories +
-                        '/' +
-                        (parseInt(profCalories) + goal) +
-                        'cal'
-                    }
-                />
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <CardContent>
-                        <SwipeableViews
-                            index={index}
-                            onChangeIndex={handleChangeIndex}
-                        >
-                            <>
-                                <Typography paragraph>
-                                    Recommended Breakdown:
-                                </Typography>
-                                {macroPieChart}
-                            </>
-                            <>
-                                <Typography paragraph>
-                                    Caloric Stats:
-                                </Typography>
-                                <BarChart
-                                    planned={parseInt(profCalories)}
-                                    recommended={nutriCals}
-                                    todaysIntake={todaysCalories}
-                                />
-                            </>
-                        </SwipeableViews>
-                        <MobileStepper
-                            variant="dots"
-                            steps={2}
-                            position="static"
-                            activeStep={index}
-                            style={{backgroundColor: 'transparent'}}
-                            nextButton={
-                                <Button size="small" onClick={handleNext}>
-                                    {<KeyboardArrowRight />}
-                                </Button>
-                            }
-                            backButton={
-                                <Button size="small" onClick={handleBack}>
-                                    {<KeyboardArrowLeft />}
-                                </Button>
-                            }
-                        />
-                    </CardContent>
-                </Collapse>
-            </Card>
-        </Grid>
+        <CardComponent
+            headline={'Macronutrients'}
+            subheader={
+                todaysCalories + '/' + (parseInt(profCalories) + goal) + 'cal'
+            }
+        >
+            <SwipeableViews index={index} onChangeIndex={handleChangeIndex}>
+                <>
+                    <TodaysLog />
+                </>
+                <>
+                    <Typography paragraph>Recommended Breakdown:</Typography>
+                    {macroPieChart}
+                </>
+                <>
+                    <Typography paragraph>Caloric Stats:</Typography>
+                    <BarChart
+                        planned={parseInt(profCalories)}
+                        recommended={nutriCals}
+                        todaysIntake={todaysCalories}
+                    />
+                </>
+            </SwipeableViews>
+            <MobileStepper
+                variant="dots"
+                steps={3}
+                position="static"
+                activeStep={index}
+                style={{backgroundColor: 'transparent'}}
+                nextButton={
+                    <Button
+                        disabled={index === 2}
+                        size="small"
+                        onClick={handleNext}
+                    >
+                        {<KeyboardArrowRight />}
+                    </Button>
+                }
+                backButton={
+                    <Button
+                        disabled={index === 0}
+                        size="small"
+                        onClick={handleBack}
+                    >
+                        {<KeyboardArrowLeft />}
+                    </Button>
+                }
+            />
+        </CardComponent>
     )
 }

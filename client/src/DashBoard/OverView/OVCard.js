@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography'
 import {red} from '@material-ui/core/colors'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Grid from '@material-ui/core/Grid'
+import clsx from 'clsx'
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -44,6 +45,10 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+/**
+ * Global overview card component
+ * @param {react} props - children, headline text and sub header
+ */
 const CardComponent = props => {
     const classes = useStyles()
     const {children, headline, subheader} = props
@@ -61,6 +66,9 @@ const CardComponent = props => {
                             aria-expanded={expanded}
                             onClick={handleExpandClick}
                             aria-label="show more"
+                            className={clsx(classes.expand, {
+                                [classes.expandOpen]: expanded
+                            })}
                         >
                             <ExpandMoreIcon />
                         </IconButton>

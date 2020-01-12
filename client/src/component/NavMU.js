@@ -97,6 +97,7 @@ const UserMenu = () => {
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.auth.user)
     const [signUp, setSignUp] = useState(false)
+    console.log(currentUser)
 
     const loginDialog = (
         <Dialog
