@@ -3,45 +3,31 @@
 const mongoose = require("mongoose")
 const {Schema} = mongoose
 
-const initialState = {
-    nutrition: {
-        name: "Total",
-        serving: "",
-        serving_label: "",
-        calories: 0,
-        fats: 0,
-        protein: 0,
-        carb: 0
-    }
-}
-
 const userProfileSchema = new Schema(
     {
         affirmation: {
             type: String,
-            default:
-                "Hey there! I'm your affirmation text! Double tap me and enter something as a reminder why you won't quit!"
+            default: ""
         },
         messages: [Schema.Types.Mixed],
         events: {type: [String], default: []},
         progressPics: {type: [String], default: []},
+
         weighIns: [Schema.Types.Mixed],
         macros: {type: Object, default: {}},
-        baseSomaType: {type: Object},
-        calories: String,
-        currentGoal: {type: Object, default: {text: "Choose a Goal", value: 0}},
-        nutritionSchedule: [Schema.Types.Mixed], //Likely DEPRECATED:
-        nutritionCalories: Number,
-        nutritionItems: {
-            type: Array,
-            default: [initialState]
-        }, //DEPRECATED:
-        email: {type: String, unique: true, lowercase: true},
-        activePlan: {type: Schema.ObjectId, ref: "Plans"},
+        calorieGoal: String,
+        tbw: Number,
+        currentGoal: Number,
+        currentWeight: Number,
+        neat: Number,
+        priorExp: Number,
+
+        activeTrainingPlan: {type: Schema.ObjectId, ref: "Plans"},
         activeNutritionPlan: {type: Schema.ObjectId, ref: "NutritionPlan"},
         _user: {type: Schema.Types.ObjectId, ref: "User"},
+
         trainingPlans: [{type: Schema.ObjectId, ref: "Plans"}],
-        foodLog: [{type: Schema.ObjectId, ref: "FoodLog"}]
+        foodLogs: [{type: Schema.ObjectId, ref: "FoodLog"}]
     },
     {usePushEach: true}
 )

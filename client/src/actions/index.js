@@ -61,6 +61,8 @@ export const REQUEST_SUCCESS = 'REQUEST_SUCCESS'
 
 export const FOOD_FOUND = 'FOOD_FOUND'
 
+export const FETCH_MEAL_LOG = 'FETCH_MEAL_LOG'
+
 export const parse = 1
 export const nutrient = 2
 
@@ -441,6 +443,12 @@ export const logMealComplete = updates => async dispatch => {
     const res = await axios.post('/api/log_meal', updates)
 
     dispatch({type: MARK_MEAL_COMPLETE, payload: res.data})
+}
+
+export const fetchMealLogs = () => async dispatch => {
+    const res = await axios.post('/api/get_food_log')
+
+    dispatch({type: FETCH_MEAL_LOG, payload: res.data})
 }
 ///
 

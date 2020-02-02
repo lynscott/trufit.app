@@ -210,7 +210,7 @@ const WeightStats = () => {
     let w2 = 0
 
     useEffect(() => {
-        if (profile.weighIns.length > 2) {
+        if (profile?.weighIns.length > 2) {
             w1 = profile.weighIns[profile.weighIns.length - 1].weight
             w2 = profile.weighIns[profile.weighIns.length - 2].weight
             setArrow(Math.sign(w1 - w2) === 1 ? '+ ' : '')

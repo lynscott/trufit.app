@@ -759,22 +759,35 @@ app.post("/api/log_meal", async (req, res) => {
     if (!req.user) {
         return res.status(401).send({error: "You must log in!"})
     }
-    let {id, log} = req.body
-    await models.NutritionPlan.findOne({_id: id}, (err, plan) => {
-        // console.log(meal.completions, meal)
-        if (err) {
-            return err
-        }
 
-        if (plan) {
-            let arr = [...plan.log]
-            arr.push(log)
-            plan.log = arr
-            plan.save()
-            // console.log(plan.log)
-            res.status(200).send("Success")
-        }
+    if (!("items" in req) || req.items.length < 1)
+        return res.status(400).send({error: "Invalid food items"})
+
+    if (!("date" in req) || !req.date)
+        return res.status(400).send({error: "Invalid date entry"})
+
+    let {items, date} = req.body
+
+    models.FoodLog.create({
+        items: items,
+        _user: req.user.id,
+        date: date
     })
+
+    return res.status(200).send("Success")
+})
+
+app.post("/api/get_food_log", async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send({error: "You must log in!"})
+    }
+
+    let logs = models.FoodLog.find({_user: req.user.id}).gt(
+        "date",
+        moment().format("MM-DD-YY")
+    )
+
+    return res.status(200).send(logs)
 })
 
 app.post("/api/new_workout", async (req, res) => {
@@ -861,19 +874,17 @@ app.post("/api/update_food_item", async (req, res, next) => {
 const expectedKeys = [
     "email",
     "name",
-    "password1",
-    "gender",
-    "height_ft",
-    "height_in",
+    "confirm_password",
+    "hours_active",
+    "prior_exp",
     "current_weight",
-    "age",
-    "somatype",
-    "activity_mod"
+    "tbw",
+    "goal",
+    "neat"
 ]
 app.post("/api/signup", async (req, res, next) => {
     try {
         expectedKeys.map(key => {
-            // console.log(key)
             if (!req.body[key] || req.body[key === ""]) {
                 throw new Error("Error:" + [key] + " required")
             }
@@ -882,43 +893,29 @@ app.post("/api/signup", async (req, res, next) => {
         return res.status(500).send(error)
     }
 
-    let email = req.body.email
-    let name = req.body.name
-    let password = req.body.password1
-    let gender = req.body.gender
-    let height =
-        parseInt(req.body.height_ft) * 12 + parseInt(req.body.height_in) //75
-    let currentWeight = parseInt(req.body.current_weight)
-    let age = parseInt(req.body.age)
-    let somatype = req.body.somatype
-    let modifier = parseInt(req.body.activity_mod)
+    const email = req.body.email
+    const name = req.body.name
+    const password = req.body.confirm_password
+    const gender = req.body?.gender
+    const goal = req.body.goal
+    const hoursActive = req.body.hours_active
+    const currentWeight = parseInt(req.body.current_weight)
+    const tbw = parseInt(req.body.tbw)
+    const neat = req.body.neat
+    const priorExp = parseInt(req.body.prior_exp)
+    const calorieGoal = tbw * (neat + hoursActive)
 
-    //TEMP Access list check
-    // console.log(process.env)
-    if (process.env.NODE_ENV) {
-        let accessDenied = await models.BetaUsers.find(
-            {Email: email},
-            (err, beta) => {
-                if (beta.length === 0) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        )
-    }
-
-    const findBMR = () => {
-        let inToCm = height * 2.54 //190.54
-        let lbsToKg = currentWeight / 2.2 //104.54
-        if (gender === "male") {
-            let BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age + 5
-            return Math.round(BMR)
-        } else if (gender === "female") {
-            let BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age - 161
-            return Math.round(BMR)
-        }
-    }
+    // const findBMR = () => {
+    //     let inToCm = height * 2.54 //190.54
+    //     let lbsToKg = currentWeight / 2.2 //104.54
+    //     if (gender === "male") {
+    //         let BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age + 5
+    //         return Math.round(BMR)
+    //     } else if (gender === "female") {
+    //         let BMR = 9.99 * lbsToKg + 6.25 * inToCm - 4.92 * age - 161
+    //         return Math.round(BMR)
+    //     }
+    // }
 
     await User.findOne({email: email}, (err, existingUser) => {
         if (err) {
@@ -938,23 +935,23 @@ app.post("/api/signup", async (req, res, next) => {
         const user = new User({
             email,
             password,
-            gender,
-            height,
             currentWeight,
             name,
             startDate: new Date()
         })
 
+        if (gender) user.gender = gender
+
         let msg = {
             to: email,
             from: "no-reply@trufit.co",
-            subject: "Welcome to LS Fitness!",
+            subject: "Welcome to TruFit!",
             text: "Welcome",
             html: welcomeTemplate(req)
         }
 
         let alert = {
-            to: "lynscott@lsphysique.com",
+            to: "lscott@trufit.com",
             from: "no-reply@trufit.co",
             subject: "A New User Has Signed Up!",
             text: name,
@@ -968,11 +965,15 @@ app.post("/api/signup", async (req, res, next) => {
 
             try {
                 var profile = new UserProfile({
-                    email: email,
                     _user: user.id,
-                    macros: somatype.macro,
                     calories: userBMR * modifier,
-                    baseSomaType: somatype
+                    currentWeight,
+                    goal,
+                    hoursActive,
+                    tbw,
+                    neat,
+                    priorExp,
+                    calorieGoal
                 })
             } catch (error) {
                 return res.status(422).send({message: error})

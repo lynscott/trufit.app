@@ -221,7 +221,6 @@ const FormDialog = ({status, meal, handleClose, updateMeal}) => {
         if (nutrientData) {
             let clone = meal
             clone.items.push(nutrientData)
-            // console.log(clone, 'gucci')
             updateMeal(clone)
         }
     }, [nutrientData])
@@ -315,6 +314,7 @@ const FormDialog = ({status, meal, handleClose, updateMeal}) => {
 
                     {foodCard()}
                 </DialogContent>
+
                 <DialogActions className={classes.alignDialog}>
                     <Button onClick={handleClose} style={{color: 'black'}}>
                         Close

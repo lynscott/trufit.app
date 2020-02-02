@@ -46,6 +46,9 @@ const useStyles = makeStyles(theme => ({
     header: {
         backgroundImage:
             'linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1))'
+    },
+    logBtn: {
+        backgroundColor: 'rgba(236, 33, 103, 1)'
     }
 }))
 
@@ -103,43 +106,43 @@ const BarChart = ({planned, todaysIntake, recommended}) => (
 )
 
 const TodaysLog = () => {
-    //TODO: create log model
-    const nutritionPlans = useSelector(
-        state => state.nutrition.userNutritionPlans
-    )
-    const userMeals = useSelector(state => state.nutrition.userMeals)
+    const userLog = useSelector(state => state.nutrition.userLog)
+    const classes = useStyles()
 
-    const [log, setLog] = useState([])
+    console.log(userLog)
 
-    useEffect(() => {
-        if (nutritionPlans.length > 0) {
-            setLog(
-                nutritionPlans[0].log.filter(
-                    l =>
-                        moment(l.timestamp).day() === moment().day() &&
-                        moment(l.timestamp).month() === moment().month()
-                )
-            )
-        }
-    }, [nutritionPlans])
-    console.log(userMeals)
-
-    return (
-        <List dense aria-label="meal log">
-            {nutritionPlans[0].log.map((l, i) => (
-                <>
-                    <ListItem key={i}>
-                        Log
-                        {/* <ListItemText
-                                    primary={l.name}
-                                    secondary={e.sets + ' x ' + e.reps}
-                                /> */}
-                    </ListItem>
-                    <Divider />
-                </>
-            ))}
-        </List>
-    )
+    if (userLog.length > 0)
+        return (
+            <List dense aria-label="meal log">
+                {userLog.map((l, i) => {
+                    let cals = l.items.reduce((a, b) => a.calories + b.calories)
+                    return (
+                        <>
+                            <ListItem>
+                                <ListItemText
+                                    primary={'Calories:' + cals}
+                                    // secondary={e.sets + ' x ' + e.reps}
+                                />
+                            </ListItem>
+                            <Divider />
+                        </>
+                    )
+                })}
+                <Button className={classes.logBtn}>Log Food</Button>
+            </List>
+        )
+    else {
+        return (
+            <Grid justify="center" alignItems="center" container>
+                <Grid style={{textAlign: 'center'}} item>
+                    <Typography variant="subtitle1">
+                        No Food Logged For Today.
+                    </Typography>
+                    <Button className={classes.logBtn}>Log Food</Button>
+                </Grid>
+            </Grid>
+        )
+    }
 }
 
 export default function MacroCard() {

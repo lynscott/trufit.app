@@ -5,7 +5,8 @@ import {
     FOOD_FOUND,
     FETCH_NUTRITION_PLANS,
     SEARCH_LOADING,
-    SEARCH_FAILED
+    SEARCH_FAILED,
+    FETCH_MEAL_LOG
 } from '../actions'
 
 const initialState = {
@@ -16,11 +17,17 @@ const initialState = {
     foodLoading: false,
     foodFound: false,
     searchFailed: false,
-    nutrientData: null
+    nutrientData: null,
+    userLog: []
 }
 
 export default function(state = initialState, action) {
     switch (action.type) {
+        case FETCH_MEAL_LOG:
+            return {
+                ...state,
+                userLog: action.payload
+            }
         case FOOD_SEARCH:
             return {
                 ...state,

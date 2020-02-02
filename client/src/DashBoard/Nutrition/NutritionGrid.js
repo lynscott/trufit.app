@@ -30,16 +30,14 @@ const NutritionTable = ({meal}) => {
         protein: 0
     }
     const [mealState, setMeals] = useState([])
+    const [isUpdating, setUpdate] = useState(false)
 
     const handleEdit = data => {
         setMeals(data)
 
         delete data['tableData']
         dispatch(editMeal(data, meal._id))
-
-        //NOTE: For now we'll fetch all meals after deleting an item
-        //This would be better if the grid handled individual meal state
-        dispatch(fetchMeals())
+        setUpdate(false)
     }
 
     useEffect(() => {
@@ -106,7 +104,7 @@ const NutritionTable = ({meal}) => {
                         editable: 'never'
                     }
                 ]}
-                data={formatNewState(meal.items)}
+                data={isUpdating ? [] : mealState} //{formatNewState(meal.items)}
                 title="Meal Details"
                 options={{
                     selection: false,
@@ -122,6 +120,7 @@ const NutritionTable = ({meal}) => {
                         new Promise((resolve, reject) => {
                             setTimeout(() => {
                                 {
+                                    setUpdate(true)
                                     let data = mealState
                                     let index = data.indexOf(oldData)
                                     data[index] = newData
@@ -135,6 +134,8 @@ const NutritionTable = ({meal}) => {
                         new Promise((resolve, reject) => {
                             setTimeout(() => {
                                 {
+                                    // setMeals([])
+                                    setUpdate(true)
                                     let data = mealState
                                     let index = data.indexOf(oldData)
                                     data.splice(index, 1)
