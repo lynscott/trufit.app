@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useReducer} from 'react'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import {Form, useForm, useField, useFormState} from 'react-final-form'
-import {signUpUser, resetSignUpFail} from '../actions'
+import {signUpUser, evaluateProfile} from '../actions'
 import {useDispatch, useSelector} from 'react-redux'
 import {OnChange} from 'react-final-form-listeners'
 import Button from '@material-ui/core/Button'
 import clsx from 'clsx'
+import {useHistory} from 'react-router-dom'
 
 //Dialog imports
 import Dialog from '@material-ui/core/Dialog'
@@ -19,6 +20,7 @@ import TextField from '@material-ui/core/TextField'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import FormControl from '@material-ui/core/FormControl'
 import InputAdornment from '@material-ui/core/InputAdornment'
+import {useSnackbar} from 'notistack'
 
 //Stepper
 import Zoom from '@material-ui/core/Zoom'
@@ -177,14 +179,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Zoom ref={ref} {...props} />
 })
 
-const steps = ['Setup', 'Evaluate', 'Get Started']
+const steps = ['Account', 'Profile', 'Submit']
 
 const baseFields = [
     {name: 'name', type: 'text'},
     {name: 'email', type: 'email'},
     {name: 'password', type: 'password'},
-    {name: 'confirm_password', type: 'password'},
-    {name: 'current_weight', type: 'number'}
+    {name: 'confirm_password', type: 'password'}
 ]
 
 const useColorlibStepIconStyles = makeStyles({
@@ -259,7 +260,7 @@ const TFConnector = withStyles({
 const validate = values => {
     const errors = {}
 
-    if (!values.update) {
+    if (!values.evalMode) {
         if (!values.name) {
             errors.name = 'Required'
         }
@@ -268,13 +269,14 @@ const validate = values => {
         }
 
         if (!values.confirm_password) {
-            errors.confirm = 'Required'
+            errors.confirm_password = 'Required'
         } else if (values.confirm_password !== values.password) {
-            errors.confirm = 'Must match'
+            errors.confirm_password = 'Must match'
         }
-        if (!values.prior_exp) {
-            errors.prior_exp = 'Required'
-        }
+    }
+
+    if (!('prior_exp' in values)) {
+        errors.prior_exp = 'Required'
     }
 
     if (!values.current_weight) {
@@ -285,7 +287,7 @@ const validate = values => {
         errors.tbw = 'Required'
     }
 
-    if (!values.goal) {
+    if (!('goal' in values)) {
         errors.goal = 'Required'
     }
 
@@ -310,7 +312,6 @@ const BasicFieldComponent = ({name, label, type, helperText = null}) => {
     const fieldName = useField(name)
     const theme = useTheme()
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-    console.log(fieldName)
     return (
         <Grid item xs={10} md={4}>
             <TextField
@@ -319,8 +320,9 @@ const BasicFieldComponent = ({name, label, type, helperText = null}) => {
                 type={type}
                 required
                 error={
-                    fieldName.meta.error && fieldName.meta.touched
-                        ? fieldName.meta.error
+                    fieldName.meta.error &&
+                    (fieldName.meta.touched || fieldName.meta.submitFailed)
+                        ? true
                         : false
                 }
                 fullWidth={fullScreen ? true : false}
@@ -353,7 +355,6 @@ const BasicSelect = ({
     const theme = useTheme()
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
     const align = helperText ? 'center' : 'flex-end'
-    // console.log(fieldName)
     return (
         <Grid alignItems={align} item container spacing={2}>
             <Grid item xs={1}>
@@ -373,8 +374,10 @@ const BasicSelect = ({
                         id={`select-${name}`}
                         type={type}
                         error={
-                            fieldName.meta.error && fieldName.meta.touched
-                                ? fieldName.meta.error
+                            fieldName.meta.error &&
+                            (fieldName.meta.touched ||
+                                fieldName.meta.submitFailed)
+                                ? true
                                 : false
                         }
                         required
@@ -422,7 +425,7 @@ const TBWBlock = () => {
                 }
                 //Beginner Weight Gain
                 else if (goal === 1) {
-                    let potentialGain = parsedWeight * NEW_GAIN.mid
+                    let potentialGain = parsedWeight * NEW_GAIN.max
                     setTBW(parsedWeight + potentialGain * 3)
                 }
             } else if (prior_exp === 1) {
@@ -499,10 +502,29 @@ const TBWBlock = () => {
  * Stepper Pages
  * TODO: Edit for update mode vs signup
  */
-const EvaluateBlock = () => {
+const EvaluateBlock = ({evalMode = false}) => {
     const classes = useStyles()
+    const form = useForm()
+
+    if (evalMode) form.change('evalMode', true)
+
+    const ToolText = ({t}) => (
+        <Typography className={classes.center} variant="caption">
+            <strong>{t.label}</strong>
+            {': ' + t.tip}
+            <br />
+            <br />
+        </Typography>
+    )
+
     return (
-        <Grid item container justify="center" spacing={5}>
+        <Grid item container justify="center" spacing={3}>
+            <BasicFieldComponent
+                name={'current_weight'}
+                label={'Current Weight (lbs)'}
+                type={'number'}
+            />
+
             <BasicSelect
                 name={'goal'}
                 type={'text'}
@@ -519,12 +541,7 @@ const EvaluateBlock = () => {
                     <MenuItem value={g.value}>{g.label}</MenuItem>
                 ))}
                 tips={EXP.map(t => (
-                    <Typography className={classes.center} variant="caption">
-                        <strong>{t.label}</strong>
-                        {': ' + t.tip}
-                        <br />
-                        <br />
-                    </Typography>
+                    <ToolText key={t.label} t={t} />
                 ))}
             />
 
@@ -535,12 +552,7 @@ const EvaluateBlock = () => {
                 type={'text'}
                 helperText={"Exclude formal exercise! (That's next)"}
                 tips={NEAT.map(t => (
-                    <Typography className={classes.center} variant="caption">
-                        <strong>{t.label}</strong>
-                        {': ' + t.tip}
-                        <br />
-                        <br />
-                    </Typography>
+                    <ToolText key={t.label} t={t} />
                 ))}
                 label={'Daily activity level.'}
                 children={NEAT.map(g => (
@@ -559,8 +571,19 @@ const EvaluateBlock = () => {
 }
 
 const StartBlock = () => {
-    const form = useForm()
-    console.log(form.getState())
+    const form = useForm().getState()
+    const {enqueueSnackbar} = useSnackbar()
+    console.log(form)
+
+    const failSnackBar = () => {
+        enqueueSnackbar('Submission Failed', {variant: 'error'})
+    }
+
+    const successSnackBar = () => {
+        enqueueSnackbar('Account Created! Please Sign In.', {
+            variant: 'success'
+        })
+    }
     return (
         <Grid container style={{textAlign: 'center'}} justify="center">
             <Grid item xs={12}>
@@ -572,6 +595,18 @@ const StartBlock = () => {
                     Start!
                 </Button>
             </Grid>
+            <Grid item xs={12}>
+                {/* {console.log(Object.keys(form.errors))} */}
+                {form.submitFailed && Object.keys(form.errors).length > 0
+                    ? Object.keys(form.errors).map(key => (
+                          <div style={{color: 'red'}} key={key}>
+                              {'Missing Field: ' + key.replace('_', ' ')}
+                          </div>
+                      ))
+                    : null}
+            </Grid>
+            {form.submitFailed ? failSnackBar() : null}
+            {form.submitSucceeded ? successSnackBar() : null}
         </Grid>
     )
 }
@@ -600,15 +635,30 @@ const FormStepper = ({activeStep}) => {
     )
 }
 
+const initialValues = {
+    tbw: null,
+    current_weight: null,
+    goal: null,
+    prior_exp: null,
+    neat: null,
+    hours_active: null,
+    evalMode: false
+}
+
 /**
  * RFF Form Component
  * @param {number} step -current active step
  */
-const FormComponent = ({step}) => {
+const FormComponent = ({step, evalMode = false}) => {
     const dispatch = useDispatch()
     const classes = useStyles()
+    const history = useHistory()
+    const profileCreated = useSelector(state => state.auth.profileCreated)
 
-    const onSubmit = values => dispatch(signUpUser(values))
+    const onSubmit = values =>
+        evalMode
+            ? dispatch(evaluateProfile(values))
+            : dispatch(signUpUser(values))
     const replaceNCap = str =>
         str === 'current_weight'
             ? str.charAt(0).toUpperCase() +
@@ -616,14 +666,23 @@ const FormComponent = ({step}) => {
               '(lbs)'
             : str.charAt(0).toUpperCase() + str.slice(1).replace('_', ' ')
 
+    useEffect(() => {
+        if (profileCreated) history.push('/dashboard/overview')
+    }, [profileCreated])
+
     return (
-        <Form onSubmit={onSubmit} validate={validate}>
+        <Form
+            onSubmit={onSubmit}
+            initialValues={initialValues}
+            validate={validate}
+        >
             {props => (
                 <form onSubmit={props.handleSubmit}>
                     {step === 0 ? (
                         <Grid justify="center" container spacing={5}>
                             {baseFields.map(f => (
                                 <BasicFieldComponent
+                                    key={f.name}
                                     name={f.name}
                                     label={replaceNCap(f.name)}
                                     type={f.type}
@@ -645,7 +704,7 @@ const FormComponent = ({step}) => {
                             />
                         </Grid>
                     ) : step === 1 ? (
-                        <EvaluateBlock />
+                        <EvaluateBlock evalMode={evalMode} />
                     ) : (
                         <StartBlock />
                     )}
@@ -658,7 +717,7 @@ const FormComponent = ({step}) => {
 /**
  * Sign Up Form Component
  */
-export default function SignUpForm() {
+export default function SignUpForm({profileMode = false}) {
     const [open, setOpen] = React.useState(false)
     const theme = useTheme()
     const classes = useStyles()
@@ -680,6 +739,13 @@ export default function SignUpForm() {
     const handleClose = () => {
         setOpen(false)
     }
+
+    useEffect(() => {
+        if (profileMode) {
+            setOpen(true)
+            setActiveStep(1)
+        }
+    }, [])
 
     const next = (
         <Button
@@ -714,23 +780,27 @@ export default function SignUpForm() {
                     style={{color: 'black'}}
                     id="responsive-dialog-title"
                 >
-                    Get True Fit!
-                    <IconButton
-                        aria-label="close"
-                        className={classes.closeButton}
-                        onClick={handleClose}
-                    >
-                        <CloseIcon />
-                    </IconButton>
+                    Account Setup
+                    {!profileMode ? (
+                        <IconButton
+                            aria-label="close"
+                            className={classes.closeButton}
+                            onClick={handleClose}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    ) : null}
                 </DialogTitle>
                 <DialogContent>
                     <FormStepper activeStep={activeStep} />
-                    <FormComponent step={activeStep} />
+                    <FormComponent evalMode={profileMode} step={activeStep} />
                 </DialogContent>
                 <DialogActions className={classes.space}>
                     <Button
                         autoFocus
-                        disabled={activeStep === 0}
+                        disabled={
+                            profileMode ? activeStep === 1 : activeStep === 0
+                        }
                         onClick={handleBack}
                         size="large"
                         style={{color: 'white'}}

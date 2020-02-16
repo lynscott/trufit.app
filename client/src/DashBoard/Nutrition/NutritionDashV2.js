@@ -67,12 +67,15 @@ export default function NutritionDash() {
             <SwipeableViews index={index} onChangeIndex={handleChangeIndex}>
                 <Grid container item xs={12} className={classes.mealGrid}>
                     <Typography className={classes.title} variant="h6">
-                        Meal List
+                        Meal Creation
                     </Typography>
                     <Divider />
                     <MealList />
                 </Grid>
-                <Grid>
+                <Grid container item xs={12} className={classes.mealGrid}>
+                    <Typography className={classes.title} variant="h6">
+                        Meal Planning
+                    </Typography>
                     <PlanView />
                 </Grid>
             </SwipeableViews>
@@ -88,12 +91,12 @@ export default function NutritionDash() {
                 >
                     <BottomNavigationAction
                         classes={navClass}
-                        label="Meals"
+                        label="Build"
                         icon={<Meals className={classes.icon} />}
                     />
                     <BottomNavigationAction
                         classes={navClass}
-                        label="Nutrition Plans"
+                        label="Plan"
                         icon={<Nutrition className={classes.icon} />}
                     />
                 </BottomNavigation>

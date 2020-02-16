@@ -63,6 +63,9 @@ export const FOOD_FOUND = 'FOOD_FOUND'
 
 export const FETCH_MEAL_LOG = 'FETCH_MEAL_LOG'
 
+export const NEW_USER_PROFILE = 'NEW_USER_PROFILE'
+export const NEW_USER_PROFILE_ERROR = 'NEW_USER_PROFILE_ERROR'
+
 export const parse = 1
 export const nutrient = 2
 
@@ -247,12 +250,11 @@ export const intakeToneForm = (values, history, id) => async dispatch => {
 export const fetchUser = () => async dispatch => {
     dispatch({type: FETCH_USER_AUTHENTICATING})
     const res = await axios.get('/api/logged_user/')
-    // console.log(res.data)
 
-    dispatch({type: FETCH_USER, payload: res.data.user})
+    dispatch({type: FETCH_USER, user: res.data.user, profile: res.data.profile})
 }
 
-//FETCH USER LOCAL
+//FETCH USER LOCAL DEPRECATED:
 export const fetchUserLocal = token => async dispatch => {
     // console.log(token)
     const res = await axios.post('/api/logged_user_local', {token: token})
@@ -296,15 +298,14 @@ export const fetchPlan = id => async dispatch => {
 export const signInUser = (history, {email, password}) => async dispatch => {
     try {
         const res = await axios.post('/api/signin/', {email, password})
-        // localStorage.setItem('token', res.data.token)
         dispatch({
             type: AUTH_USER,
             payload: res.data.token,
-            user: res.data.user
+            user: res.data.user,
+            profile: res.data.profile
         })
         history.push('/dashboard/overview')
     } catch (error) {
-        // console.log(error.response)
         dispatch({type: AUTH_ERROR, payload: 'error'})
     }
 }
@@ -312,13 +313,25 @@ export const signInUser = (history, {email, password}) => async dispatch => {
 export const signUpUser = values => async dispatch => {
     try {
         const res = await axios.post('/api/signup/', values)
-        // localStorage.setItem('token', res.data.token)
         dispatch({type: USER_SIGNUP})
     } catch (error) {
         dispatch({type: AUTH_ERROR, payload: error.response.data.message})
     }
 }
 
+export const evaluateProfile = values => async dispatch => {
+    try {
+        const res = await axios.post('/api/evaluate_profile/', values)
+        dispatch({type: NEW_USER_PROFILE, profile: res.data})
+    } catch (error) {
+        dispatch({
+            type: NEW_USER_PROFILE_ERROR,
+            payload: error.response.data.message
+        })
+    }
+}
+
+//DEPRECATED:
 export const mountToken = token => async dispatch => {
     dispatch({type: MOUNT_TOKEN, payload: token})
 }
@@ -549,7 +562,11 @@ export const foodSelect = foodID => async dispatch => {
 export const fetchProfile = () => async dispatch => {
     let res = await axios.get('/api/user_profile')
 
-    dispatch({type: FETCH_PROFILE, payload: res.data})
+    dispatch({
+        type: FETCH_PROFILE,
+        profile: res.data.profile,
+        user: res.data.user
+    })
 }
 
 export const updateProfile = values => async dispatch => {

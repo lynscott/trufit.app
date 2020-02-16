@@ -21,34 +21,12 @@ import Grid from '@material-ui/core/Grid'
 import LoginForm from './LoginForm'
 import Loadable from 'react-loadable'
 
-import PropTypes from 'prop-types'
-import AppBar from '@material-ui/core/AppBar'
-import Button from '@material-ui/core/Button'
-
-import CssBaseline from '@material-ui/core/CssBaseline'
-import Divider from '@material-ui/core/Divider'
-import Drawer from '@material-ui/core/Drawer'
-import Hidden from '@material-ui/core/Hidden'
-import IconButton from '@material-ui/core/IconButton'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import MenuIcon from '@material-ui/icons/Menu'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import {useDispatch, useSelector} from 'react-redux'
-import FitnessCenterIcon from '@material-ui/icons/FitnessCenter'
-import HomeIcon from '@material-ui/icons/Home'
-import LocalGroceryStoreIcon from '@material-ui/icons/LocalGroceryStore'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import MenuItem from '@material-ui/core/MenuItem'
-import Menu from '@material-ui/core/Menu'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Dialog from '@material-ui/core/Dialog'
-import BugReportIcon from '@material-ui/icons/BugReport'
+
+import SignUpV2 from './SignUpV2'
 
 const drawerWidth = 200
 //TODO: clean out unused styles
@@ -134,14 +112,20 @@ const AuthCheckOrRedirect = ({children}) => {
     // You must handle the authentication race condition on direct routes.
     const currentUser = useSelector(state => state.auth.user)
     const isAuthenticating = useSelector(state => state.auth.isAuthenticating)
-    const userProfile = useSelector(state => state.auth)
+    const userProfile = useSelector(state => state.auth.userProfile)
+    // console.log(userProfile, currentUser, 'AUTH')
 
     if (isAuthenticating) {
         return <Spinner color="dark" />
     }
 
-    if (currentUser && !isAuthenticating) {
+    if (currentUser && userProfile && !isAuthenticating) {
         return children
+    }
+
+    //If no user profile route to setup page
+    if (currentUser && !isAuthenticating && !userProfile) {
+        return <Redirect to="/account_setup" />
     }
 
     return <Redirect to="/" />
@@ -162,11 +146,34 @@ const renderAdmin = () => {
     return <Admin />
 }
 
+// A wrapper for <Route> that redirects to the login
+// screen if you're not yet authenticated.
+const PrivateRoute = ({children, ...rest}) => {
+    const userProfile = useSelector(state => state.auth.userProfile)
+    return (
+        <Route
+            {...rest}
+            render={({location}) =>
+                !userProfile ? (
+                    children
+                ) : (
+                    <Redirect
+                        to={{
+                            pathname: '/',
+                            state: {from: location}
+                        }}
+                    />
+                )
+            }
+        />
+    )
+}
+
 const AppRoutes = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(actions.fetchUser())
+        // dispatch(actions.fetchUser())
         dispatch(actions.fetchProfile())
     }, [])
 
@@ -204,9 +211,10 @@ const AppRoutes = () => {
                                     exact
                                     path="/dashboard/training"
                                     render={() => (
-                                        <AuthCheckOrRedirect
-                                            children={<TrainingDash />}
-                                        />
+                                        <Redirect to="/dashboard/overview" />
+                                        // <AuthCheckOrRedirect
+                                        //     children={<TrainingDash />}
+                                        // />
                                     )}
                                 />
 
@@ -229,6 +237,10 @@ const AppRoutes = () => {
                                         />
                                     )}
                                 />
+
+                                <PrivateRoute exact path="/account_setup">
+                                    <SignUpV2 profileMode={true} />
+                                </PrivateRoute>
 
                                 <Route
                                     exact

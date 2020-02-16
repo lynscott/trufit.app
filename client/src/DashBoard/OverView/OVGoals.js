@@ -73,19 +73,23 @@ import {makeStyles} from '@material-ui/core/styles'
 import {useDispatch, useSelector} from 'react-redux'
 import CardComponent from './OVCard'
 
-//TODO: Move to const folder
-const WL =
-    'Focus primarily on weight loss, which will reduce muscle as well as fat.'
-const WG =
-    'Focus on gaining lean muscle mass. Body fat increases may be accumulated in the process but we will work to keep them minimal.'
-const BR =
-    'Body recomposition focuses on decreasing body fat while simultaneously increasing muscle mass.'
-const MA = 'Maintenance'
-
-//TODO: Add training tracker and workout viewer
 const OVGoals = () => {
+    const profile = useSelector(state => state.auth.userProfile)
+    const [shouldCheckIn, setCheckIn] = useState(false)
+    const [difference, setDiff] = useState(0)
+    const [goal, setGoal] = useState('')
+    const [TBW, setTBW] = useState('')
+
+    useEffect(() => {
+        setTBW(profile.tbw)
+        if (profile.goal === 0) setGoal('Weight Loss')
+        else setGoal('Weight Gain')
+    }, profile)
     return (
-        <CardComponent headline="Goal" subheader="Date/Affirmation">
+        <CardComponent
+            headline={'Goal: ' + TBW + 'lbs'}
+            subheader={goal + ' - Day 30'}
+        >
             TODO
         </CardComponent>
     )

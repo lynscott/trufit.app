@@ -21,6 +21,8 @@ const userProfileSchema = new Schema(
         currentWeight: Number,
         neat: Number,
         priorExp: Number,
+        hoursActive: Number,
+        goal: Number,
 
         activeTrainingPlan: {type: Schema.ObjectId, ref: "Plans"},
         activeNutritionPlan: {type: Schema.ObjectId, ref: "NutritionPlan"},

@@ -190,6 +190,7 @@ const OVNutrition = () => {
     const renderHeader = () => {
         if (done) return 'All meals completed for today!'
         else if (init) return ''
+        else if (userMeals.length < 1) return 'Nutrition Stats'
         else if (!nextMeal) return <ColorLinearProgress />
         else return 'Next Meal: ' + nextMeal.meal.index
     }
@@ -204,7 +205,7 @@ const OVNutrition = () => {
     const renderShowMeal = () => {
         if (done) return 'Great Job!'
         //TODO: Add something here like a stat on adherence
-        else if (!nextMeal) return 'Create A Meal Plan'
+        else if (!nextMeal) return 'Create A Meal Plan To Get Started'
         else
             return (
                 <>
@@ -240,7 +241,7 @@ const OVNutrition = () => {
                 </>
             )
     }
-    console.log(todaysLog, userMeals)
+    // console.log(todaysLog, userMeals, nutritionPlans, userMeals)
 
     React.useEffect(() => {
         dispatch(actions.fetchNutritionPlans())

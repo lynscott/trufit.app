@@ -94,11 +94,16 @@ const WeightCheckIn = () => {
 
 const WeightGraph = () => {
     const profile = useSelector(state => state.auth.userProfile)
+    const minDate = new Date()
+    minDate.setDate(1)
+    minDate.setMonth(1)
 
     //Weight arr formatted for max and min values by 10
-    const weightArr = profile.weighIns.map(
-        item => Math.round(0.1 * parseInt(item.weight, 10)) / 0.1
-    )
+    const weightArr = profile
+        ? profile.weighIns.map(
+              item => Math.round(0.1 * parseInt(item.weight, 10)) / 0.1
+          )
+        : []
 
     return (
         <Line
@@ -137,14 +142,18 @@ const WeightGraph = () => {
                         pointHoverBorderWidth: 1,
                         pointRadius: 1,
                         pointHitRadius: 10,
-                        data: profile.weighIns.map(d => {
-                            return d
-                                ? {
-                                      y: d.weight,
-                                      x: moment(d.date).format('M-D-YY, h:mm a')
-                                  }
-                                : []
-                        })
+                        data: profile
+                            ? profile.weighIns.map(d => {
+                                  return d
+                                      ? {
+                                            y: d.weight,
+                                            x: moment(d.date).format(
+                                                'M-D-YY, h:mm a'
+                                            )
+                                        }
+                                      : []
+                              })
+                            : []
                     }
                 ]
             }}
@@ -180,12 +189,13 @@ const WeightGraph = () => {
                             ticks: {
                                 fontColor: 'black',
                                 fontSize: 10,
-                                source: 'auto'
+                                source: 'auto',
+                                min: minDate
                             },
                             type: 'time',
                             time: {
                                 unit: 'month',
-                                min: new Date('1/1/2019'),
+
                                 unitStepSize: 3,
                                 displayFormats: {
                                     quarter: 'MMM YY'
@@ -204,38 +214,42 @@ const WeightStats = () => {
     const [shouldCheckIn, setCheckIn] = useState(false)
     const [difference, setDiff] = useState(0)
     const [arrowChoice, setArrow] = useState('')
+    const [TBW, setTBW] = useState('')
     const classes = useStyles()
-    console.log(profile)
-    let w1 = 0
-    let w2 = 0
 
     useEffect(() => {
-        if (profile?.weighIns.length > 2) {
-            w1 = profile.weighIns[profile.weighIns.length - 1].weight
-            w2 = profile.weighIns[profile.weighIns.length - 2].weight
-            setArrow(Math.sign(w1 - w2) === 1 ? '+ ' : '')
-            const recent = moment(
-                profile.weighIns[profile.weighIns.length - 1].date
-            )
-            setDiff(w1 - w2)
-            console.log(arrowChoice)
-            const next = recent.add(1, 'w')
-            if (moment().isAfter(next)) setCheckIn(true)
+        if (profile) {
+            setTBW(profile.tbw)
+
+            if (profile?.weighIns.length > 1) {
+                let recent1 = profile.weighIns[profile.weighIns.length - 1]
+                let recent2 = profile.weighIns[profile.weighIns.length - 2]
+
+                setArrow(Math.sign(recent1 - recent2) === 1 ? '+ ' : '')
+                setDiff(recent1.weight - recent2.weight)
+
+                let next = moment(recent1.date).add(1, 'w')
+                if (moment().isAfter(next)) setCheckIn(true)
+            } else if (profile?.weighIns.length === 1) {
+                let recent = moment(profile.weighIns[0].date)
+                let next = recent.add(1, 'w')
+                if (moment().isAfter(next)) setCheckIn(true)
+            } else if (profile.weighIns.length === 0) setCheckIn(true)
         }
     }, [profile])
 
     const headline = (
         <Badge color="primary" variant="dot" invisible={!shouldCheckIn}>
-            <Typography variant="h5">Weight Stats</Typography>
+            {difference !== 0
+                ? arrowChoice + difference.toString()
+                : 'No Change'}
         </Badge>
     )
 
     return (
         <CardComponent
             headline={headline}
-            subheader={
-                arrowChoice + difference.toString() + 'lbs from last week'
-            }
+            subheader={'From Last Check-In'} //{`Target Body Weight: ${TBW}lbs`}
         >
             {shouldCheckIn ? <WeightCheckIn /> : null}
             <WeightGraph />

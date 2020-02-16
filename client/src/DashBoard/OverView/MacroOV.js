@@ -152,12 +152,21 @@ export default function MacroCard() {
     const [expanded, setExpanded] = useState(false)
     const [todaysCalories, setCals] = useState(0)
     const [index, setValue] = useState(0)
-    const [profCalories, setPC] = useState(0)
+
+    const [calGoal, setCalGoal] = useState(0)
+    const [fatMacro, setFatMacro] = useState(0)
+    const [carbMacro, setCarbMacro] = useState(0)
+    const [proteinMacro, setProteinMacro] = useState(0)
+
     const [goal, setGoal] = useState(0)
     const [nutriCals, setNC] = useState(0)
     const userProfile = useSelector(state => state.auth.userProfile)
+    console.log(userProfile, 'UP')
 
-    const macroSelector = val => val.baseSomaType.macro
+    const PROTEIN = 0.9
+    const FAT = 0.6
+
+    // const macroSelector = val => val.baseSomaType.macro
 
     const handleNext = () => {
         setValue(index + 1)
@@ -177,15 +186,11 @@ export default function MacroCard() {
     const macroPieChart = (
         <Pie
             data={{
-                labels: ['Carbs', 'Protein', 'Fat'],
+                labels: ['Carbs(g)', 'Protein(g)', 'Fat(g)'],
                 datasets: [
                     {
                         data: userProfile
-                            ? [
-                                  macroSelector(userProfile).carb,
-                                  macroSelector(userProfile).protein,
-                                  macroSelector(userProfile).fat
-                              ]
+                            ? [carbMacro, proteinMacro, fatMacro]
                             : [0, 0, 0],
                         backgroundColor: ['#3acbe8', '#3ae89c', '#FFCE56'],
                         hoverBackgroundColor: ['#FF6384', '#36A2EB', '#e89c3a']
@@ -202,9 +207,15 @@ export default function MacroCard() {
 
     useEffect(() => {
         if (userProfile) {
-            setPC(userProfile.calories)
-            setGoal(userProfile.currentGoal.value)
-            setNC(userProfile.nutritionCalories)
+            //If no custom macros are set, use recommended values
+            if (!userProfile.macros) {
+                setCalGoal(parseInt(userProfile.calorieGoal))
+                setFatMacro(userProfile.tbw * FAT)
+                setProteinMacro(userProfile.tbw * PROTEIN)
+                setCarbMacro((calGoal - proteinMacro * 4 - fatMacro * 9) / 4)
+            }
+            // setGoal(userProfile.currentGoal.value)
+            // setNC(userProfile.nutritionCalories)
         }
     }, [userProfile])
 
@@ -230,9 +241,10 @@ export default function MacroCard() {
 
     return (
         <CardComponent
-            headline={'Macronutrients'}
+            headline={todaysCalories + 'cals logged'}
             subheader={
-                todaysCalories + '/' + (parseInt(profCalories) + goal) + 'cal'
+                'Daily Intake Goal: ' + calGoal + 'cals'
+                // todaysCalories + '/' + (parseInt(calGoal) + goal)
             }
         >
             <SwipeableViews index={index} onChangeIndex={handleChangeIndex}>
@@ -246,7 +258,7 @@ export default function MacroCard() {
                 <>
                     <Typography paragraph>Caloric Stats:</Typography>
                     <BarChart
-                        planned={parseInt(profCalories)}
+                        planned={parseInt(calGoal)}
                         recommended={nutriCals}
                         todaysIntake={todaysCalories}
                     />

@@ -24,11 +24,13 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions'
 
+import Skeleton from '@material-ui/lab/Skeleton'
 import {tableIcons} from '../../constants/TableIcons'
 
 const useStyles = makeStyles(theme => ({
     textCenter: {
         textAlign: 'center',
+        justifyContent: 'center',
         marginTop: 20
     },
     fab: {
@@ -58,6 +60,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: 'lightgrey',
         padding: 0
     },
+    newPlan: {
+        padding: theme.spacing(3, 2),
+        width: '100%'
+    },
     expanded: {
         backgroundColor: 'lightgrey'
     }
@@ -73,7 +79,7 @@ const CreatePlan = () => {
     const [name, setName] = useState('')
 
     return (
-        <Grid className={classes.textCenter} item xs={12}>
+        <Grid className={classes.textCenter} container item xs={12}>
             <Fab
                 variant="extended"
                 aria-label="add meal"
@@ -84,7 +90,7 @@ const CreatePlan = () => {
             </Fab>
             <Slide direction="up" in={open} mountOnEnter unmountOnExit>
                 <Grid className={classes.textCenter} item md={4} xs={12}>
-                    <Paper>
+                    <Paper className={classes.newPlan}>
                         <Typography variant="h6" component="h4">
                             Lets give this plan a name.
                         </Typography>
@@ -175,17 +181,34 @@ const PlanView = () => {
     })
     console.log(plans)
     return (
-        <Grid container>
+        <Grid
+            style={{justifyContent: 'center', textAlign: 'center'}}
+            item
+            container
+        >
             <Grid item xs={12}>
-                <List
-                    component="nav"
-                    className={classes.meals}
-                    aria-label="meal list"
-                >
-                    {plans.map(p => (
-                        <DetailTable data={p} />
-                    ))}
-                </List>
+                {plans.length > 0 ? (
+                    <List
+                        component="nav"
+                        className={classes.meals}
+                        aria-label="meal list"
+                    >
+                        {plans.map(p => (
+                            <DetailTable data={p} />
+                        ))}
+                    </List>
+                ) : (
+                    <div>
+                        <Skeleton variant="rect" width={'100%'} height={50} />
+                        <br />
+                        <Skeleton variant="text" width={'100%'} height={50} />
+                        <br />
+                        <Skeleton variant="rect" width={'100%'} height={50} />
+                        <Typography variant="subtitle2">
+                            No nutrition plans created yet. Lets make some!
+                        </Typography>
+                    </div>
+                )}
             </Grid>
             <CreatePlan />
         </Grid>

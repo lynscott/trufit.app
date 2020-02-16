@@ -11,7 +11,6 @@ import {
 import PropTypes from 'prop-types'
 import AppBar from '@material-ui/core/AppBar'
 import LoginForm from './LoginForm'
-import SignUpForm from './SignUpForm'
 import Button from '@material-ui/core/Button'
 import * as actions from '../actions'
 import Grid from '@material-ui/core/Grid'
@@ -96,8 +95,8 @@ const UserMenu = () => {
     const open = Boolean(anchorEl)
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.auth.user)
+    const history = useHistory()
     const [signUp, setSignUp] = useState(false)
-    console.log(currentUser)
 
     const loginDialog = (
         <Dialog
@@ -120,6 +119,11 @@ const UserMenu = () => {
     }
 
     const handleClose = () => {
+        setAnchorEl(null)
+    }
+
+    const handleDash = () => {
+        history.push('/dashboard')
         setAnchorEl(null)
     }
 
@@ -150,7 +154,7 @@ const UserMenu = () => {
                 onClose={handleClose}
             >
                 <MenuItem onClick={handleSignOut}>Logout</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={handleDash}>My Dashboard</MenuItem>
             </Menu>
         </div>
     ) : (
@@ -195,7 +199,7 @@ function NavMUI(props) {
     const iconPack = {
         Overview: <HomeIcon />,
         Nutrition: <LocalGroceryStoreIcon />,
-        Training: <FitnessCenterIcon />
+        Workout: <FitnessCenterIcon />
     }
 
     const handleDrawerToggle = () => {
@@ -228,22 +232,33 @@ function NavMUI(props) {
         <div>
             <Divider />
             <List>
-                {['Overview', 'Nutrition', 'Training'].map((text, index) => (
-                    <NavLink
-                        activeStyle={{
-                            fontWeight: 'bold',
-                            color: 'red'
-                        }}
-                        key={text}
-                        style={{textDecoration: 'none', color: 'white'}}
-                        to={`/dashboard/${text.toLowerCase()}`}
-                    >
-                        <ListItem button onClick={handleDrawerToggle}>
+                {['Overview', 'Nutrition', 'Workout'].map((text, index) =>
+                    text === 'Workout' ? (
+                        <ListItem
+                            disabled={true}
+                            button
+                            onClick={handleDrawerToggle}
+                        >
                             <ListItemIcon>{iconPack[text]}</ListItemIcon>
                             <ListItemText primary={text} />
                         </ListItem>
-                    </NavLink>
-                ))}
+                    ) : (
+                        <NavLink
+                            activeStyle={{
+                                fontWeight: 'bold',
+                                color: 'red'
+                            }}
+                            key={text}
+                            style={{textDecoration: 'none', color: 'white'}}
+                            to={`/dashboard/${text.toLowerCase()}`}
+                        >
+                            <ListItem button onClick={handleDrawerToggle}>
+                                <ListItemIcon>{iconPack[text]}</ListItemIcon>
+                                <ListItemText primary={text} />
+                            </ListItem>
+                        </NavLink>
+                    )
+                )}
             </List>
             <Divider />
             <List>

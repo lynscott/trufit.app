@@ -17,8 +17,6 @@ import OVGoals from './OVGoals'
 import Grid from '@material-ui/core/Grid'
 
 const OverView = () => {
-    const dispatch = useDispatch()
-
     return (
         <Grid justify="center" container>
             <Typography style={{width: '100%', padding: '16px'}} variant="h4">
@@ -27,7 +25,7 @@ const OverView = () => {
             <MacroCard />
             <WeightStats />
             <OVNutrition />
-            <NextWorkout />
+            {/* <NextWorkout /> */}
             <OVGoals />
         </Grid>
     )

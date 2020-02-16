@@ -36,6 +36,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import red from '@material-ui/core/colors/red'
 import blue from '@material-ui/core/colors/blue'
 import FormDialog from './MealItems'
+import Skeleton from '@material-ui/lab/Skeleton'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -147,7 +148,7 @@ const NewMeal = () => {
     }
 
     return (
-        <Grid justify="center" container>
+        <Grid justify="center" item container>
             <Slide direction="down" in={true} mountOnEnter unmountOnExit>
                 <Grid className={classes.textCenter} item xs={12}>
                     <Fab
@@ -166,7 +167,7 @@ const NewMeal = () => {
                         <Typography variant="h6" component="h4">
                             Lets give this meal a name.
                         </Typography>
-                        <Typography variant="subtitle" component="p">
+                        <Typography variant="subtitle2" component="p">
                             This is for your personal reference.
                         </Typography>
                         <TextField
@@ -364,7 +365,7 @@ const MealList = () => {
     const userMeals = useSelector(state => state.nutrition.userMeals)
 
     const [meals, setMeals] = useState([])
-    console.log(userMeals)
+    // console.log(userMeals)
 
     useEffect(() => {
         dispatch(fetchMeals())
@@ -372,11 +373,22 @@ const MealList = () => {
     }, [])
 
     return (
-        <Grid item className={classes.alignDialog} container xs={12}>
-            <Grid xs={12}>
-                {userMeals.map((m, i) => (
-                    <MealPanel key={i} m={m} i={i} />
-                ))}
+        <Grid item container className={classes.alignDialog} container xs={12}>
+            <Grid item xs={12}>
+                {userMeals.length > 0 ? (
+                    userMeals.map((m, i) => <MealPanel key={i} m={m} i={i} />)
+                ) : (
+                    <>
+                        <Skeleton variant="rect" width={'100%'} height={30} />
+                        <br />
+                        <Skeleton variant="rect" width={'100%'} height={30} />
+                        <br />
+                        <Skeleton variant="rect" width={'100%'} height={30} />
+                        <Typography variant="subtitle2">
+                            No meals created yet. Lets make some!
+                        </Typography>
+                    </>
+                )}
             </Grid>
             <NewMeal />
         </Grid>

@@ -454,47 +454,42 @@ app.get(
     })
 )
 
+//TODO: Refactor these two calls, should only need one
 app.get("/api/logged_user", (req, res) => {
-    if (req.user) {
-        req.user.password = ""
-        res.send({user: req.user})
-    } else {
-        res.send({user: null})
-    }
+    if (req.user)
+        UserProfile.findOne({_user: req.user.id}, (err, profile) => {
+            if (err) {
+                // console.log(err)
+                return res.send({profile: null})
+            }
+
+            if (profile) {
+                req.user.password = ""
+                return res.send({profile, user: req.user})
+            } else {
+                return res.send({profile: null})
+            }
+        })
+    else return res.send({profile: null, user: null})
 })
-
-// app.post('/api/logged_user_local', async (req, res) => {
-//   // console.log(req.body.token)
-//   let decoded = jwt.decode(req.body.token, keys.secret)
-//   // console.log(process.env.NODE_ENV, 'ENV')
-//   User.findById(decoded.sub, (err, user) => {
-//     if (err) {
-//       return err
-//     }
-
-//     if (user) {
-//       user.password = ''
-//       return res.send({ user: user })
-//     } else {
-//       return res.send({ user: null })
-//     }
-//   })
-// })
 
 app.get("/api/user_profile", async (req, res, next) => {
     requireLogin(req, res, next)
-    UserProfile.findOne({_user: req.user.id}, (err, profile) => {
-        if (err) {
-            return err
-        }
+    if (req.user)
+        UserProfile.findOne({_user: req.user.id}, (err, profile) => {
+            if (err) {
+                // console.log(err)
+                return res.send({profile: null})
+            }
 
-        if (profile) {
-            // user.password = ''
-            return res.send({profile: profile})
-        } else {
-            return res.send({profile: null})
-        }
-    })
+            if (profile) {
+                req.user.password = ""
+                return res.send({profile, user: req.user})
+            } else {
+                return res.send({profile: null, user: null})
+            }
+        })
+    else return res.send({profile: null, user: null})
 })
 
 app.get("/api/logout", (req, res) => {
@@ -561,11 +556,12 @@ app.post(
     "/api/signin",
     passport.authenticate("local", {session: true}),
     async (req, res, next) => {
-        // console.log('inside logg')
         //Remove password before sending user
 
         req.user.password = ""
-        res.send({token: tokenForUser(req.user), user: req.user})
+        const profile = await models.UserProfile.findOne({_user: req.user.id})
+        // console.log(profile)
+        res.send({token: tokenForUser(req.user), user: req.user, profile})
     }
 )
 
@@ -871,39 +867,105 @@ app.post("/api/update_food_item", async (req, res, next) => {
     })
 })
 
-const expectedKeys = [
-    "email",
-    "name",
-    "confirm_password",
-    "hours_active",
-    "prior_exp",
-    "current_weight",
-    "tbw",
-    "goal",
-    "neat"
-]
-app.post("/api/signup", async (req, res, next) => {
+const msg = (req, email) => ({
+    to: email,
+    from: "no-reply@trufit.co",
+    subject: "Welcome to TruFit!",
+    text: "Welcome",
+    html: welcomeTemplate(req)
+})
+
+const alert = (req, name) => ({
+    to: "lscott@trufit.com",
+    from: "no-reply@trufit.co",
+    subject: "A New User Has Signed Up!",
+    text: name,
+    html: emailTemplate(req)
+})
+
+app.post("/api/evaluate_profile", async (req, res, next) => {
+    //TODO: make this a custom middle ware
+    const requiredKeys = [
+        "hours_active",
+        "prior_exp",
+        "current_weight",
+        "tbw",
+        "goal",
+        "neat"
+    ]
+
     try {
-        expectedKeys.map(key => {
-            if (!req.body[key] || req.body[key === ""]) {
-                throw new Error("Error:" + [key] + " required")
+        requiredKeys.map(key => {
+            if (!(key in req.body) || req.body[key] === " ") {
+                throw new Error("Error: " + [key] + " required")
             }
         })
     } catch (error) {
         return res.status(500).send(error)
     }
 
-    const email = req.body.email
-    const name = req.body.name
-    const password = req.body.confirm_password
-    const gender = req.body?.gender
     const goal = req.body.goal
-    const hoursActive = req.body.hours_active
+    const hoursActive = parseInt(req.body.hours_active)
     const currentWeight = parseInt(req.body.current_weight)
     const tbw = parseInt(req.body.tbw)
     const neat = req.body.neat
     const priorExp = parseInt(req.body.prior_exp)
-    const calorieGoal = tbw * (neat + hoursActive)
+    const calorieGoal = (neat + hoursActive) * tbw
+
+    const profile = new models.UserProfile(
+        {
+            _user: req.user.id,
+            currentWeight,
+            goal,
+            hoursActive,
+            tbw,
+            neat,
+            priorExp,
+            calorieGoal
+        },
+        (err, profile) => {
+            if (err) return res.status(500).send(err)
+        }
+    )
+    profile.save()
+    return res.status(200).send(profile)
+})
+
+app.post("/api/signup", async (req, res, next) => {
+    const requiredKeys = [
+        "email",
+        "name",
+        "confirm_password",
+        "hours_active",
+        "prior_exp",
+        "current_weight",
+        "tbw",
+        "goal",
+        "neat"
+    ]
+
+    try {
+        requiredKeys.map(key => {
+            if (!(key in req.body) || req.body[key] === " ") {
+                throw new Error("Error: " + [key] + " required")
+            }
+        })
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+
+    // Account and profile constants
+    const email = req.body.email
+    const name = req.body.name
+    const password = req.body.confirm_password
+    const gender = "gender" in req.body ? req.body.gender : null
+    const goal = req.body.goal
+    const hoursActive = parseInt(req.body.hours_active)
+    const currentWeight = parseInt(req.body.current_weight)
+    const tbw = parseInt(req.body.tbw)
+    const neat = req.body.neat
+    const priorExp = parseInt(req.body.prior_exp)
+    const calorieGoal = (neat + hoursActive) * tbw
 
     // const findBMR = () => {
     //     let inToCm = height * 2.54 //190.54
@@ -917,7 +979,8 @@ app.post("/api/signup", async (req, res, next) => {
     //     }
     // }
 
-    await User.findOne({email: email}, (err, existingUser) => {
+    //Check if user exists via email
+    await User.findOne({email: email}, async (err, existingUser) => {
         if (err) {
             return next(err)
         }
@@ -929,62 +992,42 @@ app.post("/api/signup", async (req, res, next) => {
             })
         }
 
-        // Instantiate user's BMR
-        const userBMR = findBMR()
+        //Create new user model
+        models.User.create(
+            {
+                email,
+                password,
+                currentWeight,
+                name,
+                startDate: new Date(),
+                gender
+            },
+            (err, user) => {
+                if (err) return next(err)
 
-        const user = new User({
-            email,
-            password,
-            currentWeight,
-            name,
-            startDate: new Date()
-        })
-
-        if (gender) user.gender = gender
-
-        let msg = {
-            to: email,
-            from: "no-reply@trufit.co",
-            subject: "Welcome to TruFit!",
-            text: "Welcome",
-            html: welcomeTemplate(req)
-        }
-
-        let alert = {
-            to: "lscott@trufit.com",
-            from: "no-reply@trufit.co",
-            subject: "A New User Has Signed Up!",
-            text: name,
-            html: emailTemplate(req)
-        }
-
-        user.save(async err => {
-            if (err) {
-                return next(err)
+                // Create user profile
+                models.UserProfile.create(
+                    {
+                        _user: user.id,
+                        currentWeight,
+                        goal,
+                        hoursActive,
+                        tbw,
+                        neat,
+                        priorExp,
+                        calorieGoal
+                    },
+                    (err, profile) => {
+                        if (err) return next(err)
+                        console.log(profile, "PROF?")
+                    }
+                )
             }
+        )
 
-            try {
-                var profile = new UserProfile({
-                    _user: user.id,
-                    calories: userBMR * modifier,
-                    currentWeight,
-                    goal,
-                    hoursActive,
-                    tbw,
-                    neat,
-                    priorExp,
-                    calorieGoal
-                })
-            } catch (error) {
-                return res.status(422).send({message: error})
-            }
-
-            await profile.save()
-            //Respond with user token
-            await sgMail.send(msg)
-            await sgMail.send(alert)
-            res.json({token: tokenForUser(user)})
-        })
+        await sgMail.send(msg(req, email))
+        await sgMail.send(alert(req, name))
+        return res.status(200).send("Success")
     })
 })
 
