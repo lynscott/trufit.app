@@ -14,6 +14,9 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import 'react-s-alert/dist/s-alert-default.css'
 import 'react-s-alert/dist/s-alert-css-effects/scale.css'
 import './App2.scss'
+import PoseNet from './HIITLive/PoseNet.js'
+import WorkoutScreen from './HIITLive/WorkoutViewer'
+import TopScores from './HIITLive/TopScoreTable'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 
@@ -158,9 +161,13 @@ class App extends Component {
                     className="MainButton"
                     onClick={() => this.signup()}
                     color="info"
+                    disabled={
+                        process.env.NODE_ENV === 'production' ? true : false
+                    }
                 >
-                    Sign Up For Our Public Beta, It's Free.
+                    Sign Up For Our Public Beta, It's Free. (Coming Soon)
                 </Button>
+
                 <Modal isOpen={this.state.signup} toggle={() => this.signup()}>
                     <ModalHeader toggle={() => this.signup()}>
                         {/* Request Beta Access{' '} */}
@@ -266,6 +273,7 @@ class App extends Component {
     render() {
         return (
             <div className="container-fluid bg-dark">
+                <WorkoutScreen />
                 <LogoBtnBlock formWithModal={this.formWithModal} />
                 <div className="row title-head" id="header">
                     <Particles
@@ -357,6 +365,7 @@ class App extends Component {
                         </Fade>
                     </div> */}
                 </div>
+                <TopScores />
 
                 {this.renderHomeBlocks()}
 

@@ -30,6 +30,7 @@
     "express": "^4.17.1",
     "express-http-to-https": "^1.1.4",
     "jwt-simple": "^0.5.6",
+    "moment": "^2.24.0",
     "mongoose": "^5.7.13",
     "morgan": "^1.9.1",
     "node-fetch": "^2.6.0",

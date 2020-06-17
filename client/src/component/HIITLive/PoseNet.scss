@@ -2,7 +2,7 @@
     margin: 0 auto;
     margin-left: auto;
     margin-right: auto;
-    padding: 6px;
+    // padding: 6px;
   }
   
   #videoNoShow {
@@ -18,13 +18,13 @@
   }
 
   .embed-responsive-21by9::before {
-      display: none;
+      display: block;
   }
 
-  .konvajs-content{
-    // width: 100% !important;
+  // .konvajs-content{
+  //   width: 100% !important;
     
-    canvas{
-      // width: 100% !important;
-    }
-  }
+  //   canvas{
+  //     width: 100% !important;
+  //   }
+  // }

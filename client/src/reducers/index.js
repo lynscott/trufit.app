@@ -10,6 +10,7 @@ import NutritionReducer from './nutritionReducer'
 import LayoutReducer from './layoutReducer'
 import EmailReducer from './emailReducer'
 import WorkoutReducer from './workoutReducer'
+import ScoreReducer from './topScoresReducer'
 import {reducer as formReducer} from 'redux-form'
 import {connectRouter} from 'connected-react-router'
 
@@ -27,7 +28,8 @@ const rootReducer = history =>
         nutrition: NutritionReducer,
         layout: LayoutReducer,
         emails: EmailReducer,
-        workout: WorkoutReducer
+        workout: WorkoutReducer,
+        scores: ScoreReducer
     })
 
 export default rootReducer

@@ -1,18 +1,23 @@
-const mongoose = require('mongoose');
-mongoose.Promise = require('bluebird')
-mongoose.set('debug', process.env.NODE_ENV ? false : true); //Debug mongoose queries in console
+/** @format */
 
-const { Schema } = mongoose;
+const mongoose = require("mongoose")
+mongoose.Promise = require("bluebird")
+mongoose.set("debug", process.env.NODE_ENV ? false : true) //Debug mongoose queries in console
 
-const betaUsers = new Schema({Email: String,});
+const {Schema} = mongoose
 
-module.exports.BetaUsers = mongoose.model('beta_users', betaUsers);
+const betaUsers = new Schema({Email: String})
 
-module.exports.User = require("./User");
-module.exports.Plans = require("./Plans");
-module.exports.Exercises = require("./Exercises");
-module.exports.UserProfile = require("./UserProfile");
-module.exports.Workouts = require("./Workouts");
-module.exports.Meals = require("./Meals");
-module.exports.NutritionPlan = require("./NutritionPlan");
-module.exports.PlanTemplates = require("./PlanTemplates");
+module.exports.BetaUsers = mongoose.model("beta_users", betaUsers)
+
+module.exports.User = require("./User")
+module.exports.Plans = require("./Plans")
+module.exports.Exercises = require("./Exercises")
+module.exports.UserProfile = require("./UserProfile")
+module.exports.Workouts = require("./Workouts")
+module.exports.Meals = require("./Meals")
+module.exports.NutritionPlan = require("./NutritionPlan")
+module.exports.PlanTemplates = require("./PlanTemplates")
+module.exports.FoodLog = require("./FoodLog")
+module.exports.Scores = require("./Scores")
+// module.exports.PermissionTypes

@@ -230,8 +230,8 @@ const WeightStats = () => {
 
                 let next = moment(recent1.date).add(1, 'w')
                 if (moment().isAfter(next)) setCheckIn(true)
-            } else if (profile?.weighIns.length === 1) {
-                let recent = moment(profile.weighIns[0].date)
+            } else if (profile?.weighIns.length > 10) {
+                let recent = moment(profile.weighIns[0]?.date)
                 let next = recent.add(1, 'w')
                 if (moment().isAfter(next)) setCheckIn(true)
             } else if (profile.weighIns.length === 0) setCheckIn(true)

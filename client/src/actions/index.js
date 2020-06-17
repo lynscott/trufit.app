@@ -46,6 +46,7 @@ export const DELETE_PLAN_SUCCESS = 'DELETE_PLAN_SUCCESS'
 export const MARK_MEAL_COMPLETE = 'MARK_MEAL_COMPLETE'
 export const EDIT_NUTRITION_PLAN = 'EDIT_NUTRITION_PLAN'
 export const EDIT_NUTRITION_PLAN_FAILED = 'EDIT_NUTRITION_PLAN_FAILED'
+export const FOOD_LOGGED_SUCCESSFULLY = 'FOOD_LOGGED_SUCCESSFULLY'
 
 export const SET_SIDEBAR_WIDTH = 'SET_SIDEBAR_WIDTH'
 export const INIT_NEW_USER_TRAINING_PLAN = 'INIT_NEW_USER_TRAINING_PLAN'
@@ -105,16 +106,13 @@ export const foodSearchV2 = (search, route) => async dispatch => {
             ]
         }
 
-        // if ('quantity' in search.food) foodJSON.quantity = search.food.quantity
-
-        // foodJSON.ingredients[0].measureURI = search.food.measure.uri
-
         console.log(search, foodJSON, 'JSON')
         const nutrientData = await axios.post(nutrientURL, foodJSON)
 
         let food = {...nutrientData.data, name: search.food.label}
 
-        axios.post('/api/add_item', {food, id: search.id})
+        if (search.id) axios.post('/api/add_item', {food, id: search.id})
+
         dispatch({type: 'FOOD_SEARCH_SUCCESS', food})
 
         console.log(nutrientData.data, 'DT')
@@ -452,6 +450,11 @@ export const editMeal = (meal, id) => async dispatch => {
     dispatch({type: EDIT_MEAL, payload: res.data})
 }
 
+/**
+ * For logging single or groups of misc food items
+ * Separate from meal logging
+ * @param {*} items
+ */
 export const logMealComplete = updates => async dispatch => {
     const res = await axios.post('/api/log_meal', updates)
 

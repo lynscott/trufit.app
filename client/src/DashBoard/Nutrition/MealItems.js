@@ -214,22 +214,36 @@ const FormDialog = ({status, meal, handleClose, updateMeal}) => {
     }
 
     const handleSearch = event => {
+        // Dispatch a parse request for user input
         dispatch(foodSearchV2(foodSearch, 1))
     }
 
     useEffect(() => {
-        if (nutrientData) {
+        // If nutrient data changes from a successful parse/select
+        // Update the meal item in state
+        if (nutrientData && meal) {
             let clone = meal
             clone.items.push(nutrientData)
             updateMeal(clone)
+
+            // Else send a new food log to be created
+        } else if (!meal && nutrientData) {
+            updateMeal({item: nutrientData, date: new Date()})
         }
     }, [nutrientData])
 
     const handleSelect = () => {
-        dispatch(foodSearchV2({food: foodState, id: meal._id}, nutrient))
-        dispatch(fetchMeals())
+        // Dispatch the nutrient request for parsed search query
+        // User has selected to add this item
+        dispatch(
+            foodSearchV2(
+                {food: foodState, id: meal ? meal._id : null},
+                nutrient
+            )
+        )
+        //If we are in meal mode fetch meals to update
+        if (meal) dispatch(fetchMeals())
         setFoodState(null)
-        // setOpen(false)
     }
 
     const parseState = state => {

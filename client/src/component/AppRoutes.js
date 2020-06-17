@@ -25,6 +25,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import {useDispatch, useSelector} from 'react-redux'
+import GoogleFontLoader from 'react-google-font-loader'
 
 import SignUpV2 from './SignUpV2'
 
@@ -182,6 +183,14 @@ const AppRoutes = () => {
             style={{padding: 0, backgroundColor: 'white'}}
             maxWidth={'xl'}
         >
+            <GoogleFontLoader
+                fonts={[
+                    {
+                        font: 'Orbitron',
+                        weights: [400, 500]
+                    }
+                ]}
+            />
             <BrowserRouter>
                 <NavMUI>
                     <>

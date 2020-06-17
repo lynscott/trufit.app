@@ -26,7 +26,7 @@ export default function(state = initialState, action) {
         case FETCH_MEAL_LOG:
             return {
                 ...state,
-                userLog: action.payload
+                userLog: action.payload.logs || []
             }
         case FOOD_SEARCH:
             return {

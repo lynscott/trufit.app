@@ -235,6 +235,7 @@ function NavMUI(props) {
                 {['Overview', 'Nutrition', 'Workout'].map((text, index) =>
                     text === 'Workout' ? (
                         <ListItem
+                            key={index}
                             disabled={true}
                             button
                             onClick={handleDrawerToggle}

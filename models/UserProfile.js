@@ -7,7 +7,7 @@ const userProfileSchema = new Schema(
     {
         affirmation: {
             type: String,
-            default: ""
+            default: "",
         },
         messages: [Schema.Types.Mixed],
         events: {type: [String], default: []},
@@ -29,9 +29,9 @@ const userProfileSchema = new Schema(
         _user: {type: Schema.Types.ObjectId, ref: "User"},
 
         trainingPlans: [{type: Schema.ObjectId, ref: "Plans"}],
-        foodLogs: [{type: Schema.ObjectId, ref: "FoodLog"}]
+        foodLogs: [{type: Schema.ObjectId, ref: "FoodLog"}],
     },
     {usePushEach: true}
 )
 
-module.exports = mongoose.model("profile", userProfileSchema)
+module.exports = mongoose.model("userprofile", userProfileSchema)

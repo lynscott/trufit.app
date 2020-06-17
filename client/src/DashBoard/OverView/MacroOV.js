@@ -21,6 +21,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import Grid from '@material-ui/core/Grid'
 import moment from 'moment'
 import CardComponent from './OVCard'
+import FormDialog from '../Nutrition/MealItems'
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -48,7 +49,8 @@ const useStyles = makeStyles(theme => ({
             'linear-gradient( to bottom right, rgba(236, 33, 103, 1), rgba(244, 123, 40, 1))'
     },
     logBtn: {
-        backgroundColor: 'rgba(236, 33, 103, 1)'
+        backgroundColor: 'rgba(236, 33, 103, 1)',
+        margin: '10px'
     }
 }))
 
@@ -108,37 +110,71 @@ const BarChart = ({planned, todaysIntake, recommended}) => (
 const TodaysLog = () => {
     const userLog = useSelector(state => state.nutrition.userLog)
     const classes = useStyles()
+    const dispatch = useDispatch()
+    const [searchOpen, setStatus] = useState(false)
 
-    console.log(userLog)
+    const logFood = items => {
+        dispatch(actions.logMealComplete(items))
+    }
+
+    const handleOpenSearch = () => {
+        setStatus(true)
+    }
+
+    const nameSelector = log => {
+        return log.item[0].ingredients[0].parsed[0].food
+    }
+
+    console.log(userLog.length, 'UL', userLog)
 
     if (userLog.length > 0)
         return (
-            <List dense aria-label="meal log">
+            <List dense style={{textAlign: 'center'}} aria-label="meal log">
                 {userLog.map((l, i) => {
-                    let cals = l.items.reduce((a, b) => a.calories + b.calories)
+                    let cals = l.item[0]?.calories
+                    let ts = moment(l.date).format('LT')
                     return (
                         <>
                             <ListItem>
                                 <ListItemText
-                                    primary={'Calories:' + cals}
-                                    // secondary={e.sets + ' x ' + e.reps}
+                                    primary={ts + ' ' + nameSelector(l)}
+                                    secondary={'Calories: ' + cals}
                                 />
                             </ListItem>
                             <Divider />
                         </>
                     )
                 })}
-                <Button className={classes.logBtn}>Log Food</Button>
+                <FormDialog
+                    status={searchOpen}
+                    meal={null}
+                    updateMeal={logFood}
+                    handleClose={() => setStatus(false)}
+                />
+                <Button onClick={handleOpenSearch} className={classes.logBtn}>
+                    Log Food
+                </Button>
             </List>
         )
     else {
         return (
             <Grid justify="center" alignItems="center" container>
+                <FormDialog
+                    status={searchOpen}
+                    meal={null}
+                    updateMeal={logFood}
+                    handleClose={() => setStatus(false)}
+                />
                 <Grid style={{textAlign: 'center'}} item>
                     <Typography variant="subtitle1">
                         No Food Logged For Today.
                     </Typography>
-                    <Button className={classes.logBtn}>Log Food</Button>
+                    <Button
+                        onClick={handleOpenSearch}
+                        className={classes.logBtn}
+                    >
+                        Log Food
+                    </Button>
                 </Grid>
             </Grid>
         )
@@ -161,7 +197,8 @@ export default function MacroCard() {
     const [goal, setGoal] = useState(0)
     const [nutriCals, setNC] = useState(0)
     const userProfile = useSelector(state => state.auth.userProfile)
-    console.log(userProfile, 'UP')
+    const userLog = useSelector(state => state.nutrition.userLog)
+    // console.log(userProfile, 'UP')
 
     const PROTEIN = 0.9
     const FAT = 0.6
@@ -201,8 +238,18 @@ export default function MacroCard() {
     )
 
     useEffect(() => {
+        if (userLog.length > 0) {
+            let cals = userLog.reduce(
+                (a, b) => a.item[0].calories + b.item[0].calories
+            )
+            setCals(cals)
+        }
+    }, [userLog])
+
+    useEffect(() => {
         if (!userProfile) dispatch(actions.fetchProfile())
         if (nutritionPlans.length === 0) dispatch(actions.fetchNutritionPlans())
+        dispatch(actions.fetchMealLogs())
     }, [])
 
     useEffect(() => {
@@ -241,11 +288,15 @@ export default function MacroCard() {
 
     return (
         <CardComponent
-            headline={todaysCalories + 'cals logged'}
-            subheader={
-                'Daily Intake Goal: ' + calGoal + 'cals'
-                // todaysCalories + '/' + (parseInt(calGoal) + goal)
+            headline={
+                <>
+                    <Typography variant="body2">Today's Log</Typography>
+                    <Typography variant="h5">
+                        {todaysCalories + ' calories'}
+                    </Typography>
+                </>
             }
+            subheader={'Daily Intake Goal: ' + calGoal + ' cals'}
         >
             <SwipeableViews index={index} onChangeIndex={handleChangeIndex}>
                 <>

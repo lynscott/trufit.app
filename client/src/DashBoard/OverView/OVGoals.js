@@ -84,7 +84,7 @@ const OVGoals = () => {
         setTBW(profile.tbw)
         if (profile.goal === 0) setGoal('Weight Loss')
         else setGoal('Weight Gain')
-    }, profile)
+    }, [profile])
     return (
         <CardComponent
             headline={'Goal: ' + TBW + 'lbs'}

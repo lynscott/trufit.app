@@ -249,6 +249,7 @@ const OVNutrition = () => {
     }, [])
 
     React.useEffect(() => {
+        //TODO: Refactor this logic for new plan flow
         if (nutritionPlans.length > 0) {
             setLog(
                 nutritionPlans[0].log.filter(
