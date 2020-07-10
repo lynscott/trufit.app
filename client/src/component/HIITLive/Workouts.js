@@ -29,6 +29,7 @@ const go = new UIfx(nextRound, {
     throttleMs: 100
 })
 
+//OLD VERSION
 const WORKOUTS0 = {
     Toe_Taps: {
         name: 'Toe Tap',
@@ -91,6 +92,7 @@ const WORKOUTS = {
     //     },
     //     scoreMultiplier: 1
     // },
+    // TODO: pose with arms up hands together
     // Burpees: {
     //     name: 'Burpees',
     //     keyStates: 4,

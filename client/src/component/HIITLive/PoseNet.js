@@ -246,8 +246,6 @@ export function usePoseNet(workout) {
                         canvasContext.current
                     )
                 }
-
-                // workout.update(keypoints)
             }
         })
     }

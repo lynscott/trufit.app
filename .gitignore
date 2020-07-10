@@ -3,6 +3,6 @@ dev.js
 .history
 .vscode
 package-lock.json
-
+config/dev.js
 planTest.json
 sendgrid.env

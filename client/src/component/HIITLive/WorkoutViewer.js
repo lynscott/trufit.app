@@ -41,6 +41,7 @@ import GoogleFontLoader from 'react-google-font-loader'
 
 import {useWorkout} from './Workouts'
 import {usePoseNet} from './PoseNet'
+import './PoseNet.scss'
 
 import {
     createMuiTheme,
@@ -253,10 +254,9 @@ const Warning = () => {
     )
 }
 
-export default function FullScreenDialog() {
+export default function WorkoutInterface() {
     const classes = useStyles()
     const [open, setOpen] = React.useState(false)
-    // const [workout, setWorkout] = React.useState(null)
     const [sessActive, updateActive] = React.useState(false)
     const [modelLoaded, setMLoaded] = React.useState(false)
     const [anchorEl, setAnchorEl] = React.useState(null)
@@ -285,15 +285,12 @@ export default function FullScreenDialog() {
         }
     ]
 
-    // console.log(workout)
-
     const handleClickOpen = () => {
         setOpen(true)
     }
 
     const handleClose = () => {
         setOpen(false)
-        // setWorkout(null)
     }
 
     const handleSettings = event => {
@@ -411,7 +408,6 @@ export default function FullScreenDialog() {
                                     color="primary"
                                     size={'small'}
                                     onClick={handleNet}
-                                    // className={classes.title}
                                 >
                                     <Hidden mdDown>
                                         {'Workout Generator'}
