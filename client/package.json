@@ -34,7 +34,7 @@
     "ra-data-simple-rest": "^2.9.7",
     "ra-jsonapi-client": "^0.4.11",
     "react": "^16.10.2",
-    "react-admin": "^2.9.7",
+    "react-admin": "^4.7.0",
     "react-beautiful-dnd": "^10.1.1",
     "react-big-calendar": "^0.22.1",
     "react-bootstrap-table-next": "^2.2.0",
